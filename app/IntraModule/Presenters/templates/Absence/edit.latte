@@ -1,0 +1,152 @@
+{block title}
+    {ifset $entity}
+        {_'Editace absence'}
+    {else}
+        {_'Přidání absence'}
+    {/ifset}
+{/block}
+{block description}
+    {ifset $entity}
+        {_'Editace stávací absence'}
+    {else}
+        {_'Přidání nové absence'}
+    {/ifset}
+{/block}
+{block header-icon}<i class="fa fa-user-times icon-gradient bg-happy-itmeo"></i>{/block}
+{block header-actions}
+    <a n:href="Absence:default" class="btn btn-outline-primary">
+        {_'Zpět'}
+    </a>
+{/block}
+{block content}
+{snippetArea absenceForm}
+    {form form}
+        <div class="card mb-2">
+            <div class="card-body">
+                <div class="row">
+                    <div style="" class="col-xs-12 col-sm-12 col-md-6">
+                        <div class="form-row">
+                            <div style="display: none; padding: 0;" class="col-12" id="showForAdmin">
+                                {include bootstrap-input $form, 'user', 12, 'showForAdminHelp'}
+                            </div>
+                            {include bootstrap-input $form, 'reason', 12}
+                            {include bootstrap-input $form, 'description', 12}
+                            <span style="display: none;" id="showForAdmin">
+                                {include bootstrap-input $form, 'addWorked', 12}
+                            </span>
+                        </div>
+                    </div>
+                    <div style="" class="col-xs-12 col-sm-12 col-md-6">
+                        <div class="form-row">
+                            {include bootstrap-input $form, 'dateStart', 6}
+                            {include bootstrap-input $form, 'dateEnd', 6}
+                            {include bootstrap-input $form, 'timeRange', 12}
+                            {include bootstrap-input $form, 'wholeDay', 6}
+                            <div style="padding: 0;" class="col-md-12">
+                                {snippet absenceService}
+                                    {var $form = $control['form']}
+                                    <div class="row" style="display: {if isset($needDelegateService)}block{else}none{/if}; color: #ff0000;">
+                                        <div style="" class="col-xs-12 col-sm-12 col-md-12">
+                                            V tomto termínu máte naplánovanou službu!
+                                        </div>
+                                    </div>
+                                    {if isset($needDelegateService)}
+                                        <input name="needDelegateService" type="hidden" value="1">
+                                    {/if}
+                                    <div style="display: {if isset($needDelegateService)}block{else}none{/if}; padding: 0;" class="col-12" id="showForAdmin">
+                                        {include bootstrap-input $form, 'userDelegate', 12, 'showForAdminHelp'}
+                                    </div>
+                                {/snippet}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <a n:href="Absence:default" class="btn btn-outline-primary">
+                    {_'Zpět'}
+                </a>
+                {if $usrGrp == 1}
+                    <button name="send" type="submit" class="btn btn-primary"><i class="fa fa-floppy-o"/> {_'Uložit'}</button>
+                    {if isset($entity) && $entity->state && $entity->state->id == 2}
+                        <button name="sendApprove" type="submit" class="btn btn-success"><i class="fa fa-check"/> {_'Schválit'}</button>
+                        <button name="sendReject" type="submit" class="btn btn-danger"><i class="fa fa-times"/> {_'Zamítnout'}</button>
+                    {/if}
+                {/if}
+                <span class="pull-right">
+                    {*if in_array($usrGrp, [1,2,3,5])*}
+                        {if !isset($entity) || (isset($entity) && $entity->state && $entity->state->allowEditTech)}
+                            <button name="sendBack" type="submit" class="btn btn-primary"><i class="fa fa-floppy-o"/> {_'Uložit a zpět'}</button>
+                            <button name="send" type="submit" class="btn btn-primary"><i class="fa fa-floppy-o"/> {_'Uložit'}</button>
+                        {/if}
+                        {if !isset($entity) || (isset($entity) && $entity->state && $entity->state->id == 1)}
+                            <button name="sendToConfirm" type="submit" class="btn btn-success"><i class="fa fa-share"/> {_'Odeslat ke schválení'}</button>
+                        {/if}
+                    {*/if*}
+                </span>
+            </div>
+        </div>
+    {/form}
+{/snippetArea}
+{/block}
+{block scriptsBot}
+    {if $usrGrp == 1}
+        <style>
+            #showForAdmin {
+                display: block !important;
+            }
+        </style>
+    {/if}
+    <style>
+        #showForAdminHelp {
+            padding-right: 5px;
+            padding-left: 5px;
+        }
+    </style>
+    <script>
+        $(document).ready(function() {
+            changeTimeRange();
+        });
+        function changeTimeRange() {
+            if($( "#frm-wholeDay" )[0].checked === true) {
+                $('#frm-timeRange').parent().parent().hide();
+            } else {
+                $('#frm-timeRange').parent().parent().show();
+            }
+        }
+        $(document).on('change', '#frm-wholeDay', function (e) {
+            changeTimeRange();
+        });
+    </script>
+    {if $usrGrp == 2}
+        <script>
+            $(document).ready(function() {
+                $(document).on('change', '#frm-form-dateStart, #frm-dateEnd', function () {
+                    checkServiceOnAbsence();
+                });
+                checkServiceOnAbsence();
+            });
+            function checkServiceOnAbsence() {
+                let dateFrom = null;
+                let dateTo = null;
+                if ($('#frm-form-dateStart').val() != '') {
+                    dateFrom = $('#frm-form-dateStart').val();
+                }
+                if ($('#frm-dateEnd').val() != '') {
+                    dateTo = $('#frm-dateEnd').val();
+                }
+                $.nette.ajax({
+                    method: 'post',
+                    url: {link checkServiceOnAbsence!},
+                    data: {
+                        dateStart: dateFrom,
+                        dateEnd: dateTo,
+                    }
+                });
+            }
+        </script>
+    {/if}
+{/block}

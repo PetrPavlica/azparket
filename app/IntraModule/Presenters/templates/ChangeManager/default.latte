@@ -1,0 +1,12 @@
+{block title}{_'Řízení změn'}{/block}
+{block description}{_'Seznam řízených změn'}{/block}
+{block header-icon}<i class="fa fa-exchange-alt icon-gradient bg-mean-fruit"></i>{/block}
+{block header-actions}
+    <a n:href="ChangeManager:edit" class="btn btn-primary">
+        {_'Nová změna'}
+    </a>
+    {*_'Přehled OP'} - {$processState->name} - {$processState->type->name*}
+{/block}
+{block content}
+    {control table}
+{/block}

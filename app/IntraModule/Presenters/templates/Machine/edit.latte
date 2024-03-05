@@ -1,0 +1,247 @@
+{block title}
+    {ifset $entity}
+        {_'Editace stroje'} {$entity->name} {$entity->regId}
+    {else}
+        {_'Přidání stroje'}
+    {/ifset}
+{/block}
+{block description}
+    {ifset $entity}
+        {_'Editace stávajícího stroje či zařízení'}
+    {else}
+        {_'Přidání nového stroje či zařízení'}
+    {/ifset}
+{/block}
+{block header-icon}<i class="fa fa-car-battery icon-gradient bg-happy-itmeo"></i>{/block}
+{block content}
+
+    <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
+        <li class="nav-item"><a class="nav-link {if empty($openTab) || $openTab == '#home'}show active{/if}" data-toggle="tab" id="tab-1" href="#home" role="tab"><span>Přehled</span></a></li>
+        <li class="nav-item" {if !isset($entity)}title="{_'Je nutné uložit formulář'}" style="cursor:not-allowed"{/if}>
+            <a class="nav-link {if !isset($entity)}disabled{/if} {if $openTab == '#serviceVisits'}show active{/if}" data-toggle="tab" id="tab-3" href="#serviceVisits" role="tab">
+                <span>Servis</span>
+            </a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div id="home" class="tab-pane tabs-animation fade {if empty($openTab) || $openTab == '#home'}show active{/if}">
+            <div n:snippet='owf-form'>
+                {form form}
+                    {*input id*}
+
+                    <div class="card mb-2">
+                        <div class="card-header">
+                            {_'Obecné'}
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                {include bootstrap-input $form, 'name', 9}
+                                {include bootstrap-input $form, 'regId', 3}
+
+
+                                {include bootstrap-input $form, 'type', 9}
+                                {include bootstrap-input $form, 'weight', 3}
+                                {include bootstrap-input $form, 'active', 12}
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+
+                    <div id="accordion4">
+                        <div class="card mb-2">
+                            <div class="card-header">
+                                <a class="card-link" data-toggle="collapse" href="#collapse4">
+                                    <i class="fa fa-plus"></i> {_'Životní cyklus'}
+                                </a>
+                            </div>
+                            <div id="collapse4" class="collapse show" data-parent="#accordion4">
+                                <div class="card-body">
+                                    <div class="form-row">
+                                        {include bootstrap-input $form, 'startDate', 6}
+                                        {include bootstrap-input $form, 'endDate', 6}
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="accordion1">
+                        <div class="card mb-2">
+                            <div class="card-header">
+                                <a class="card-link" data-toggle="collapse" href="#collapse1">
+                                    <i class="fa fa-plus"></i> {_'Doplňující data'}
+                                </a>
+                            </div>
+                            <div id="collapse1" class="collapse" data-parent="#accordion1">
+                                <div class="card-body">
+                                    <div class="form-row">
+                                        {include bootstrap-input $form, 'ph1', 3}
+                                        {include bootstrap-input $form, 'ph2', 3}
+                                        {include bootstrap-input $form, 'ph3', 3}
+                                        {include bootstrap-input $form, 'ph4', 3}
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <a href="{link Machine:default}" class="btn btn-outline-primary">
+                                <span class="fa fa-arrow-left" aria-hidden="true"></span>
+                                Zpět
+                            </a>
+                            <span class="pull-right">
+                                <button name="sendBack" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a zpět</button>
+                                <button name="send" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit</button>
+                                <button name="sendNew" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a nový</button>
+                            </span>
+                        </div>
+                    </div>
+
+                    {*input ajax*}
+                {/form}
+            </div>
+        </div>
+
+        {ifset $entity}
+        <div id="serviceVisits" class="tab-pane tabs-animation fade {if $openTab == '#serviceVisits'}show active{/if}">
+            <div class="card mb-2">
+                <div class="card-header">
+                    {_'Servis'}
+                    <a n:href="ExternServiceVisit:" class="btn btn-link ml-auto">Přejít na návštěvu servisu</a>
+                </div>
+                <div class="card-body" n:snippet="tableServiceVisit">
+                    <table class="table table-bordered table-sm" id="sortable-table" style="table-layout: fixed;">
+                        <thead>
+                        <tr>
+                            <th style="width: 5%">Id</th>
+                            <th style="width: 30%">Název</th>
+                            <th style="width: 15%">Datum</th>
+                            <th style="width: 10%">Výsledek</th>
+                            <th style="width: 35%">Poznámka</th>
+                            <th style="width: 5%">Akce</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {if isset($serviceVisits) && $serviceVisits}
+                            {foreach $serviceVisits as $sv}
+                                <tr data-id="{$sv->id}">
+                                    <td>
+                                        <a n:href="ExternServiceVisit:edit $sv->externServiceVisit->id">{$sv->externServiceVisit->id}</a>
+                                    </td>
+                                    <td>
+                                        <a n:href="ExternServiceVisit:edit $sv->externServiceVisit->id">{$sv->externServiceVisit->name}</a>
+                                    </td>
+                                    <td>
+                                        {$sv->externServiceVisit->visitDate|date:'j. n. Y'}
+                                    </td>
+                                    {if $sv->externServiceVisit->visitDate > (new DateTime('NOW'))}
+                                        <td colspan="2">Servis ještě neproběhl</td>
+                                    {else}
+                                        <td>
+                                            <select name="result" class="form-control selectpicker">
+                                                <option value="" disabled {if !$sv->result}selected{/if}>Nedefinováno</option>
+                                                <option value="1" {if $sv->result == '1'}selected{/if}>Neopraveno</option>
+                                                <option value="2" {if $sv->result == '2'}selected{/if}>Závadné</option>
+                                                <option value="3" {if $sv->result == '3'}selected{/if}>Prolídka v pořádku</option>
+                                                <option value="4" {if $sv->result == '4'}selected{/if}>Opraveno</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <textarea name="resultDesc" rows="1" class="form-control col-12">{$sv->resultDesc}</textarea>
+                                        </td>
+                                    {/if}
+                                    
+                                    <td>
+                                        <span style="cursor: pointer; {if $sv->externServiceVisit->visitDate > (new DateTime('NOW'))}display:none{/if}" class="saveServiceVisit" titile="Odeslat výsledek"><i class="fa fa-save text-info pl-2 pr-3"></i></span>
+                                        <span style="cursor: pointer" class="removeServiceVisit" ><i class="fa fa-trash text-danger"></i></span>
+                                    </td>
+                                </tr>
+                            {/foreach}
+                        {else}
+                            <tr>
+                                <td colspan="6">
+                                    {_'Žádný servis není zadán'}
+                                </td>
+                            </tr>
+                        {/if}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="card" n:if="isset($backExSrvVsID)">
+                <div class="card-body">
+                    <a n:href="ExternServiceVisit:edit id => $backExSrvVsID, 'openTab' => '#machines'" class="btn btn-outline-primary">
+                        <span class="fa fa-arrow-left" aria-hidden="true"></span>
+                        Zpět na úpravu servisu
+                    </a>
+                </div>
+            </div>
+        </div>
+        {/ifset}
+
+    </div>
+
+{/block}
+
+{block scriptsBot}
+
+    <script>
+        $(document).ready(function () {
+            $('#cal-col-picker').val('#' + $('#frm-calendarColor').val()).change();
+        });
+
+        $(document).on('change', "#cal-col-picker", function () {
+            $('#frm-calendarColor').val($(this).val().replace('#','')).change();
+        });
+
+        var url = document.location.toString();
+        if (url.match('#')) {
+            $('.nav-tabs a[href="#' + url.split('#')[1] + '"]').tab('show');
+        }
+    </script>
+
+    {* tabulka Servisu *}
+    <script>
+        $( function() {
+            $(document).on('click', '.saveServiceVisit', function (e) {
+                var id = $(e.currentTarget).closest('tr').data('id');
+                //console.log('savetender ' + id);
+                //console.log('selected: ' + $('tr[data-id="' + id + '"] select[name="result"]').find(":selected").val());
+                $.nette.ajax({
+                    url: {link saveServiceVisit!},
+                    type: 'POST',
+                    data: {
+                        id : id,
+                        result : $('tr[data-id="' + id + '"] select[name="result"]').find(":selected").val(),
+                        resultDesc : $('tr[data-id="' + id + '"] textarea[name="resultDesc"]').val()
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        $( function() {
+            $(document).on('click', '.removeServiceVisit', function (e) {
+                id = $(e.currentTarget).closest('tr').data('id');
+                $.nette.ajax({
+                    url: {link removeServiceVisit!},
+                    type: 'POST',
+                    data: {
+                        id : id
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+    </script>
+{/block}

@@ -1,0 +1,4 @@
+table: "App\\Model\\Database\\Entity\\Translation"
+id: "keyM"
+locale: "lang"
+message: "message"

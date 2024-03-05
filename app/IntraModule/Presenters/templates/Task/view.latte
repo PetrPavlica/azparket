@@ -1,0 +1,314 @@
+{block title}{_'Úkol'}{/block}
+{block description}{_'Náhled úkolu'}{/block}
+{block header-icon}<i class="fa fa-indent icon-gradient bg-mean-fruit"></i>{/block}
+{block header-actions}
+    <a n:href="Task:default" class="btn btn-outline-dark">
+        {_'Nástěnka'}
+    </a>
+    <a n:if="isset($entity) && $entity && (in_array($usrGrp, [1]) || $user->id == $entity->originator->id)" n:href="Task:edit id => $entity->id" class="btn btn-primary">
+        {_'Editace úkolu'}
+    </a>
+{/block}
+
+{block content}
+
+    <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
+        <li class="nav-item"><a class="nav-link {if empty($openTab) || $openTab == '#home'}show active{/if}" data-toggle="tab" id="tab-1" href="#home" role="tab"><span>Úvod</span></a></li>
+        <li class="nav-item"><a class="nav-link {if $openTab == '#docs'}show active{/if}" data-toggle="tab" id="tab-2" href="#docs" role="tab"><span>Dokumenty</span></a></li>
+        <li class="nav-item"><a class="nav-link {if $openTab == '#comm'}show active{/if}" data-toggle="tab" id="tab-3" href="#comm" role="tab"><span>Komentáře</span></a></li>
+        <li class="nav-item"><a class="nav-link {if $openTab == '#changes'}show active{/if}" data-toggle="tab" id="tab-4" href="#changes" role="tab"><span>Přehled změn</span></a></li>
+    </ul>
+
+    <div class="tab-content">
+
+        <div id="home" class="tab-pane tabs-animation fade {if empty($openTab) || $openTab == '#home'}show active{/if}">
+            <div class="card mb-1">
+                <div class="card-header">
+                    Úkol: {$entity->name}
+                </div>
+                <div class="card-body" >
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12 col-xs-12">
+                            <div class="row" n:if="$entity->taskState">
+                                <div class="col-3">Ve stavu:</div>
+                                <div class="col-9 font-weight-bold">{$entity->taskState->name}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-3">Dní ve stavu:</div>
+                                {var $nowDate = Nette\Utils\DateTime::from('now')}
+                                {if $entity->inStateDate}
+                                    {var $diffDate = $nowDate->diff($entity->inStateDate)}
+                                {else}
+                                    {var $diffDate = $nowDate->diff($nowDate)}
+                                {/if}
+                                <div class="col-9 font-weight-bold">{$diffDate->d}&nbsp;dní</div>
+                            </div>
+                            <div class="row" n:if="$entity->assigned">
+                                <div class="col-3">Přiřazeno&nbsp;/&nbsp;řeší:</div>
+                                <div class="col-9 font-weight-bold">{$entity->assigned->name}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12 col-xs-12">
+                            <div class="row">
+                                <div class="col-3">Datum založení:</div>
+                                <div class="col-9 font-weight-bold">{$entity->foundedDate|date:'j. n. Y'}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-3">Datum ukončení:</div>
+                                <div class="col-9 font-weight-bold">{$entity->closeToDate|date:'j. n. Y'}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-3">Je prioritní:</div>
+                                <div class="col-9 font-weight-bold">{if $entity->priority}ANO{else}NE{/if}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header">
+                    Popis
+                </div>
+                <div class="card-body">
+                    {nl2br($entity->description)|noescape}
+                </div>
+            </div>
+        </div>
+
+        <div id="docs" class="tab-pane tabs-animation fade {if $openTab == '#docs'}show active{/if}">
+            <div class="card mb-3">
+                <div class="card-header">
+                    Dokumenty
+                    <span style="cursor: pointer" class="checkTaskDoc btn btn-primary ml-auto" data-toggle="modal" data-target="#docModal" data-id="0">
+                        <i class="fa fa-plus"></i> Přidat dokument
+                    </span>
+                </div>
+                <div class="card-body" n:snippet="docsTable">
+                    <table class="table table-bordered table-sm" id="sortable-table">
+                        <thead>
+                        <tr>
+                            <th style="width: 10%;">Název</th>
+                            <th style="width: 10%;">Popis</th>
+                            <th style="width: 10%;">Přidal</th>
+                            <th style="width: 10%;">Akce</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {if isset($taskDocs) && $taskDocs}
+                            {foreach $taskDocs as $taskDoc}
+                                <tr>
+                                    <td>
+                                        {substr($taskDoc->document, strrpos($taskDoc->document, '/') + 1)}
+                                    </td>
+                                    <td>
+                                        {$taskDoc->description}
+                                    </td>
+                                    <td>
+                                        {if $taskDoc->user}{$taskDoc->user->name}{/if}
+                                    </td>
+                                    <td>
+                                        <a style="cursor: pointer" class="" href="{$basePath}/{$taskDoc->document}" download><i class="fa fa-download text-success pl-2 pr-3"></i></a>
+                                        <span style="cursor: pointer" class="removeTaskDoc" data-id="{$taskDoc->id}"><i class="fa fa-trash text-danger"></i></span>
+                                    </td>
+                                </tr>
+                            {/foreach}
+                        {else}
+                            <tr>
+                                <td colspan="6">
+                                    {_'Žádný dokument není zadán'}
+                                </td>
+                            </tr>
+                        {/if}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="comm" class="tab-pane tabs-animation fade {if $openTab == '#comm'}show active{/if}">
+            <div class="card mb-3">
+                <div class="card-header">
+                    Komentáře
+                    <span style="cursor: pointer" class="checkTaskComm btn btn-primary ml-auto" data-toggle="modal" data-target="#commModal" data-id="0">
+                        <i class="fa fa-plus"></i> Přidat Komentář
+                    </span>
+                </div>
+                <div class="card-body" n:snippet="commTable">
+                    {if isset($taskComm) && $taskComm}
+                        <table class="table table-bordered table-striped table-sm" >
+                            <tbody>
+                            {foreach $taskComm as $comm}
+                                <tr>
+                                    <td rowspan="2" class="text-center">
+                                        <img width="42" class="rounded-circle" src="{$basePath}/assets/images/gravatar-top.png" alt="">
+                                    </td>
+                                    <td class="font-weight-bold">
+                                        {if $comm->user}{$comm->user->name}{/if}
+                                    </td>
+                                    <td>
+                                        {$comm->createdAt|date:'j.n.Y H:i:s'}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        {nl2br($comm->description)|noescape}
+                                    </td>
+                                </tr>
+                            {/foreach}
+                            </tbody>
+                        </table>
+                    {/if}
+                </div>
+            </div>
+        </div>
+
+        <div id="changes" class="tab-pane tabs-animation fade {if $openTab == '#changes'}show active{/if}">
+            <div class="card mb-3">
+                <div class="card-header">
+                    Přehled změn
+                </div>
+                <div class="card-body">
+                    {if isset($entity)}
+                        {if $entity->taskChangeLog && count($entity->taskChangeLog)}
+                            <table class="table table-bordered table-sm" id="sortable-table">
+                                <thead>
+                                    <tr>
+                                        <th class="" style="">Datum</th>
+                                        <th class="" style="">Změnil</th>
+                                        <th class="" style="">Změna</th>
+                                        <th class="" style="">Z</th>
+                                        <th class="" style="">Na</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {foreach $entity->taskChangeLog as $log}
+                                        <tr>
+                                            <td class="" style="">{$log->foundedDate|date:'j.n.Y H:i:s'}</td>
+                                            <td class="" style="">{if $log->user}{$log->user->name}{/if}</td>
+                                            <td class="" style="">{$log->text}</td>
+                                            <td class="" style="word-break: break-word;">{$log->oldText}</td>
+                                            <td class="" style="word-break: break-word;">{$log->newText}</td>
+                                        </tr>
+                                    {/foreach}
+                                </tbody>
+                            </table>
+                        {else}
+                            <label>{_'Nepodařilo se najít žádné změny.'}</label>
+                        {/if}
+                    {else}
+                        <label>{_'Změny lze sledovat, až bude úkol poprvé uložena.'}</label>
+                    {/if}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{/block}
+
+{block scriptsBot}
+    <div n:ifset="$entity" class="modal fade" id="docModal" tabindex="-1" role="dialog" aria-labelledby="docModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+            <div class="modal-content" n:snippet="docModal">
+                {form docModalForm}
+                    <input type="text" style="display: none;" name="task" value="{$entity->id}">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="docModalLabel">Dokument</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <style type="text/css">
+
+                    </style>
+                    <div class="modal-body compact-my-modal">
+                        <div class="form-row">
+                            {include bootstrap-input $form, 'description', 12}
+                            {include bootstrap-input $form, 'document', 12}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Uložit</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Zavřít</button>
+                    </div>
+                {/form}
+            </div>
+        </div>
+    </div>
+
+    <div n:ifset="$entity" class="modal fade" id="commModal" tabindex="-1" role="dialog" aria-labelledby="commModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+            <div class="modal-content" n:snippet="commModal">
+                {form commModalForm}
+                    <input type="text" style="display: none;" name="task" value="{$entity->id}">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="commModalLabel">Komentář</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <style type="text/css">
+
+                    </style>
+                    <div class="modal-body compact-my-modal">
+                        <div class="form-row">
+                            {include bootstrap-input $form, 'description', 12}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Uložit</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Zavřít</button>
+                    </div>
+                {/form}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $( function() {
+            $(document).on('click', '.checkTaskDoc', function (e) {
+                $.nette.ajax({
+                    url: {link checkTaskDoc!},
+                    type: 'POST',
+                    data: {
+                        doc : $(this).attr('data-id')
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        $( function() {
+            $(document).on('click', '.removeTaskDoc', function (e) {
+                $.nette.ajax({
+                    url: {link removeTaskDoc!},
+                    type: 'POST',
+                    data: {
+                        doc : $(this).attr('data-id')
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        $( function() {
+            $(document).on('click', '.checkTaskComm', function (e) {
+                $.nette.ajax({
+                    url: {link checkTaskComm!},
+                    type: 'POST',
+                    data: {
+                        comm : $(this).attr('data-id')
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+    </script>
+
+{/block}

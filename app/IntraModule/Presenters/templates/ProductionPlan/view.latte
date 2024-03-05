@@ -1,0 +1,302 @@
+{block title}{_'Plánování výroby'}{/block}
+{*block description}{_'Přehled výroby pro linku'} {$aaType}{/block}
+{block header-icon}<i class="fa fa-box icon-gradient bg-mean-fruit"></i>{/block*}
+{block header-actions-top}
+
+    <div class="top-week">
+        <a n:href="ProductionPlan:view type => $aaType, day => $previousDay, month => $previousMonth, year => $previousYear">
+            <i class="fa fa-chevron-left"></i>
+        </a>
+        <div class="week-number date-btn">
+            <span>{$day}. {$month}. {$year}</span>
+            <input type="text" id="date" value="{$dateInput}" autocomplete="off" />
+        </div>
+        <a n:href="ProductionPlan:view type => $aaType, day => $nextDay, month => $nextMonth, year => $nextYear">
+            <i class="fa fa-chevron-right"></i>
+        </a>
+    </div>
+
+
+{/block}
+{block content}
+    <div class="col-md-12" style="margin-bottom: 50px;">
+        <div class="row">
+            <div class="col-md-12 tpp5">
+                <div class="row">
+                    <div class="col-md-10 tpp5 tpp5-fgreen">
+                        {_'Denní plán výroby'}
+                    </div>
+                    <div class="col-md-2 tpp5 tpp5-yellow">
+                        {$day}. {$month}. {$year}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3 tpp5 tpp5-fgreen">
+                        {_'LINKA'}
+                    </div>
+                    <div class="col-md-1 tpp5 tpp5-gray">
+                        {$aaType}
+                    </div>
+                    <div class="col-md-4 tpp5 tpp5-white">
+
+                    </div>
+                    <div class="col-md-3 tpp5 tpp5-fgreen">
+                        {_'Plán závěsů pro směnu celkem'}:
+                    </div>
+                    <div class="col-md-1 tpp5 tpp5-yellow" n:snippet="rodsTop">
+                        {$rodsTotal[1]}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-1 tpp5 tpp5-lgreen">
+                        {_'Pořadí'}
+                    </div>
+                    <div class="col-md-2 tpp5 tpp5-lgreen">
+                        {_'Kód dílce'}
+                    </div>
+                    <div class="col-md-4 tpp5 tpp5-lgreen">
+                        {_'Zákazník / číslo dílu'}
+                    </div>
+                    <div class="col-md-1 tpp5 tpp5-lgreen">
+                        {_'Zakázka'}
+                    </div>
+                    <div class="col-md-1 tpp5 tpp5-lgreen">
+                        {_'ks/tyč'}
+                    </div>
+                    <div class="col-md-1 tpp5 tpp5-lgreen">
+                        {_'Počet kusů'}
+                    </div>
+                    <div class="col-md-1 tpp5 tpp5-lgreen">
+                        {_'Navěšeno'}
+                    </div>
+                    <div class="col-md-1 tpp5 tpp5-lgreen">
+                        {_'Odesláno'}
+                    </div>
+                </div>
+                {foreach $floorsA as $floor}
+                    <div class="row">
+                        <div class="col-md-1 tpp6 tpp5-white">
+                            {$floor}
+                        </div>
+                        <div class="col-md-2 tpp6 tpp5-white beforeStyleCol" {ifset $spotsA[$ymd.'_'.$floor]}
+                            {if $spotsA[$ymd.'_'.$floor]['plan']->rodSend}style="" data-styles="{$spotsA[$ymd.'_'.$floor]['beforeStyle']|noescape}" {else}style="{$spotsA[$ymd.'_'.$floor]['beforeStyle']|noescape}" data-styles=""{/if}
+                                {/ifset}>
+                            {ifset $spotsA[$ymd.'_'.$floor]}{$spotsA[$ymd.'_'.$floor]['code']}{/ifset}
+                        </div>
+                        <div class="col-md-4 tpp6 tpp5-white styleCol" {ifset $spotsA[$ymd.'_'.$floor]}
+                            {if $spotsA[$ymd.'_'.$floor]['plan']->rodSend}style="" data-styles="{$spotsA[$ymd.'_'.$floor]['style']|noescape}" {else}style="{$spotsA[$ymd.'_'.$floor]['style']|noescape}" data-styles=""{/if}
+                                {/ifset}>
+                            {ifset $spotsA[$ymd.'_'.$floor]}{$spotsA[$ymd.'_'.$floor]['title']}{/ifset}
+                        </div>
+                        <div class="col-md-1 tpp6 tpp5-white">
+                            {ifset $spotsA[$ymd.'_'.$floor]}{$spotsA[$ymd.'_'.$floor]['order']}{/ifset}
+                        </div>
+                        <div class="col-md-1 tpp6 tpp5-white">
+                            {ifset $spotsA[$ymd.'_'.$floor]}{$spotsA[$ymd.'_'.$floor]['hinges']}{/ifset}
+                        </div>
+                        <div class="col-md-1 tpp6 tpp5-white">
+                            {ifset $spotsA[$ymd.'_'.$floor]}{$spotsA[$ymd.'_'.$floor]['counts']}{/ifset}
+                        </div>
+                        <div id="hang-top-{$floor}" class="col-md-1 tpp6 {if isset($spotsA[$ymd.'_'.$floor]) && $spotsA[$ymd.'_'.$floor]['plan']->rodHang}tpp5-green{else}tpp5-white{/if}">
+                            {ifset $spotsA[$ymd.'_'.$floor]}
+                                <select name="rodHang-{$spotsA[$ymd.'_'.$floor]['plan']->id}" class="rodHangChange tpp5-select" id="rodHang-{$spotsA[$ymd.'_'.$floor]['plan']->id}" data-id="{$spotsA[$ymd.'_'.$floor]['plan']->id}">
+                                    <option value="0" {if !$spotsA[$ymd.'_'.$floor]['plan']->rodHang}selected{/if}>NE</option>
+                                    <option value="1" {if $spotsA[$ymd.'_'.$floor]['plan']->rodHang}selected{/if}>ANO</option>
+                                </select>
+                            {/ifset}
+                        </div>
+                        <div id="send-top-{$floor}" class="col-md-1 tpp6 {if isset($spotsA[$ymd.'_'.$floor]) && $spotsA[$ymd.'_'.$floor]['plan']->rodSend}tpp5-green{else}tpp5-white{/if}">
+                            {ifset $spotsA[$ymd.'_'.$floor]}
+                                <select name="rodSend-{$spotsA[$ymd.'_'.$floor]['plan']->id}" class="rodSendChange tpp5-select" id="rodSend-{$spotsA[$ymd.'_'.$floor]['plan']->id}" data-id="{$spotsA[$ymd.'_'.$floor]['plan']->id}">
+                                    <option value="0" {if !$spotsA[$ymd.'_'.$floor]['plan']->rodSend}selected{/if}>NE</option>
+                                    <option value="1" {if $spotsA[$ymd.'_'.$floor]['plan']->rodSend}selected{/if}>ANO</option>
+                                </select>
+                            {/ifset}
+                        </div>
+                    </div>
+                {/foreach}
+            </div>
+        </div>
+
+        <br>
+
+        <div class="row">
+            <div class="col-md-12 tpp5">
+                <div class="row">
+                    <div class="col-md-10 tpp5 tpp5-fgreen">
+                        {_'Noční plán výroby'}
+                    </div>
+                    <div class="col-md-2 tpp5 tpp5-yellow">
+                        {$day}. {$month}. {$year}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3 tpp5 tpp5-fgreen">
+                        {_'LINKA'}
+                    </div>
+                    <div class="col-md-1 tpp5 tpp5-gray">
+                        {$aaType}
+                    </div>
+                    <div class="col-md-4 tpp5 tpp5-white">
+
+                    </div>
+                    <div class="col-md-3 tpp5 tpp5-fgreen">
+                        {_'Plán závěsů pro směnu celkem'}:
+                    </div>
+                    <div class="col-md-1 tpp5 tpp5-yellow" n:snippet="rodsBot">
+                        {$rodsTotal[2]}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-1 tpp5 tpp5-lgreen">
+                        {_'Pořadí'}
+                    </div>
+                    <div class="col-md-2 tpp5 tpp5-lgreen">
+                        {_'Kód dílce'}
+                    </div>
+                    <div class="col-md-4 tpp5 tpp5-lgreen">
+                        {_'Zákazník / číslo dílu'}
+                    </div>
+                    <div class="col-md-1 tpp5 tpp5-lgreen">
+                        {_'Zakázka'}
+                    </div>
+                    <div class="col-md-1 tpp5 tpp5-lgreen">
+                        {_'ks/tyč'}
+                    </div>
+                    <div class="col-md-1 tpp5 tpp5-lgreen">
+                        {_'Počet kusů'}
+                    </div>
+                    <div class="col-md-1 tpp5 tpp5-lgreen">
+                        {_'Navěšeno'}
+                    </div>
+                    <div class="col-md-1 tpp5 tpp5-lgreen">
+                        {_'Odesláno'}
+                    </div>
+                </div>
+                {foreach $floorsB as $floor}
+                    <div class="row">
+                        <div class="col-md-1 tpp6 tpp5-white">
+                            {$floor}
+                        </div>
+                        <div class="col-md-2 tpp6 tpp5-white beforeStyleCol" {ifset $spotsB[$ymd.'_'.$floor]}
+                            {if $spotsB[$ymd.'_'.$floor]['plan']->rodSend}style="" data-styles="{$spotsB[$ymd.'_'.$floor]['beforeStyle']|noescape}" {else}style="{$spotsB[$ymd.'_'.$floor]['beforeStyle']|noescape}" data-styles=""{/if}
+                                {/ifset}>
+                            {ifset $spotsB[$ymd.'_'.$floor]}{$spotsB[$ymd.'_'.$floor]['code']}{/ifset}
+                        </div>
+                        <div class="col-md-4 tpp6 tpp5-white styleCol" {ifset $spotsB[$ymd.'_'.$floor]}
+                            {if $spotsB[$ymd.'_'.$floor]['plan']->rodSend}style="" data-styles="{$spotsB[$ymd.'_'.$floor]['style']|noescape}" {else}style="{$spotsB[$ymd.'_'.$floor]['style']|noescape}" data-styles=""{/if}
+                                {/ifset}>
+                            {ifset $spotsB[$ymd.'_'.$floor]}{$spotsB[$ymd.'_'.$floor]['title']}{/ifset}
+                        </div>
+                        <div class="col-md-1 tpp6 tpp5-white">
+                            {ifset $spotsB[$ymd.'_'.$floor]}{$spotsB[$ymd.'_'.$floor]['order']}{/ifset}
+                        </div>
+                        <div class="col-md-1 tpp6 tpp5-white">
+                            {ifset $spotsB[$ymd.'_'.$floor]}{$spotsB[$ymd.'_'.$floor]['hinges']}{/ifset}
+                        </div>
+                        <div class="col-md-1 tpp6 tpp5-white">
+                            {ifset $spotsB[$ymd.'_'.$floor]}{$spotsB[$ymd.'_'.$floor]['counts']}{/ifset}
+                        </div>
+                        <div id="hang-bot-{$floor}" class="col-md-1 tpp6 {if isset($spotsB[$ymd.'_'.$floor]) && $spotsB[$ymd.'_'.$floor]['plan']->rodHang}tpp5-green{else}tpp5-white{/if}">
+                            {ifset $spotsB[$ymd.'_'.$floor]}
+                                <select name="rodHang-{$spotsB[$ymd.'_'.$floor]['plan']->id}" class="rodHangChange tpp5-select" id="rodHang-{$spotsB[$ymd.'_'.$floor]['plan']->id}" data-id="{$spotsB[$ymd.'_'.$floor]['plan']->id}">
+                                    <option value="0" {if !$spotsB[$ymd.'_'.$floor]['plan']->rodHang}selected{/if}>NE</option>
+                                    <option value="1" {if $spotsB[$ymd.'_'.$floor]['plan']->rodHang}selected{/if}>ANO</option>
+                                </select>
+                            {/ifset}
+                        </div>
+                        <div id="send-bot-{$floor}" class="col-md-1 tpp6 {if isset($spotsB[$ymd.'_'.$floor]) && $spotsB[$ymd.'_'.$floor]['plan']->rodSend}tpp5-green{else}tpp5-white{/if}">
+                            {ifset $spotsB[$ymd.'_'.$floor]}
+                                <select name="rodSend-{$spotsB[$ymd.'_'.$floor]['plan']->id}" class="rodSendChange tpp5-select" id="rodSend-{$spotsB[$ymd.'_'.$floor]['plan']->id}" data-id="{$spotsB[$ymd.'_'.$floor]['plan']->id}">
+                                    <option value="0" {if !$spotsB[$ymd.'_'.$floor]['plan']->rodSend}selected{/if}>NE</option>
+                                    <option value="1" {if $spotsB[$ymd.'_'.$floor]['plan']->rodSend}selected{/if}>ANO</option>
+                                </select>
+                            {/ifset}
+                        </div>
+                    </div>
+                {/foreach}
+            </div>
+        </div>
+    </div>
+{/block}
+
+{block scriptsBot}
+    <script>
+        $( function() {
+            $(document).on('change', '.rodHangChange', function (e) {
+                $.nette.ajax({
+                    url: {link rodHangChange!},
+                    type: 'POST',
+                    data: {
+                        item : $(this).attr('data-id'),
+                        val: $(this).val()
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+
+                let topDiv = $(this).parent();
+                if($(this).val() === '1') {
+                    topDiv.removeClass('tpp5-white');
+                    topDiv.addClass('tpp5-green');
+                } else {
+                    topDiv.removeClass('tpp5-green');
+                    topDiv.addClass('tpp5-white');
+                }
+            });
+        });
+
+        $( function() {
+            $(document).on('change', '.rodSendChange', function (e) {
+                $.nette.ajax({
+                    url: {link rodSendChange!},
+                    type: 'POST',
+                    data: {
+                        item : $(this).attr('data-id'),
+                        val: $(this).val()
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+
+                let topDiv = $(this).parent();
+                let beforeStyleCol = topDiv.parent().find('.beforeStyleCol');
+                let styleCol = topDiv.parent().find('.styleCol');
+                let helper = beforeStyleCol.attr('data-styles');
+                beforeStyleCol.attr('data-styles', beforeStyleCol.attr('style'));
+                beforeStyleCol.attr('style', helper);
+                helper = styleCol.attr('data-styles');
+                styleCol.attr('data-styles', styleCol.attr('style'));
+                styleCol.attr('style', helper);
+                if($(this).val() === '1') {
+                    topDiv.removeClass('tpp5-white');
+                    topDiv.addClass('tpp5-green');
+                } else {
+                    topDiv.removeClass('tpp5-green');
+                    topDiv.addClass('tpp5-white');
+                }
+            });
+        });
+
+        $("#date2").datepicker({
+            format: "yyyy-mm-dd",
+            language: 'cs'
+        });
+
+        $("#date").datepicker({
+            format: "yyyy-mm-dd",
+            language: 'cs'
+        }).on('changeDate', function(e) {
+            let dateString = e.date.getDate() + ". " + (e.date.getMonth() + 1)  + ". " + e.date.getFullYear();
+            let yearUrl = e.date.getFullYear();
+
+            $(".week-number").find("span").text(dateString);
+            let fullLink = {link ProductionPlan:view test=>0};
+            fullLink = fullLink.split('?')[0];
+            let typeUrl = {$aaType};
+            location.href = fullLink + "?day=" + e.date.getDate() + '&month=' + (e.date.getMonth() + 1) + '&year=' + yearUrl + '&type=' + typeUrl;
+        });
+    </script>
+{/block}

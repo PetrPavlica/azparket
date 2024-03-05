@@ -1,0 +1,65 @@
+{block title}
+    {ifset $entity}
+        {_'Úprava pracoviště'}
+    {else}
+        {_'Nové pracoviště'}
+    {/ifset}
+{/block}
+{block header-icon}<i class="fa fa-people-carry icon-gradient bg-mean-fruit"></i>{/block}
+
+{block content}
+
+{*<ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
+    <li class="nav-item"><a class="nav-link show active" data-toggle="tab" id="tab-1" href="#home" role="tab"><span>Základní informace</span></a></li>
+</ul>*}
+
+<div>
+<span n:snippet='owf-form'>
+{form form}
+    {*input id*}
+
+    <div class="tab-content">
+        <div id="home" class="tab-pane tabs-animation fade active show">
+            <div class="card mb-2">
+                <div class="card-body">
+                    <div class="form-row">
+                        {include bootstrap-input $form, 'name', 6}
+                        {include bootstrap-input $form, 'masters', 6}
+                        {include bootstrap-input $form, 'description', 12}
+                        {include bootstrap-input $form, 'workerPositions', 12}
+                        {include bootstrap-input $form, 'superiorWorkplaces', 6}
+                        {include bootstrap-input $form, 'subordinateWorkplaces', 6}
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <a n:href="Workplace:default" class="btn btn-outline-primary">
+                <span class="fa fa-arrow-left" aria-hidden="true"></span>
+                Zpět
+            </a>
+            <span class="pull-right">
+                <button name="sendBack" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a zpět</button>
+                <button name="send" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit</button>
+                <button name="sendNew" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a nový</button>
+            </span>
+        </div>
+    </div>
+    {*input ajax*}
+{/form}
+    </span>
+</div>
+
+
+<script>
+
+    var url = document.location.toString();
+    if (url.match('#')) {
+        $('.nav-tabs a[href="#' + url.split('#')[1] + '"]').tab('show');
+    }
+
+</script>

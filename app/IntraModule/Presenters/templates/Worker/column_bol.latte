@@ -1,0 +1,12 @@
+{**
+ * @param $item    Ublaboo\DataGrid\Row
+*}
+{if $item && count($item->$column)}
+    <span class="badge badge-success">
+        <span class="fa fa-check"></span>
+    </span>
+{else}
+    <span class="badge badge-danger">
+        <span class="fa fa-times"></span>
+    </span>
+{/if}

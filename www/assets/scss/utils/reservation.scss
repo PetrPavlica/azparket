@@ -1,0 +1,194 @@
+$select-highlight: #ff8800;
+$ocupied-highlight: #c55900;
+
+#reservation-items {
+
+    max-width: 1600px;
+    margin: 0 auto;
+
+    .reservation-item {
+        h2 {
+            font-size: 3rem;
+            margin: 2rem 0;
+        }
+    }
+
+    table {
+        table-layout: fixed;
+
+        // fancy borders
+        thead {
+            tr:last-child td, tr:last-child th {
+                border-bottom-width: 2px;
+            }
+        }
+        tr:first-child td, tr:first-child th {
+            border-top-width: 0;
+        } 
+        tr td:first-child, tr th:first-child {
+            border-left-width: 0;
+        }
+        tr:last-child td, tr:last-child th {
+            border-bottom-width: 0;
+        } 
+        tr td:last-child, tr th:last-child {
+            border-right-width: 0;
+        }
+
+        td.unreservable {
+        }
+
+        td, th {
+            border-width: 2px;
+            text-align: center;
+            vertical-align: middle;
+            cursor: default;
+            width: 70px;
+            padding: .2rem;
+
+
+            // 39 - 47 = 8
+            &.r-reserved {
+                background: #bb2225;
+                &:hover {
+                    background: hsl(359, 69%, 35%);
+                }
+                color: #eee;
+            }
+            &.r-free {
+                background: #237f52;
+                &:hover {
+                    background: #1d6944;
+                }
+                &.r-selected {
+                    background: #31A8D5;
+                }
+                color: #eee;
+            }
+            &.r-past {
+                background: #a6c095;
+                &:hover {
+                    background: hsl(96, 25%, 59%);
+                }
+                &.r-reserved {
+                    background: #e29b83;
+                    &:hover {
+                        background: hsl(15, 62%, 62%);
+                    }
+                }
+                color: #111;
+            }
+        }
+        thead {
+            line-height: 1;
+            .hypen {
+                line-height: .8;
+                margin-bottom: 3px;
+            }
+        }
+        td {
+            &.free, &.selected {
+                cursor: pointer;
+            }
+            
+        }
+    }
+
+    .r-legend {
+        .legend-item {
+            width: 1rem;
+            height: 1rem;
+            display: inline-block
+        }
+        .legend-item-half {
+            width: 100%;
+            height: 50%;
+        }
+    }
+
+    // 39 - 47 = 8
+    .r-reserved {
+        background: #bb2225;
+        &:hover {
+            background: hsl(359, 69%, 35%);
+        }
+        color: #eee;
+    }
+    .r-free {
+        background: #237f52;
+        &:hover {
+            background: #1d6944;
+        }
+        &.r-selected {
+            background: #31A8D5;
+        }
+        color: #eee;
+    }
+    .r-past {
+        background: #a6c095;
+        &:hover {
+            background: hsl(96, 25%, 59%);
+        }
+        &.r-reserved {
+            background: #e29b83;
+            &:hover {
+                background: hsl(15, 62%, 62%);
+            }
+        }
+        color: #111;
+    }
+}
+
+#reservation-items:not(.admin-mode) {
+
+    padding: 4rem 2rem;
+
+    @media (max-width: 991px) {
+        padding: 4rem 1rem;
+    }
+
+    .body-tabs {
+        li {
+
+            > span {
+                cursor: pointer;
+                border-radius: .25rem;
+                margin: .25rem .1rem;
+                background-color: #fff;
+                transition: background-color 0.3s ease, color 0.3s ease;
+                border: 1px solid #bb2225;
+                color: #000;
+
+                &:hover,&.active {
+                    background-color: #bb2225;
+                    color: #fff;
+                }
+
+            }
+        }
+    }
+
+    .reservation-item {
+        .weekpicker {
+            @media (min-width: 992px) {
+                position: absolute;
+                top: 0;
+                left: 50%;
+                transform: translate(-50%, 0);
+                margin-top: 9px !important;
+            }
+        }
+    }
+}
+
+#reservation-items.admin-mode {
+    table {
+        
+        td {
+            &.reserved {
+                cursor: pointer;
+            }
+            
+        }
+    }
+}

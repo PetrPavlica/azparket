@@ -1,0 +1,283 @@
+{block title}
+    {ifset $entity}
+        {_'Úprava řízené změny'}
+    {else}
+        {_'Nová řízená změna'}
+    {/ifset}
+{/block}
+
+{block content}
+
+<div>
+<span n:snippet='owf-form'>
+{form form}
+    {input id}
+    {input changedInput}
+
+    {*<ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
+        <li class="nav-item"><a class="nav-link show active" data-toggle="tab" id="tab-1" href="#home" role="tab"><span>Základní informace</span></a></li>
+    </ul>*}
+
+    <div class="tab-content">
+        <div id="home" class="tab-pane tabs-animation fade active show">
+            <div class="card mb-2">
+                <div class="card-header">
+                    {ifset $change}
+                        {switch $change->type}
+                            {case 1}
+                                {_'Interní technická změna'} TZI{$change->id}
+                            {case 2}
+                                {_'Externí technická změna'} TZZ{$change->id}
+                            {case 3}
+                                {_'Organizační technická změna'} {$change->id}
+                            {default}
+                                {_'Nová změna'}
+                        {/switch}
+                    {else}
+                        {_'Nová změna'}
+                    {/ifset}
+                    {if isset($change->customer) && $change->customer}
+                        {var $customer = $change->customer}
+                        |
+                        {$customer->name} {$customer->surname}, {$customer->phone}, {$customer->email}
+                    {/if}
+                </div>
+                <div class="card-body">
+                    <div class="form-row">
+                        {include bootstrap-input $form, 'type', 12}
+                        {include bootstrap-autocomplete $form, 'customer', 6, 'getCustomers', '', 'handleCustomerAutocmplt'}
+                        {include bootstrap-autocomplete $form, 'parentChange', 3, 'getManagedChanges', '', ''}
+                        {include bootstrap-input $form, 'customerChangeNo', 3}
+                        {include bootstrap-input $form, 'originator', 6}
+                        {include bootstrap-input $form, 'dateCreatedAt', 3}
+                        {include bootstrap-input $form, 'dateRequiredEnd', 3}
+
+                        {include bootstrap-input $form, 'text', 12}
+                        {include bootstrap-input $form, 'actualState', 6}
+                        {include bootstrap-input $form, 'requiredState', 6}
+
+                        {include bootstrap-input $form, 'reason', 6}
+                        {include bootstrap-input $form, 'internShortReason', 6}
+                    </div>
+
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+
+            <div class="card mb-2">
+                <div class="card-header">{_'Řešení'}</div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            {include bootstrap-input $form, 'result', 4}
+                            {include bootstrap-input $form, 'resultedBy', 4}
+                            {include bootstrap-input $form, 'dateRealEnd', 4}
+                            {include bootstrap-input $form, 'resultOfExamination', 12}
+                        </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+
+            <div class="card mb-2">
+                <div class="card-header">
+                    {_'Dokument'}
+                </div>
+                <div class="card-body">
+                    <div class="form-row">
+                        {*include bootstrap-input $form, 'docName', 6}
+                        {include bootstrap-input $form, 'docMark', 3}
+                        {include bootstrap-input $form, 'changeIndex', 3*}
+                        {include bootstrap-input $form, 'docText', 12}
+                        {*<fieldset class="col-12">
+                            <legend>{_'Dokument'}</legend>
+                            <div class="form-row">
+                                {include bootstrap-input $form, 'docName', 6}
+                                {include bootstrap-input $form, 'docMark', 3}
+                                {include bootstrap-input $form, 'changeIndex', 3}
+                            </div>
+                        </fieldset>*}
+                    </div>
+
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+
+            <div class="card mb-2">
+                <div class="card-header">
+                    {_'Kroky potřebné k dosažení změny'}
+                    <span n:ifset="$change" style="cursor: pointer" class="checkManageChangeStep btn btn-primary ml-auto" data-toggle="modal" data-target="#changeManageStepModal" data-id="0">
+                        <i class="fa fa-plus"></i> Přidat krok
+                    </span>
+                </div>
+                <div class="card-body" n:snippet="changeManageStepTable">
+                    <div class="form-row">
+                        {if isset($change)}
+                            {if $change->steps && count($change->steps)}
+                                <div class="col-12">
+                                    <div class="row pb-3" style="border-bottom: 2px solid #dee2e6;">
+                                        <div class="col-md-1">#</div>
+                                        <div class="col-md-2">Činnost řízení realizace</div>
+                                        <div class="col-md-2">Popis</div>
+                                        <div class="col-md-2">Odpovídá</div>
+                                        <div class="col-md-2">Termín do</div>
+                                        <div class="col-md-2">Datum splnění</div>
+                                        <div class="col-md-1">Akce</div>
+                                    </div>
+                                    {foreach $change->steps as $manStep}
+                                        <div class="row" style="{if $iterator->counter % 2 != 0}background-color: rgba(0,0,0,.05); {/if} border-bottom: 1px solid #dee2e6;">
+                                            <div class="col-md-1 pt-3 pb-3">{$iterator}</div>
+                                            <div class="col-md-2 pt-3 pb-3">{$manStep->implementationManagement}</div>
+                                            <div class="col-md-2 pt-3 pb-3">{$manStep->description}</div>
+                                            <div class="col-md-2 pt-3 pb-3">{$manStep->responsible}</div>
+                                            <div class="col-md-2 pt-3 pb-3">{$manStep->deadline|date:'j.n.Y'}</div>
+                                            <div class="col-md-2 pt-3 pb-3">{$manStep->completionDate|date:'j.n.Y'}</div>
+                                            <div class="col-md-1">
+                                                <span style="cursor: pointer; font-size: 16px;" class="checkManageChangeStep" data-toggle="modal" data-target="#changeManageStepModal" data-id="{$manStep->id}"><i class="fa fa-pen text-info pt-3 pb-3" title="Upravit" data-toggle="tooltip" data-placement="top"></i></span>
+                                                &nbsp;&nbsp;
+                                                <span style="cursor: pointer; font-size: 16px;" class="removeManageChangeStep" data-id="{$manStep->id}"><i class="fa fa-trash text-danger pt-3 pb-3" title="Smazat" data-toggle="tooltip" data-placement="top"></i></span>
+                                            </div>
+                                        </div>
+                                    {/foreach}
+                                </div>
+                            {else}
+                                {_'Zatím nebyly přidány žádné položky'}
+                            {/if}
+                        {else}
+                            {_'Pro zadávání položek nejprve uložte formulář'}
+                        {/if}
+                    </div>
+
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+
+            <div class="card mb-2">
+                <div class="card-header">
+                    <span>{_'Schválení požadavku na změnu'}</span>
+                    {if !isset($change) || (isset($change) && !$change->approveUser)}
+                    <span class="ml-auto">
+                        <button name="approve" type="submit" class="btn btn-primary"> Schválit</button>
+                    </span>
+                    {/if}
+                </div>
+                {if isset($change) && $change->approveUser}
+                <div class="card-body">
+                    <div class="form-row">
+                        <span for="frm-name col-12">Schválil / dne:</span>&nbsp;&nbsp;
+                        <div>{$change->approveUser->name} {if $change->approveDate}({$change->approveDate|date:'j.n.Y'}){/if}</div>
+                    </div>
+
+                    <div class="clearfix"></div>
+                </div>
+                {/if}
+            </div>
+            
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <a n:href="ChangeManager:default" class="btn btn-outline-primary">
+                <span class="fa fa-arrow-left" aria-hidden="true"></span>
+                Zpět
+            </a>
+            <span class="pull-right">
+                <button name="sendBack" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a zpět</button>
+                <button name="send" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit</button>
+                <button name="sendNew" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a nový</button>
+                <button name="sendRemoveAll" type="submit" class="btn btn-primary"><i style="color: #1461A7" class=" fa fa-trash-o"></i> Zahodit změny</button>
+            </span>
+        </div>
+    </div>
+    {input ajax}
+{/form}
+    </span>
+</div>
+
+{/block}
+{block scriptsBot}
+    <div n:ifset="$change" class="modal fade" id="changeManageStepModal" tabindex="-1" role="dialog" aria-labelledby="changeManageStepLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+            <div class="modal-content" n:snippet="changeManageStepModal">
+                {form changeManageStepModalForm}
+                    <input type="text" style="display: none;" name="change" value="{$change->id}">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="changeManageStepLabel">Krok potřebný ke schválení</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <style type="text/css">
+
+                    </style>
+                    <div class="modal-body compact-my-modal">
+                        <div class="form-row">
+                            {include bootstrap-input $form, 'implementationManagement', 6}
+                            {include bootstrap-input $form, 'responsible', 6}
+                            {include bootstrap-input $form, 'description', 12}
+                            {include bootstrap-input $form, 'deadline', 6}
+                            {include bootstrap-input $form, 'completionDate', 6}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Uložit</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Zavřít</button>
+                    </div>
+                {/form}
+            </div>
+        </div>
+    </div>
+
+<script>
+    var actualCurrency;
+
+    function handleCustomerAutocmplt(data, inputCm, inputRes) {
+        /*var tr = inputCm.parent().parent().parent();
+        $.get({link getCustomerPreload!}, {
+            customerId: inputRes.val()
+        }, function (data, status, xhr) {
+            var values = JSON.parse(data.data); //0 => priceLevel, 1 => currency
+            $(document).find("#frm-currency").val(values[1]);
+            $(document).find("#frm-priceLevel").val(values[0]);
+            customElemFocus = $("#1_tatcmplt");
+        });
+        tr.closest('form').append('<input type="hidden" name="changeSupplier" value="1">');
+        $("#save").click();*/
+    }
+
+    var url = document.location.toString();
+    if (url.match('#')) {
+        $('.nav-tabs a[href="#' + url.split('#')[1] + '"]').tab('show');
+    }
+
+    $( function() {
+        $(document).on('click', '.checkManageChangeStep', function (e) {
+            $.nette.ajax({
+                url: {link checkManageChangeStep!},
+                type: 'POST',
+                data: {
+                    changeStep : $(this).attr('data-id')
+                },
+                off: {
+                    snippets: true
+                }
+            });
+        });
+    });
+
+    $( function() {
+        $(document).on('click', '.removeManageChangeStep', function (e) {
+            $.nette.ajax({
+                url: {link removeManageChangeStep!},
+                type: 'POST',
+                data: {
+                    changeStep : $(this).attr('data-id')
+                },
+                off: {
+                    snippets: true
+                }
+            });
+        });
+    });
+
+</script>
+{/block}

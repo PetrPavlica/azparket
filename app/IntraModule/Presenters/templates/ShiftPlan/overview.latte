@@ -1,0 +1,124 @@
+{block title}{_'Přehled fondů'}{/block}
+{*block description}{_'Přehled směn pro linku'} {$aaType}{/block}
+{block header-icon}<i class="fa fa-box icon-gradient bg-mean-fruit"></i>{/block*}
+{block header-actions-top}
+
+    <div class="top-week">
+        <a n:href="ShiftPlan:overview yeara => $previousYear">
+            <i class="fa fa-chevron-left"></i>
+        </a>
+        <div class="week-number date-btn">
+            <span>{$yeara}</span>
+            <input type="text" id="date" value="{$dateInput}" autocomplete="off" />
+        </div>
+        <a n:href="ShiftPlan:overview yeara => $nextYear">
+            <i class="fa fa-chevron-right"></i>
+        </a>
+    </div>
+
+
+{/block}
+{block content}
+    <div n:snippet="snippFunds" class="col-md-12" style="margin-bottom: 10px;">
+        <div class="row cols-cus-20">
+            {foreach $cusMonths as $monthName}
+                {if $monthName == ''}
+                    <div class="col-md-1 cus20-md-4 ssp-empty ssp-border d-flex align-items-center justify-content-center">
+                        <div style="font-size: medium; font-weight: 500;">
+                            Jméno
+                        </div>
+                    </div>
+                {elseif $monthName == 'first'}
+                    <div class="col-md-1 cus20-md-1 ssp-special ssp-border d-flex align-items-center justify-content-center">
+                        <div style="font-size: medium; font-weight: 500;">
+                            6m
+                        </div>
+                    </div>
+                {elseif $monthName == 'second'}
+                    <div class="col-md-1 cus20-md-1 ssp-special ssp-border d-flex align-items-center justify-content-center">
+                        <div style="font-size: medium; font-weight: 500;">
+                            6m
+                        </div>
+                    </div>
+                {elseif $monthName == 'total'}
+                    <div class="col-md-1 cus20-md-2 ssp-special ssp-border d-flex align-items-center justify-content-center">
+                        <div style="font-size: medium; font-weight: 500;">
+                            Celkem
+                        </div>
+                    </div>
+                {else}
+                    <div class="col-md-1 cus20-md-1 ssp-empty ssp-border d-flex align-items-center justify-content-center">
+                        <div style="font-size: medium; font-weight: 500;">
+                            {$monthName}
+                        </div>
+                    </div>
+                {/if}
+            {/foreach}
+        </div>
+        {foreach $workers as $worker}
+            <div class="row cols-cus-20">
+                {foreach $cusMonths as $monthName}
+                    {if $monthName == ''}
+                        <div class="col-md-1 cus20-md-4 ssp-empty ssp-border d-flex align-items-center justify-content-center">
+                            <div style="font-size: medium; font-weight: 500;">
+                                {$worker->surname} {$worker->name}
+                            </div>
+                        </div>
+                    {elseif $monthName == 'first'}
+                        <div class="col-md-1 cus20-md-1 ssp-special ssp-border d-flex align-items-center justify-content-center">
+                            <div style="font-size: medium; font-weight: 500;">
+                                {ifset $workersHours['first'][$worker->id]}{$workersHours['first'][$worker->id]}{else}0{/ifset}/{if $worker->timeFund}{$worker->timeFund * 6}{elseif $worker->shift && isset($fpd['first'][$worker->shift])}{$fpd['first'][$worker->shift]}{else}-{/if}
+                            </div>
+                        </div>
+                    {elseif $monthName == 'second'}
+                        <div class="col-md-1 cus20-md-1 ssp-special ssp-border d-flex align-items-center justify-content-center">
+                            <div style="font-size: medium; font-weight: 500;">
+                                {ifset $workersHours['second'][$worker->id]}{$workersHours['second'][$worker->id]}{else}0{/ifset}/{if $worker->timeFund}{$worker->timeFund * 6}{elseif $worker->shift && isset($fpd['second'][$worker->shift])}{$fpd['second'][$worker->shift]}{else}-{/if}
+                            </div>
+                        </div>
+                    {elseif $monthName == 'total'}
+                        <div class="col-md-1 cus20-md-2 ssp-special ssp-border d-flex align-items-center justify-content-center">
+                            <div style="font-size: medium; font-weight: 500;">
+                                {ifset $workersHours['total'][$worker->id]}{$workersHours['total'][$worker->id]}{else}0{/ifset}/{if $worker->timeFund}{$worker->timeFund * 12}{elseif $worker->shift && isset($fpd['total'][$worker->shift])}{$fpd['total'][$worker->shift]}{else}-{/if}
+                            </div>
+                        </div>
+                    {else}
+                        <div class="col-md-1 cus20-md-1 ssp-border d-flex align-items-center justify-content-center">
+                            <div style="font-size: medium; font-weight: 500;">
+                                {*ifset $workersHours[$monthName][$worker->id]}{$workersHours[$monthName][$worker->id]}{else}0{/ifset}/{if $worker->timeFund}{$worker->timeFund}{elseif $worker->shift && isset($fpd[$monthName][$worker->shift])}{$fpd[$monthName][$worker->shift]}{else}-{/if*}
+                                {ifset $workersHours[$monthName][$worker->id]}{$workersHours[$monthName][$worker->id]}{else}0{/ifset}/{if $worker->shift && isset($fpd[$monthName][$worker->shift])}{$fpd[$monthName][$worker->shift]}{elseif $worker->timeFund}{$worker->timeFund}{else}-{/if}
+                            </div>
+                        </div>
+                    {/if}
+                {/foreach}
+            </div>
+        {/foreach}
+    </div>
+{/block}
+
+{block scriptsBot}
+    <script>
+        $("#date").datepicker({
+            format: "yyyy",
+            language: 'cs',
+            startView: 2,
+            minViewMode: 2
+        }).on('changeDate', function(e) {
+            let eDate = new Date(e.date.getTime());
+            let nDay = (eDate.getDay() + 6) % 7;
+            eDate.setDate(eDate.getDate() - nDay + 3);
+            let n1stThursday = eDate.valueOf();
+            eDate.setMonth(0, 1);
+            if (eDate.getDay() !== 4) {
+                eDate.setMonth(0, 1 + ((4 - eDate.getDay()) + 7) % 7);
+            }
+            let dateString = e.date.getFullYear();
+            let yearUrl = e.date.getFullYear();
+
+            $(".week-number").find("span").text(dateString);
+            let fullLink = {link ShiftPlan:overview test=>0};
+            fullLink = fullLink.split('?')[0];
+            location.href = fullLink + '?yeara=' + yearUrl;
+        });
+    </script>
+{/block}

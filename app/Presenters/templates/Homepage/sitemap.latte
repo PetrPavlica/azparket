@@ -1,0 +1,15 @@
+{contentType application/xml}
+<?xml version="1.0" encoding="UTF-8"?>
+{cache 'sitemap-'.$locale, expire => '360 minutes'}
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+        <loc>{link //Homepage:default}</loc>
+    </url>
+    {foreach $menu as $m}
+        {continueIf $m->url == '/'}
+        <url>
+            <loc>{link '//Page:default' id => $m->id}</loc>
+        </url>
+    {/foreach}
+</urlset>
+{/cache}

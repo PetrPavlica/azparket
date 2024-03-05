@@ -1,0 +1,10 @@
+{var $newId = str_replace(']','',$name)}
+{var $newId = str_replace('[','',$newId)}
+
+<div class="form-group">
+    <input name="{$name}" id="{$id}_{$newId}" placeholder="{$placeholder}" class="form-control {$class} input-md" value="{$value}" {$attrs|noescape}
+           data-nette-rules="[{ &quot;op&quot;:&quot;optional&quot;},{ &quot;op&quot;:&quot;:float&quot;,&quot;msg&quot;:&quot;Musí být číslo!&quot;}]" data-lfv-initialized="true" data-lfv-message-id="frm-{$name}{$id}_{$newId}_message" type="text">
+    <span id="frm-{$name}{$id}_{$newId}_message" class=""></span>
+</div>
+
+

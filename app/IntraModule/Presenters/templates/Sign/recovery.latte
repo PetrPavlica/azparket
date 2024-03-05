@@ -1,0 +1,48 @@
+{block title}{_'Obnova hesla'}{/block}
+{block content}
+
+<div style="height: 80vh">
+    <div class="flex-center flex-column">
+        <div class="container">
+            <div class="row justify-content-md-center">
+                <div class="col-md-6 col-sm-12 col-xs-12">
+
+                    <!--Form with header-->
+                    <div class="card">
+                        <div class="card-block">
+
+                            <!--Header-->
+                            <div class="form-header light-blue darken-3 white-text">
+                                <img src="{$basePath}/assets/img/intra.png" class="mx-auto d-block">
+                            </div>
+                            {form recoveryForm}
+                            <!--Body-->
+                            <div class="md-form">
+                                <i class="fa fa-envelope prefix"></i>
+                                {input email}
+                                <label for="form2">{_'Email zadaný při registraci'} </label>
+                            </div>
+
+
+                            <div class="text-center">
+                                <button class="btn btn-info waves-effect waves-light" name="send">{_'Zaslat email s instrukcemi'}
+                                    <i class="fa fa-sign-in ml-1"></i></button>
+                            </div>
+
+                        </div>
+
+                        {/form}
+                        <!--Footer-->
+                        <div class="modal-footer">
+                            <div class="options">
+                                <p>{_'Zpět na '} <a n:href="Sign:in">{_'přihlášení'}</a>.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

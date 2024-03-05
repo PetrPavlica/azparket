@@ -1,0 +1,64 @@
+
+{import '../../templates/form.latte'}
+
+<!-- MODAL ZDE -->
+
+<div class="modal fade" tabindex="-1" role="dialog" id="reservationAdminModal" aria-labelledby="reservationAdminModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content" data-modal="reservationAdminModal" n:snippet="reservationAdminModal">
+            {form reservationAdminModalForm class => 'r-form'}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="reservationAdminModalLabel">{_'Přidání rezervace'}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                
+                    <div class="form-row">
+                        {include bootstrap-input $form, 'date', 6}
+                        {include bootstrap-input $form, 'reservationItem', 6}
+                        {include bootstrap-input $form, 'timeFrom', 6}
+                        {include bootstrap-input $form, 'timeTo', 6}
+                        {include bootstrap-input $form, 'newCustomer', 12}
+                        <div class="col-md-12">
+                            <div class="form-row" id="r-existing-customer" {if $form->getComponent('newCustomer')->getValue()}style="display:none"{/if}>
+                                {include bootstrap-autocomplete $form, 'customer', 12, 'getCustomers', '', ''}
+                            </div>
+                            <div class="form-row" id="r-new-customer" {if !$form->getComponent('newCustomer')->getValue()}style="display:none"{/if}>
+                                {include bootstrap-input $form, 'name', 6}
+                                {include bootstrap-input $form, 'surname', 6}
+                                {include bootstrap-input $form, 'email', 6}
+                                {include bootstrap-input $form, 'phone', 6}
+                            </div>
+                        </div>
+                        {include bootstrap-input $form, 'repeat', 12}
+                        <div class="col-md-12" style="display:none" id="repeat-part">
+                            <div class="form-row">
+                                {include bootstrap-input $form, 'repeatByValue', 3}
+                                {include bootstrap-input $form, 'repeatBy', 3}
+                                {include bootstrap-input $form, 'repeatDateTo', 6}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    {if isset($reservation)}
+                        <span
+                            data-confirm-sweetalert2="delete"
+                            class="btn btn-outline-danger"
+                            data-title="Zrušit rezervaci"
+                            data-text="Opravdu si opřejete zrušit rezervaci?"
+                            data-success-click="#cancel-reservation-butt"
+                        >
+                            Zrušit rezervaci <i class="fa fa-times"></i>
+                        </span>
+                        <a n:href="cancelReservation! id => $reservation->id" class="ajax d-none" id="cancel-reservation-butt"></a>
+                    {/if}
+                    <button type="submit" class="btn btn-primary ajax">Uložit</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Zavřít</button>
+                </div>
+            {/form}
+        </div>
+    </div>
+</div>

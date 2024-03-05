@@ -1,0 +1,49 @@
+{block title}
+    {ifset $entity}
+        {_'Úprava šablony nabídky'}
+    {else}
+        {_'Nová šablony nabídky'}
+    {/ifset}
+{/block}
+{block description}
+    {ifset $entity}
+        {_'Editace stávající šablony nabídky'}
+    {else}
+        {_'Přidání nové šablony nabídky'}
+    {/ifset}
+{/block}
+{block header-icon}<i class="fa fa-file-invoice icon-gradient bg-mean-fruit"></i>{/block}
+{block content}
+<span n:snippet='owf-form'>
+    {form formTemplate}
+        <div class="card mb-2">
+            <div class="card-body">
+                <div class="row">
+                    {include bootstrap-input $form, 'name', 12}
+                    {include bootstrap-input $form, 'price', 2}
+                    {include bootstrap-input $form, 'order', 2}
+                    {include bootstrap-input $form, 'type', 2}
+                    {include bootstrap-input $form, 'isModule', 2}
+                    {include bootstrap-input $form, 'isProductDescription', 2}
+                    {include bootstrap-input $form, 'isReference', 2}
+                    {include bootstrap-input $form, 'isAfterPricing', 2}
+                    {include bootstrap-input $form, 'content', 12}
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <a class="btn btn-outline-primary" href="{link Offer:default 'openTab' => '#templates' }">
+                    <span class="fa fa-arrow-left" aria-hidden="true"></span>
+                    Zpět
+                </a>
+
+                <button name="sendBack" type="submit" class="btn btn-primary"><i class="fa fa-floppy-o"></i> Uložit</button>
+                <button name="send" type="submit" class="btn btn-primary"><i class="fa fa-floppy-o"></i> Uložit a pokračovat</button>
+                <button name="sendNew" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a nový</button>
+            </div>
+        </div>
+    {/form}
+</span>
+{/block}

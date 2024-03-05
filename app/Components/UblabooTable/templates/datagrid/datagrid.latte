@@ -1,0 +1,585 @@
+{**
+ * @param Column[]        $columns            Available columns
+ * @param Action[]        $actions            Available actions
+ * @param Export[]        $exports            Available exports
+ * @param Filter[]        $filters            Available filters
+ * @param ToolBarButton[] $toolbarButtons    Available toolbar_buttons
+ * @param Form            $filter             Walkaround for latte snippets
+ * @param Row[]           $rows               List of rows (each contain a item from data source)
+ * @param DataGrid        $control            Parent (DataGrid)
+ * @param string          $original_template  Original template file path
+ * @param string          $iconPrefix        Icon prefix (fa fa-)
+ * @param array           $columnsVisibility What columns are visible
+ * @param InlineEdit|null $inlineEdit  Inline editing data
+ * @param InlineEdit|null $inlineAdd   Inline add data
+*}
+
+<div class="datagrid datagrid-{$control->getName()} card mb-3" data-refresh-state="{link refreshState!}">
+    {**
+     * Own data
+    *}
+    <div n:snippet="grid" class="card-body">
+        {snippetArea gridSnippets}
+            {form filter, class => 'ajax', autocomplete => 'off'}
+                {**
+                 * Filter form
+                *}
+                {if $control->hasOuterFilterRendering()}
+                    <div class="row row-filters">
+                        {var $i = 0}
+                        <div class="col-sm-6" n:foreach="$filters as $f">
+                            {**
+                             * Each fitler is rendered separately in its own template
+                            *}
+                            {var $filter_block = 'filter-' . $f->getKey()}
+                            {var $filter_type_block = 'filtertype-' . $f->getType()}
+
+                            {ifset #$filter_block}
+                                {include #$filter_block, filter => $f, input => $form['filter'][$f->getKey()], outer => TRUE}
+                            {else}
+                                {ifset #$filter_type_block}
+                                    {include #$filter_type_block, filter => $f, input => $form['filter'][$f->getKey()], outer => TRUE}
+                                {else}
+                                    {include $f->getTemplate(), filter => $f, input => $form['filter'][$f->getKey()], outer => TRUE}
+                                {/ifset}
+                            {/ifset}
+                            {var $i = $i+1}
+                        </div>
+                    </div>
+                    {if !$control->hasAutoSubmit()}
+                        <div class="text-right datagrid-manual-submit">
+                            {input $filter['filter']['submit']}
+                        </div>
+                    {/if}
+                {/if}
+                <div class="row-group-actions" n:if="$hasGroupActions || $exports || $toolbarButtons || $control->canHideColumns() || $inlineAdd" n:block="group-actions">
+                    <div class="ublaboo-datagrid-th-form-inline">
+                        {if $hasGroupActions}
+                            {block group_actions}
+                                <span class="datagrid-group-action-title">
+										{='ublaboo_datagrid.group_actions'|translate}:
+									</span>
+                                {foreach $filter['group_action']->getControls() as $form_control}
+                                    {if $form_control instanceof \Nette\Forms\Controls\SubmitButton && $form_control->getName() === 'submit'}
+                                        {input $form_control, class => 'btn btn-primary btn-sm', disabled => TRUE, hidden=>true}
+                                    {elseif $form_control instanceof \Nette\Forms\Controls\SubmitButton}
+                                        {input $form_control, disabled => TRUE}
+                                    {elseif $form_control->getName() == 'group_action'}
+                                        {input $form_control, class => 'form-control input-sm form-control-sm no-live-validation', disabled => TRUE}
+                                    {else}
+                                        {php $form_control->setHtmlAttribute('class', $form_control->getControl()->attrs['class'].' no-live-validation')}
+                                        {input $form_control hidden=>true}
+                                    {/if}
+                                {/foreach}
+                                {if $control->shouldShowSelectedRowsCount()}
+                                    <span class="datagrid-selected-rows-count"></span>
+                                {/if}
+                            {/block}
+                        {/if}
+
+                        <div class="datagrid-toolbar" n:if="$control->canHideColumns() || $inlineAdd || $exports || $toolbarButtons">
+								<span n:if="$toolbarButtons">
+									{foreach $toolbarButtons as $toolbar_button}{$toolbar_button->renderButton()}{/foreach}
+								</span>
+
+                            <span n:snippet="resetFilter">
+                                <a n:if="$filter_active" n:href="resetFilter!" class="ajax btn btn-danger btn-sm reset-filter">{_'ublaboo_datagrid.reset_filter'}</a>
+                            </span>
+
+                            <span class="datagrid-exports" n:if="$exports" n:snippet="exports" n:block="exports">
+									{foreach $exports as $export}{$export->render()}{/foreach}
+								</span>
+
+                            <div class="datagrid-settings" n:block="settings" n:if="$control->canHideColumns() || $inlineAdd">
+                                {if $inlineAdd}
+                                    {$inlineAdd->renderButtonAdd()}
+                                {/if}
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                <table class="{block table-class}table table-hover table-striped table-bordered{/block}" n:snippet="table" n:block="data" data-resize-url="{link resizeColumn!}">
+                    <thead n:block="header">
+                    <tr n:block="header-column-row">
+                        <th n:if="$hasGroupActionOnRows" rowspan="2" class="col-checkbox">
+                            <input n:class="$control->shouldUseHappyComponents() ? 'happy gray-border' , primary" name="{$control->getName()|lower}-toggle-all" type="checkbox" data-check="{$control->getName()}" data-check-all="{$control->getName()}">
+                        </th>
+                        {foreach $columns as $key => $column}
+                            {var $th = $column->getElementForRender('th', $key)}
+                            {php $th->data('resizable-column-id', $key);}
+                            {ifset $widthColumns[$key]}
+                                {php $th->appendAttribute('style', sprintf('width: %dpx; min-width: %dpx; max-width: %dpx;', $widthColumns[$key], $widthColumns[$key], $widthColumns[$key]));}
+                            {/ifset}
+                            {$th->startTag()|noescape}
+                            {var $col_header = 'col-' . $key . '-header'}
+
+                            {**
+                             * Column header can be defined also with block {col-<key>-header}
+                            *}
+                            {ifset #$col_header}
+                                {include #$col_header, column => $column}
+                            {else}
+                                <div class="head-group">
+                                <span data-toggle="tooltip" title="{$column->getName()}">
+                                {if $column->isSortable()}
+                                    <a n:class="$column->isSortedBy() ? 'sort' : '', 'ajax'" {if $column->hasSortNext()}href="{link sort!, sort => $column->getSortNext()}"{else}href="{link sort!, sort => NULL}"{/if} id="datagrid-sort-{$key}" style="color: black; margin-left: 0">
+                                        {include #column-header, column => $column}
+
+                                            {if $column->isSortedBy()}
+                                                {if $column->isSortAsc()}
+                                                    <i n:block="icon-sort-up" class="{$iconPrefix}caret-up teal-text"></i>
+                                                {else}
+                                                    <i n:block="icon-sort-down" class="{$iconPrefix}caret-down teal-text"></i>
+                                                {/if}
+                                            {else}
+                                                <i n:block="icon-sort" class="{$iconPrefix}sort teal-text"></i>
+                                            {/if}
+                                    </a>
+                                {else}
+                                    {include #column-header, column => $column}
+                                {/if}
+                                    </span>
+
+                                <div class="datagrid-column-header-additions">
+                                    <div class="btn-group column-settings-menu" n:if="$control->canHideColumns()">
+                                        <a class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" href="">
+                                            <i n:block="icon-caret-down" class="{$iconPrefix}caret-down"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-menu--grid">
+                                            <li>
+                                                <a n:href="hideColumn!, column => $key" class="ajax dropdown-item">
+                                                    <i n:block="icon-eye-slash" class="{$iconPrefix}eye-slash"></i> {='ublaboo_datagrid.hide_column'|translate}</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    {if $control->hasColumnReset()}
+                                        <a data-datagrid-reset-filter-by-column="{$key}" n:href="resetColumnFilter!, key => $key" n:class="isset($filters[$key]) && $filters[$key]->isValueSet() ? '' : 'hidden', 'ajax'" title="{='ublaboo_datagrid.reset_filter'|translate}">
+                                            <i n:block="icon-remove" class="{$iconPrefix}times"></i>
+                                        </a>
+                                    {/if}
+                                </div>
+                                </div>
+                            {/ifset}
+                            {$th->endTag()|noescape}
+                        {/foreach}
+                        <th n:if="$actions || $control->canHideColumns() || $control->isSortable() || $itemsDetail || $inlineEdit || $inlineAdd" class="col-action col-action-{count($actions)}">
+                            <span class="datagrid-exports">
+                                <div>
+                                    <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#{$control->getName()}Modal">
+                                      <i class="fa fa-cog"></i>
+                                    </button>
+                                </div>
+                            </span>
+                        </th>
+                    </tr>
+                    <tr class="table-filters" n:block="header-filters" n:if="!empty($filters) && !$control->hasOuterFilterRendering() && ($visibleFilters == true || $filter_active == true)">
+                        {foreach $columns as $key => $column}
+                            {var $th = $column->getElementForRender('th', $key)}
+                            {ifset $widthColumns[$key]}
+                                {php $th->appendAttribute('style', sprintf('width: %dpx; min-width: %dpx; max-width: %dpx;', $widthColumns[$key], $widthColumns[$key], $widthColumns[$key]));}
+                            {/ifset}
+                            {$th->startTag()|noescape}
+                            {var $col_header = 'col-filter-' . $key . '-header'}
+                            {if !$control->hasOuterFilterRendering() && isset($filters[$key])}
+                                {var $i = $filter['filter'][$key]}
+
+                                {var $filter_block = 'filter-' . $filters[$key]->getKey()}
+                                {var $filter_type_block = 'filtertype-' . $filters[$key]->getType()}
+
+                                {ifset #$filter_block}
+                                    {include #$filter_block, filter => $filters[$key], input => $i, outer => FALSE}
+                                {else}
+                                    {ifset #$filter_type_block}
+                                        {include #$filter_type_block, filter => $filters[$key], input => $i, outer => FALSE}
+                                    {else}
+                                        {include $filters[$key]->getTemplate(), filter => $filters[$key], input => $i, outer => FALSE}
+                                    {/ifset}
+                                {/ifset}
+
+                            {/if}
+                            {$th->endTag()|noescape}
+                        {/foreach}
+                        <th n:if="$actions || $control->canHideColumns() || $control->isSortable() || $itemsDetail || $inlineEdit || $inlineAdd" class="col-action col-action-{count($actions)} text-center">
+                            {if !$control->hasAutoSubmit() && !$control->hasOuterFilterRendering()}
+                                {input $filter['filter']['submit'], class=>'btn-link'}
+                            {/if}
+                        </th>
+                    </tr>
+                    </thead>
+
+                    <tbody n:snippet="tbody" {if $control->isSortable()}data-sortable data-sortable-url="{plink $control->getSortableHandler()}" data-sortable-parent-path="{$control->getSortableParentPath()}"{/}>
+                    {snippetArea items}
+                        {if $inlineAdd && $inlineAdd->isPositionTop()}
+                            {include inlineAddRow, columns => $columns}
+                        {/if}
+
+                        {foreach $rows as $row}
+                            {var $item = $row->getItem()}
+
+                            {if !isset($toggle_detail)}
+                                {if $inlineEdit && $inlineEdit->getItemId() == $row->getId()}
+                                    {php $inlineEdit->onSetDefaults($filter['inline_edit'], $item); }
+
+                                    <tr data-id="{$row->getId()}" n:snippet="item-{$row->getId()}" n:class="$row->getControlClass()" >
+                                        <td n:if="$hasGroupActionOnRows" class="col-checkbox"></td>
+
+                                        {foreach $columns as $key => $column}
+                                            {var $col = 'col-' . $key}
+
+                                            {var $td = $column->getElementForRender('td', $key, $row)}
+                                            {var $td->class[] = ' datagrid-inline-edit'}
+                                            {$td->startTag()|noescape}
+                                                {if isset($filter['inline_edit'][$key])}
+                                                    {input $filter['inline_edit'][$key]}
+                                                {elseif $inlineEdit->showNonEditingColumns()}
+                                                    {include column-value, column => $column, row => $row, key => $key}
+                                                {/if}
+
+                                            {$td->endTag()|noescape}
+                                        {/foreach}
+
+                                        <td class="col-action col-action-inline-edit">
+                                            {input $filter['inline_edit']['cancel'], class => 'btn btn-group-xs btn-sm btn-danger'}
+                                            {input $filter['inline_edit']['submit'], class => 'btn btn-group-xs btn-sm btn-primary'}
+                                            {input $filter['inline_edit']['_id']}
+                                            {input $filter['inline_edit']['_primary_where_column']}
+                                        </td>
+                                    </tr>
+                                {else}
+                                    <tr data-id="{$row->getId()}" n:snippet="item-{$row->getId()}" n:class="$row->getControlClass()"
+                                    {ifset $row->getControl()->attrs['attribute']}
+                                        {foreach $row->getControl()->attrs['attribute'] as $attrName => $attrVal}
+                                            {$attrName} = {$attrVal}
+                                        {/foreach}
+                                    {/ifset}
+                                    >
+                                    <td n:if="$hasGroupActionOnRows" class="col-checkbox">
+                                        {if $row->hasGroupAction()}
+                                            <input n:class="$control->shouldUseHappyComponents() ? 'happy gray-border' , primary" type="checkbox" data-check="{$control->getName()}" data-check-all-{$control->getName()|noescape} name="{$control->getName()|lower}_group_action_item[{$row->getId()}]">
+                                        {/if}
+                                    </td>
+                                    {foreach $columns as $key => $column}
+                                        {var $col = 'col-' . $key}
+                                        {php $column = $row->applyColumnCallback($key, clone $column)}
+
+                                        {var $td = $column->getElementForRender('td', $key, $row)}
+                                        {ifset $widthColumns[$key]}
+                                            {php $td->appendAttribute('style', sprintf('width: %dpx; min-width: %dpx; max-width: %dpx;', $widthColumns[$key], $widthColumns[$key], $widthColumns[$key]));}
+                                        {/ifset}
+                                        {$td->startTag()|noescape}
+                                        <span>
+                                        {if $column->hasTemplate()}
+                                            {include $column->getTemplate(), row => $row, item => $item, (expand) $column->getTemplateVariables()}
+                                        {else}
+                                            {ifset #$col}
+                                                {include #$col, item => $item}
+                                            {else}
+                                                {if $column->isTemplateEscaped()}
+                                                    {$column->render($row)}
+                                                {else}
+                                                    {$column->render($row)|noescape}
+                                                {/if}
+                                            {/ifset}
+                                        {/if}
+                                        </span>
+                                        {$td->endTag()|noescape}
+                                    {/foreach}
+                                    <td n:if="$actions || $control->canHideColumns() || $control->isSortable() || $itemsDetail || $inlineEdit || $inlineAdd" class="col-action col-action-{count($actions)}">
+                                        {foreach $actions as $key => $action}
+                                            {if $row->hasAction($key)}
+                                                {if !$action->hasTemplate()}
+                                                    {$action->render($row)|noescape}
+                                                {/if}
+                                            {/if}
+                                        {/foreach}
+                                        {foreach $actions as $key => $action}
+                                            {if $row->hasAction($key)}
+                                                {if $action->hasTemplate()}
+                                                    {include $action->getTemplate(), item => $item, (expand) $action->getTemplateVariables(), row => $row}
+                                                {/if}
+                                            {/if}
+                                        {/foreach}
+                                        {if $inlineEdit && $row->hasInlineEdit()}
+                                            {$inlineEdit->renderButton($row)|noescape}
+                                        {/if}
+                                        {if $itemsDetail}
+                                            {$itemsDetail->renderButton($row)|noescape}
+                                        {/if}
+                                        {if $actions && count($actions) > 0}
+                                            {*<div class="dropdown dropleft">
+                                                <button class="border-0 btn-transition btn btn-link" type="button" id="dropdownMenuButton{$row->getId()}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    <i class="fa fa-ellipsis-h"></i>
+                                                </button>
+                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton{$row->getId()}">
+                                                    {foreach $actions as $key => $action}
+                                                        {if $row->hasAction($key)}
+                                                            {if $action->hasTemplate()}
+                                                                {include $action->getTemplate(), item => $item, (expand) $action->getTemplateVariables(), row => $row}
+                                                            {else}
+                                                                {$action->render($row)|noescape}
+                                                            {/if}
+                                                        {/if}
+                                                    {/foreach}
+                                                </div>
+                                            </div>*}
+                                        {/if}
+                                        {*<span class="handle-sort btn btn-xs btn-default" n:if="$control->isSortable()">
+                                            <i n:block="icon-arrows-v" class="{$iconPrefix}arrows-v"></i>
+                                        </span>*}
+                                    </td>
+                                    </tr>
+                                {/if}
+                            {/if}
+
+                            {**
+                             * Item detail
+                            *}
+                            {if $itemsDetail}
+                                <tr class="row-item-detail item-detail-{$row->getId()}" n:snippet="item-{$row->getId()}-detail">
+                                    {if isset($toggle_detail) && $toggle_detail == $row->getId()}
+                                        {var $item_detail_params = ['item' => $item, '_form' => $filter] + $itemsDetail->getTemplateVariables()}
+
+                                        {if isset($filter['items_detail_form'])}
+                                            {var $item_detail_params['items_detail_form'] = $filter['items_detail_form']}
+                                        {/if}
+
+                                        {ifset #detail}
+                                            <td colspan="{$control->getColumnsCount()}">
+                                                <div class="item-detail-content">
+                                                    {include #detail, (expand) $item_detail_params}
+                                                </div>
+                                            </td>
+                                        {elseif $itemsDetail}
+                                            <td colspan="{$control->getColumnsCount()}">
+                                                <div class="item-detail-content">
+                                                    {if $itemsDetail->getType() == 'template'}
+                                                        {include $itemsDetail->getTemplate(), (expand) $item_detail_params}
+                                                    {else}
+                                                        {$itemsDetail->render($item)|noescape}
+                                                    {/if}
+                                                </div>
+                                            </td>
+                                        {/ifset}
+                                    {/if}
+                                </tr>
+                                <tr class="row-item-detail-helper"></tr>
+                            {/if}
+                        {/foreach}
+
+                        {if $inlineAdd && $inlineAdd->isPositionBottom()}
+                            {include inlineAddRow, columns => $columns}
+                        {/if}
+
+                        {if !empty($rows) && $columnsSummary}
+                            {include columnsSummary, columns => $columns}
+                        {/if}
+
+                        {block noItems}
+                            <tr n:if="!$rows">
+                                <td colspan="{$control->getColumnsCount()}">
+                                    {if $filter_active}
+                                        {_'ublaboo_datagrid.no_item_found_reset'}
+                                        <a class="link ajax" n:href="resetFilter!">{_'ublaboo_datagrid.here'}</a>.
+                                    {else}
+                                        {_'ublaboo_datagrid.no_item_found'}
+                                    {/if}
+                                </td>
+                            </tr>
+                        {/block}
+                    {/snippetArea}
+                    </tbody>
+                </table>
+                </div>
+                {block tfoot}
+                    <div n:snippet="pagination">
+                    {if $control->isPaginated() || $filter_active}
+                        <div n:block="pagination">
+                            <div n:if="!$control->isTreeView()" class="row-grid-bottom">
+                                <div class="col-items">
+                                    <small class="text-muted" n:if="$control->isPaginated()">
+                                        ({var $paginator = $control['paginator']->getPaginator()}
+
+                                            {if $control->getPerPage() === 'all'}
+                                        {_'ublaboo_datagrid.items'}: {_'ublaboo_datagrid.all'}
+                                        {else}
+                                        {_'ublaboo_datagrid.items'}: {$paginator->getOffset() > 0 ? $paginator->getOffset() + 1 : 0} - {sizeof($rows) + $paginator->getOffset()}
+                                        {_'ublaboo_datagrid.from'} {$paginator->getItemCount()}
+                                        {/if})
+                                    </small>
+                                </div>
+                                <div class="col-pagination text-center">
+                                    {**
+                                    * Pagination
+                                    *}
+                                        {control paginator}
+                                </div>
+                                <div class="col-per-page text-right">
+                                    {**
+                                    * Items per page form (display only beside paginated grido)
+                                    *}
+                                    <div class="align-middle">
+                                        <a n:if="$filter_active" n:href="resetFilter!" class="ajax btn btn-danger btn-sm reset-filter">{_'ublaboo_datagrid.reset_filter'}</a>
+                                        {if $control->isPaginated()}
+                                            {input $filter['perPage'], data-autosubmit-per-page => TRUE, class => 'form-control pagginator-dropdown'}
+                                            {input $filter['perPage_submit'], class => 'datagrid-per-page-submit'}
+                                        {/if}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {/if}
+                    </div>
+                {/block}
+            {/form}
+        {/snippetArea}
+    </div>
+    <div n:snippet="gridModal">
+        <div class="modal fade" id="{$control->getName()}Modal" tabindex="-1" role="dialog" aria-labelledby="{$control->getName()}ModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-content">
+                    {form settings}
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="{$control->getName()}ModalLabel">Nastavení</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            {var $id = 'visibleFilters'}
+                            <label for="{$id}">
+                                {input 'visibleFilters' :, id => $id}
+                                {_'Zobrazit filtry'}
+                            </label>
+                            <table class="table table-bordered table-sm" id="sortable-table">
+                                <thead>
+                                <tr>
+                                    <th style="width: 10%;">Pozice</th>
+                                    <th style="width: 60%;">Sloupec</th>
+                                    <th style="width: 10%;">Zobrazit</th>
+                                    <th style="width: 20%;">Šířka</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {var $i = 1}
+                                    {foreach $allColumns as $k => $c}
+                                    {var $id = 'visible_'.$k}
+                                    <tr>
+                                        <td>
+                                            <span>{$i}.</span>
+                                            {input 'pos_'.$k}
+                                        </td>
+                                        <td>
+                                            {$c->getName()}
+                                        </td>
+                                        <td>
+                                            <label for="{$id}" class="mb-0">
+                                                {input 'visible_'.$k :, id => $id}
+                                                Ano
+                                            </label>
+                                        </td>
+                                        <td>
+                                            <div class="input-group input-group-sm">
+                                                {input 'width_'.$k class => 'form-control form-control-sm'}
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text">px</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {var $i += 1}
+                                {/foreach}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Zavřít</button>
+                            <button type="submit" class="btn btn-primary">Uložit změny</button>
+                        </div>
+                    {/form}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{define inlineAddRow}
+    {php $inlineAdd->onSetDefaults($filter['inline_add']); }
+
+    <tr class="datagrid-row-inline-add datagrid-row-inline-add-hidden">
+        <td n:if="$hasGroupActionOnRows" class="col-checkbox"></td>
+
+        {foreach $columns as $key => $column}
+            {var $col = 'col-' . $key}
+
+            {var $td = clone $column->getElementForRender('td', $key)}
+            {var $td->class[] = ' datagrid-inline-edit'}
+            {$td->startTag()|noescape}
+            {if isset($filter['inline_add'][$key])}
+                {input $filter['inline_add'][$key]}
+            {/if}
+            {$td->endTag()|noescape}
+        {/foreach}
+
+        <td class="col-action col-action-inline-edit">
+            {input $filter['inline_add']['cancel']}
+            {input $filter['inline_add']['submit']}
+        </td>
+    </tr>
+{/define}
+
+
+{define columnsSummary}
+    <tr class="datagrid-row-columns-summary" n:if="$columnsSummary->someColumnsExist($columns)" style="background-color: rgba(0,0,0,0.05)">
+        <td n:if="$control->hasGroupActions()" class="col-checkbox"></td>
+
+        {foreach $columns as $key => $column}
+            {var $td = $column->getElementForRender('td', $key)}
+
+            {$td->startTag()|noescape}
+            {$columnsSummary->render($key)}
+            {$td->endTag()|noescape}
+        {/foreach}
+
+        <td n:if="$actions || $control->canHideColumns() || $control->isSortable() || $itemsDetail || $inlineEdit || $inlineAdd" class="col-action col-action-{count($actions)}">
+        </td>
+    </tr>
+{/define}
+
+
+{define column-header}
+    {if $column->isHeaderEscaped()}
+        {if $column instanceof \Nette\Utils\Html}
+            {$column->getName()|noescape}
+        {else}
+            {_$column->getName()|noescape}
+        {/if}
+    {else}
+        {if $column instanceof \Nette\Utils\Html}
+            {$column->getName()}
+        {else}
+            {_$column->getName()}
+        {/if}
+    {/if}
+{/define}
+
+{define column-value}
+    {var $col = 'col-' . $key}
+    {var $item = $row->getItem()}
+
+    {if $column->hasTemplate()}
+        {include $column->getTemplate(), row => $row, item => $item, (expand) $column->getTemplateVariables()}
+    {else}
+        {ifset #$col}
+            {include #$col, item => $item}
+        {else}
+            {if $column->isTemplateEscaped()}
+                {$column->render($row)}
+            {else}
+                {$column->render($row)|noescape}
+            {/if}
+        {/ifset}
+    {/if}
+{/define}

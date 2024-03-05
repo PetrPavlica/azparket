@@ -1,0 +1,73 @@
+{block title}{_'Plán zakázek'}{/block}
+{block description}{_'Kalendář s plánem zakázek'}{/block}
+{block header-icon}<i class="fa fa-calendar-alt icon-gradient bg-happy-itmeo"></i>{/block}
+{block header-actions}
+{/block}
+{block content}
+    <fieldset style="margin-bottom: 10px; margin-top: -20px; clear: both">
+        <div class="row" style="padding-left: 20px; padding-top: 5px">
+            <div class="col-xs-12 col-sm-12 col-md-12">
+                {form displayedForm}
+                    <legend style="font-weight: bold; margin: 0; margin-left: -20px; cursor: default; padding-bottom: 5px; border-bottom: none;"
+                            id="displayed-check" class="checklist">
+                        <i class="fa fa-plus-circle"></i>
+                        {_'Zobrazení zaměstnanci'}
+                    </legend>
+
+                    <div class="row" style="display: none;">
+                        {foreach $workers as $worker}
+                            <div class="col-xs-6 col-sm-6 col-md-4 col-lg-2">
+                                {var $chname = 'displayed'.$worker->id}
+                                {include bootstrap-customswitch $form, $chname, 12, 'calendar-show'}
+                            </div>
+                        {/foreach}
+                        <div class="col-12 mt-1">
+                            <span class="showAll btn btn-success">{_'Všechny'}</span>
+                            <span class="showNone btn btn-danger">{_'Žádná'}</span>
+                            <button name="send" type="submit" class="btn btn-primary">{_'Zobrazit'}</button>
+                        </div>
+                    </div>
+                {/form}
+            </div>
+        </div>
+    </fieldset>
+
+    {* 0 - Daily plan - default[React] *}
+    {* 1 - Tender plan - default[React] *}
+    <span id="calendar-type-help" style="display: none;">0</span>
+    <div id="root"></div>
+{/block}
+{block scriptsBot}
+    <script>
+
+        $(document).on("click", ".showAll", function () {
+            $(document).find('.calendar-show').each(function () {
+                $(this).prop('checked', true);
+            });
+        });
+
+        $(document).on("click", ".showNone", function () {
+            $(document).find('.calendar-show').each(function () {
+                $(this).prop('checked', false);
+            });
+        });
+
+        $(document).on("click", ".checklist", function () {
+            var id = $(this).parent().children('div');
+
+            if ($(this).find('i').hasClass('fa-minus-circle')) {
+                if ($(id)) {
+                    $(id).css('display', 'none');
+                    $(this).find('i').addClass('fa-plus-circle');
+                    $(this).find('i').removeClass('fa-minus-circle');
+                }
+            } else {
+                if ($(id)) {
+                    $(id).css('display', 'flex');
+                    $(this).find('i').addClass('fa-minus-circle');
+                    $(this).find('i').removeClass('fa-plus-circle');
+                }
+            }
+        });
+    </script>
+{/block}

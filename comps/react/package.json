@@ -1,0 +1,41 @@
+{
+  "name": "unplugged",
+  "version": "1.0.0",
+  "private": true,
+  "author": "WebRex",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "moment": "2.24.0",
+    "path": "^0.12.7",
+    "phantomjs-prebuilt": "^2.1.16",
+    "react": "16.8.6",
+    "react-big-calendar": "^0.24.6",
+    "react-dnd": "7.4.5",
+    "react-dnd-html5-backend": "7.4.4",
+    "react-dom": "16.8.6",
+    "react-scripts": "3.0.1",
+    "webpack-atoms": "^11.1.1",
+    "webpack-cli": "^3.3.12"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "postbuild": "del /f /s /q \"../../www/bundle/build\" 1>nul && rmdir /s /q \"../../www/bundle/build\" && mv build ../../www/bundle",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "webpack": "webpack"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

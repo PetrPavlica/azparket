@@ -1,0 +1,28 @@
+<article n:if="$article" class="download">
+    <h2 n:if="$article->show_name">{$article->name}</h2>
+    {if $files}
+        <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Soubor</th>
+                    <th width="130">Typ</th>
+                    <th width="250">Velikost</th>
+                    <th width="120">Stáhnout</th>
+                </tr>
+            </thead>
+            <tbody>
+            {foreach $files as $f}
+                {var $type = pathinfo($f->path, PATHINFO_EXTENSION)}
+                <tr>
+                    <td>{$f->alt|noescape}</td>
+                    <td>{$type}</td>
+                    <td>{filesize($f->path)|bytes}</td>
+                    <td class="text-center"><a href="{$basePath}/{$f->path}" target="_blank" title="{$f->alt}"><i class="fa fa-download" aria-hidden="true"></i></a></td>
+                </tr>
+            {/foreach}
+            </tbody>
+        </table>
+        </div>
+    {/if}
+</article>

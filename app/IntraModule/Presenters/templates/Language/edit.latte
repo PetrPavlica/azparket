@@ -1,0 +1,23 @@
+{block title}
+    {ifset $entity}
+        {_'Editace jazyka'}
+    {else}
+        {_'Přidání jazyka'}
+    {/ifset}
+{/block}
+{block header-icon}<i class="fa fa-globe icon-gradient bg-mean-fruit"></i>{/block}
+{block content}
+    {form form, class=>"form-horizontal"}
+        <div class="card mb-2">
+            <div class="card-body">
+                <div class="row">
+                    {include bootstrap-input $form, 'name', 6}
+                    {include bootstrap-input $form, 'code', 6}
+                    {include bootstrap-input $form, 'orderCode', 6}
+                    {include bootstrap-input $form, 'defaultCode', 6}
+                </div>
+            </div>
+        </div>
+        {control renderer $form, 'btns'}
+    {/form}
+{/block}

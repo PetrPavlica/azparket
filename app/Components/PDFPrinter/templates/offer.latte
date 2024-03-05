@@ -1,0 +1,232 @@
+<htmlpageheader name="headerFirstPage" style="display:none">
+<div>
+    <h2 style="float:left">NABÍDKA {$offer->offerNo}</h2>
+</div>
+</htmlpageheader>
+<htmlpageheader name="headerOtherPages" style="display:none"></htmlpageheader>
+<htmlpagefooter name="footerFirstPage" style="display:none">
+
+<table class="w-100">
+    <tr class="border-top border-dark">
+        <td class="w-33 text-left">{if $offer->originator}Vytiskl: <b>{$offer->originator->name}</b>{else}&nbsp;{/if}</td>
+        <td class="w-33 text-center">Den: <b>{$date->format('j. n. Y')}</b></td>
+        <td class="w-33 text-right"><b>Zpracováno v systému AVICANA 5.0</b></td>
+    </tr>
+</table>
+
+
+</htmlpagefooter>
+<htmlpagefooter name="footerOtherPages" style="display:none"></htmlpagefooter>
+
+<div class="border border-dark">
+    <div class="w-50 float-left">
+        <div class="border-right-dark p-1">
+            <div class="px-1">DODAVATEL</div>
+            <div style="height: 90px">
+                <div class="w-33 float-left">
+                    <div class="p-1">
+                        <img src="assets/img/logo.png" alt="" style="width:70px">
+                    </div>
+                </div>
+                <div class="w-66 float-left">
+                    <div class="p-1">
+                        <span class="text-larger"><b>db Betonové Jímky s.r.o.</b></span><br><br>
+                        <span class="text-bigger">Stříbrná 851</span><br>
+                        <span class="text-bigger">593 01 Bystřice nad Pernštejnem</span><br>
+                    </div>
+                </div>
+            </div>
+            <div class="clear-fix"></div>
+
+            <div>
+                <div class="px-1 p-05">
+                    <div class="w-33 float-left">
+                        IČO: {$ico}
+                    </div>
+                    <div class="w-66 float-left">
+                        <div class="px-1">
+                            DIČ: {$dic}
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <table>
+                        <tr>
+                            <td>Email:</td>
+                            <td>jimky@db-jimky.cz</td>
+                        </tr>
+                        <tr>
+                            <td>Tel.:</td>
+                            <td>732 323 244</td>
+                        </tr>
+                    </table>
+                </div>
+
+            </div>
+                <div class="clear-fix"></div>
+        </div>
+    </div>
+    <div class="w-50 float-left">
+        <div class="p-1">
+            <div class="px-1">PŘÍJEMCE</div>
+            {if $offer->customer}
+                <div style="height: 90px">
+                    {*<div class="w-33 float-left">
+                        <div class="p-1">
+                            <img src="assets/img/logo.png" alt="" style="width:75px">
+                        </div>
+                    </div>
+                    <div class="w-66 float-left">*}
+                        <div class="p-1">
+                            <span class="text-larger"><b>{if $offer->customer->company}{$offer->customer->company}{else}{$offer->customer->fullname}{/if}</b></span><br><br>
+                            <span class="text-bigger">{$offer->customer->street}</span><br>
+                            <span class="text-bigger"> {$offer->customer->zip} {$offer->customer->city}</span><br>
+                        </div>
+                    {*</div>*}
+                </div>
+                <div class="clear-fix"></div>
+
+                <div>
+                    <div class="px-1 p-05">
+                        <div class="w-33 float-left">
+                            IČO: {$offer->customer->vatNo}
+                        </div>
+                        <div class="w-66 float-left">
+                            <div class="px-1">
+                                DIČ: {$offer->customer->idNo}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <table>
+                            <tr>
+                                <td>Email:</td>
+                                <td>{$offer->customer->email}</td>
+                            </tr>
+                            <tr>
+                                <td>Tel.:</td>
+                                <td>{$offer->customer->phone}</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                </div>
+            <div class="clear-fix"></div>
+            {/if}
+        </div>
+    </div>
+</div>
+
+{var $priceProduct = 0}
+
+<div class="py-1">
+    <table class="w-100">
+        <tr class="border-bottom border-dashed">
+            <th class="w-50 text-left text-bigger">Položky nabídky</th>
+            <th class="w-25 text-right text-bigger">Množství</th>
+            <th class="w-25 text-right text-bigger">Hmotnost/ks</th>
+        </tr>
+        {foreach $offer->products as $op}
+            {var $priceProduct += $op->price}
+            {var $p = $op->product}
+            <tr class="{if !$iterator->isLast()}border-bottom{/if} border-dashed">
+                <td class="text-left">
+                    {if $p}
+                        {$p->nazev_polozky}
+                    {else}
+                        &nbsp;
+                    {/if}
+                </td>
+                <td class="text-right bold">
+                    {$op->count|number:2, ',', ' '}
+                    {if $p}
+                        {$p->zkratka_mj}
+                    {/if}
+                </td>
+                <td class="text-right bold">
+                    {if $p && $p->hmotnost_mj}
+                        {$p->hmotnost_mj} kg
+                    {else}
+                        x
+                    {/if}
+                </td>
+            </tr>
+        {/foreach}
+    </table>
+</div>
+
+<div>
+    <table class="border border-dark border-fat w-100">
+        <tr>
+            <td class="text-bigger bold">Součet položek bez DPH</td>
+            <td class="text-right bold">{$priceProduct|number:2, ',', ' '} Kč</td>
+        </tr>
+        <tr>
+            <td class="bold text-smaller">Místo dodání: &nbsp; {$offer->installCity}</td>
+            <td>&nbsp;</td>
+        </tr>
+        {if $offer->priceCrane}
+            <tr>
+                <td class="text-smaller text-danger">
+                    Cena jeřábu bez DPH
+                </td>
+                <td class="text-right text-smaller text-danger">{$offer->priceCrane|number:2, ',', ' '} Kč</td>
+            </tr>
+        {else}
+            <tr>
+                <td class="text-smaller text-danger">
+                    <b>Cena jeřábu bez DPH</b><br>
+                    <u>Pokud není cena jeřábu zahrnuta v ceně,
+                    zajistí objednatel jeřáb dostatečné nostnosti
+                    na předem dohodnutý termín dodání.</u>
+                </td>
+                <td class="text-right text-smaller text-danger bold">Není zahrnuta v ceně</td>
+            </tr>
+        {/if}
+        <tr>
+            <td class="bold">Cena dopravy bez DPH</td>
+            <td class="text-right bold">{$offer->priceDelivery|number:2, ',', ' '} Kč</td>
+        </tr>
+        <tr class="border-bottom border-dark">
+            <td class="bold">Cena montáže bez DPH</td>
+            <td class="text-right bold">{$offer->priceInstall|number:2, ',', ' '} Kč</td>
+        </tr>
+        <tr class="border-bottom border-fat border-dark">
+            <td class="bold text-bigger">Celková cena bez DPH</td>
+            <td class="bold text-right text-bigger">{$offer->price|number:2, ',', ' '} Kč</td>
+        </tr>
+        <tr>
+            <td class="bold text-bigger">DPH &nbsp;&nbsp;&nbsp; {if $offer->vat}{$offer->vat->name}{else}0 %{/if}</td>
+            <td class="text-right bold text-bigger">{if $offer->vat}{$offer->vat->value / 100 * $offer->price|number:2, ',', ' '}{else}{0|number:2, ',', ' '} Kč{/if}</td>
+        </tr>
+        <tr>
+            <td class="bold text-bigger">Celková cena vč. DPH</td>
+            <td class="text-right bold text-bigger">{if $offer->vat}{(100 + $offer->vat->value) / 100 * $offer->price|number:2, ',', ' '}{else}{$offer->price|number:2, ',', ' '} Kč{/if}</td>
+        </tr>
+    </table>
+</div>
+
+<div class="text-small p-2" style="color:#33d">
+    <i>
+    Platební podmínky:<br>
+    Cena platí při úhradě záloha 50% + doplatek 50%.<br>
+    Při úhradě 100% předem poskytneme slevu z ceny materiálu -3%<br>
+    <br>
+    Součástí CN není:<br>
+    &nbsp;&nbsp;&nbsp;- zemní práce a příprava podloží<br>
+    &nbsp;&nbsp;&nbsp;- jeřáb – objednává stavba na cca 1-2 hod (+ patkování)<br>
+    &nbsp;&nbsp;&nbsp;- finální dorovnání poklopů do úrovně terénu<br>
+    <br>
+    Nádrž je přejezdná vozidly s celkovou hmotností do 3,5 t.<br>
+    Není uvažováno s výskytem spodní vody v případě jejího výskytu se musí přepočítat vztlak.<br>
+    <br>
+    Vzhledem k současné situaci na trhu cen nákladní dopravy je v nabídce uvedena předpokládaná cena dopravy, která bude
+    aktualizována/potvrzena k termínu objednání.<br>
+    <br>
+    Cena dopravy výrobků je platná pro dovoz silničními návěsy. Případné požadavky na dopravu "sólo" autem, nebo silniční
+    soupravou musí být vzneseny při objednávce, kdy bude cena potvrzena nebo upravena dle konkrétní situace smluvních
+    dopravců.
+    </i>
+</div>

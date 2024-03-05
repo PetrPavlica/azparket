@@ -1,0 +1,11 @@
+{block title}{_'Absence'}{/block}
+{block description}{_'Seznam absencí'}{/block}
+{block header-icon}<i class="fa fa-user-times icon-gradient bg-happy-itmeo"></i>{/block}
+{block header-actions}
+    <a n:if="!isset($absenceState) || (isset($absenceState) && $absenceState->id == 1)" n:href="Absence:edit" class="btn btn-primary">
+        {_'Nová absence'}
+    </a>
+{/block}
+{block content}
+    {control table}
+{/block}

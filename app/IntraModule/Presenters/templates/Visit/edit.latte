@@ -1,0 +1,1395 @@
+{block title}
+    {ifset $entity}
+        {_'Editace výjezdu'}
+    {else}
+        {_'Přidání výjezdu'}
+    {/ifset}
+{/block}
+{block description}
+    {ifset $entity}
+        {_'Editace stávajícího výjezdu'}
+    {else}
+        {_'Přidání nového výjezdu'}
+    {/ifset}
+{/block}
+{block header-icon}<i class="fa fa-suitcase icon-gradient bg-happy-itmeo"></i>{/block}
+{block header-actions}
+    <a n:href="Visit:default" class="btn btn-outline-primary">
+        {_'Zpět'}
+    </a>
+{/block}
+{block body-start}
+    <div class="spinner-wrap" style="display: none;"><div class="spinner-dual-ring"></div></div>
+{/block}
+
+{block content}
+
+    <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
+        <li class="nav-item"><a class="nav-link {if empty($openTab) || $openTab == '#home'}show active{/if}" data-toggle="tab" id="tab-1" href="#home" role="tab"><span>Úvod</span></a></li>
+        <li class="nav-item"><a class="nav-link {if $openTab == '#bozp'}show active{/if}" data-toggle="tab" id="tab-2" href="#bozp" role="tab"><span>Bozp</span></a></li>
+        <li n:if="isset($entity)" class="nav-item"><a class="nav-link {if $openTab == '#docs'}show active{/if}" data-toggle="tab" id="tab-3" href="#docs" role="tab"><span>Dokumenty</span></a></li>
+        <li n:if="isset($entity) && $usrGrp != 2" class="nav-item"><a class="nav-link {if $openTab == '#workflowChange'}show active{/if}" data-toggle="tab" id="tab-4" href="#workflowChange" role="tab"><span>Změny workflow</span></a></li>
+    </ul>
+
+    {snippetArea visitForm}
+        {form form}
+            {input id}
+            <div class="tab-content">
+
+                <div id="home" class="tab-pane tabs-animation fade {if empty($openTab) || $openTab == '#home'}show active{/if}">
+                    <div class="card mb-2">
+                        <div class="card-header">
+                            {_'Základní informace'}
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 col-sm-12 col-xs-12">
+                                    <div class="form-row">
+                                        {include bootstrap-autocomplete $form, 'traffic', 12, 'getTraffics', '', 'handleTrafficsAutocmplt'}
+                                        {include bootstrap-autocomplete $form, 'customer', 12, 'getCustomers', '', ''}
+                                        {include bootstrap-autocomplete $form, 'customerOrdered', 12, 'getCustomerOrdereds', '', ''}
+                                        {include bootstrap-autocomplete $form, 'visitProcess', 12, 'getVisitProcess', '', 'handleVisitProcessAutocmplt'}
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-12 col-xs-12">
+                                    <div class="form-row">
+                                        {include bootstrap-input $form, 'state', 6}
+                                        {include bootstrap-input $form, 'status', 6}
+                                        {include bootstrap-input $form, 'orderFinish', 6}
+                                        {include bootstrap-input $form, 'name', 12}
+                                        <div class="d-none">
+                                            {include bootstrap-input $form, 'orderId', 12}
+                                        </div>
+                                        {include bootstrap-input $form, 'orderId2', 12}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="accordion1">
+                        <div class="card mb-2">
+                            <div class="card-header">
+                                <a class="card-link" data-toggle="collapse" href="#collapse1">
+                                    <i class="fa fa-plus"></i> {_'Doplňující informace'}
+                                </a>
+                            </div>
+                            <div id="collapse1" class="collapse" data-parent="#accordion1">
+                                <div class="card-body">
+                                    <div class="form-row">
+                                        {include bootstrap-input $form, 'device', 4}
+                                        {include bootstrap-input $form, 'serialNumber', 4}
+                                        {include bootstrap-input $form, 'position', 4}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="accordion2">
+                        <div class="card mb-2">
+                            <div class="card-header">
+                                <a class="card-link" data-toggle="collapse" href="#collapse2">
+                                    <i class="fa fa-plus"></i> {_'Období výjezdu'}
+                                </a>
+                            </div>
+                            <div id="collapse2" class="collapse show" data-parent="#accordion2">
+                                <div class="card-body">
+                                    <div class="form-row">
+                                        {include bootstrap-input $form, 'dateDeadline', 3}
+                                        {include bootstrap-input $form, 'deadlineTimes', 3}
+                                        {include bootstrap-input $form, 'minutesBefore', 3}
+                                        {include bootstrap-input $form, 'minutesAfter', 3}
+                                        {*include bootstrap-input $form, 'service', 6*}
+                                        {include bootstrap-switchtoggle $form, 'service', 6, '<i class="fa fa-check"></i>&nbsp;&nbsp; Ano', '<i class="fa fa-times"></i>&nbsp;&nbsp; Ne', 'success', 'danger', 'slow', 'sm', '80'}
+                                        {include bootstrap-input $form, 'worker', 6}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="accordion3">
+                        <div class="card mb-2">
+                            <div class="card-header">
+                                <a class="card-link" data-toggle="collapse" href="#collapse3">
+                                    <i class="fa fa-plus"></i> {_'Podrobné informace'}
+                                </a>
+                            </div>
+                            <div id="collapse3" class="collapse" data-parent="#accordion3">
+                                <div class="card-body">
+                                    <div class="form-row">
+                                        {include bootstrap-input $form, 'description', 6}
+                                        {include bootstrap-input $form, 'workDescription', 6}
+                                        {*include bootstrap-input $form, 'freeDeli', 3*}
+                                        {include bootstrap-switchtoggle $form, 'freeDeli', 3, '<i class="fa fa-check"></i>&nbsp;&nbsp; Ano', '<i class="fa fa-times"></i>&nbsp;&nbsp; Ne', 'success', 'danger', 'slow', 'sm', '80'}
+                                        {include bootstrap-input $form, 'ships', 3}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="accordion4">
+                        <div class="card mb-2">
+                            <div class="card-header">
+                                <a class="card-link" data-toggle="collapse" href="#collapse4">
+                                    <i class="fa fa-plus"></i> {_'Použitý materiál'}
+                                </a>
+                                <span n:if="isset($entity)" style="cursor: pointer" class="checkMaterialPart btn btn-primary ml-auto" {*data-toggle="modal" data-target="#materialModal"*} data-id="0">
+                                    <i class="fa fa-plus"></i> Přidat materiál
+                                </span>
+                            </div>
+                            <div id="collapse4" class="collapse" data-parent="#accordion4">
+                                <div class="card-body">
+                                    <div class="">
+                                        {snippet material-visit}
+                                            {if isset($entity)}
+                                                <div class="table-responsive">
+                                                    <table id="operationTable" class="table table-bordered table-stripped">
+                                                        <thead>
+                                                        <tr>
+                                                            <th class="text-left">
+                                                                {_'M. číslo'}
+                                                            </th>
+                                                            <th class="text-center">
+                                                                {_'Popis'}
+                                                            </th>
+                                                            <th class="text-center">
+                                                                {_'Množství'}
+                                                            </th>
+                                                            <th class="text-center">
+                                                                {_'Jednotka'}
+                                                            </th>
+                                                            <th class="text-center">
+                                                                {_'Sklad'}
+                                                            </th>
+                                                            <th class="text-center">
+                                                                {_'Akce'}
+                                                            </th>
+                                                        </thead>
+                                                        <tbody>
+                                                        {if isset($material) && $material}
+                                                            {foreach $material as $mat}
+                                                                <tr>
+                                                                    <td class="text-left">
+                                                                        {$mat->number}
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        {$mat->description}
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        {$mat->count}
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        {$mat->unit}
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        {$mat->stock}
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        <span style="cursor: pointer; font-size: 16px;" class="checkMaterialPart" {*data-toggle="modal" data-target="#materialModal"*} data-id="{$mat->id}"><i class="fa fa-edit"></i></span>
+                                                                        <span style="cursor: pointer; font-size: 16px; margin-left: 20px;" class="" data-id="{$mat->id}" data-confirm-sweetalert2="delete" data-success-click="#removeMaterialPart{$mat->id}"><i class="fa fa-trash text-danger"></i></span>
+                                                                        <span style="display: none;" class="removeMaterialPart" data-id="{$mat->id}" id="removeMaterialPart{$mat->id}"></span>
+                                                                    </td>
+                                                                </tr>
+                                                            {/foreach}
+                                                        {/if}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            {else}
+                                                {_'Materiál lze přidat až je výjezd poprvé uložen.'}<br/><br/>
+                                            {/if}
+                                        {/snippet}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="accordion5">
+                        <div class="card mb-2">
+                            <div class="card-header">
+                                <a class="card-link" data-toggle="collapse" href="#collapse5">
+                                    <i class="fa fa-plus"></i> {_'Nutno objednat materiál'}
+                                </a>
+                            </div>
+                            <div id="collapse5" class="collapse" data-parent="#accordion5">
+                                <div class="card-body">
+                                    {snippet materialNeedBuy}
+                                        {ifset $entity}
+                                            <div class="form-row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <div class="input-group">
+                                                            <input data-source="{link dataSource! 'getMaterials'}" data-to-send=""
+                                                                   data-output=".searchMaterialNeedBuy-autocomplete" type="text" name="textsearchMaterialNeedBuy"
+                                                                   id="textsearchMaterialNeedBuy" class="form-control autocomplete-input"
+                                                                   data-preload=false data-suggest=true data-minlen=1 data-toggle=completer title="" placeholder="Nutno objednat">
+                                                            <input name="searchMaterialNeedBuy" id="searchMaterialNeedBuy" class="searchMaterialNeedBuy-autocomplete" type="hidden">
+                                                            <span class="input-group-append">
+                                                                <span class="input-group-text remove-autocomplete-value"><i class="fa fa-times"></i></span>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <span>
+                                                    <button name="addNeedBuy" type="submit" class="btn btn-info ajax"><i class="fa fa-plus"/> {_'Přidat nutno objednat'}</button>
+                                                </span>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="table-responsive">
+                                                        <table id="operationTable" class="table table-bordered table-stripped">
+                                                            <thead>
+                                                            <tr>
+                                                                <th class="text-left">
+                                                                    {_'Název'}
+                                                                </th>
+                                                                <th class="text-center">
+                                                                    {_'Akce'}
+                                                                </th>
+                                                            </thead>
+                                                            <tbody>
+                                                            {if isset($needBuyMat) && $needBuyMat}
+                                                                {foreach $needBuyMat as $buy}
+                                                                    <tr>
+                                                                        <td class="text-left">
+                                                                            {$buy->name}
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            <span style="cursor: pointer; font-size: 16px; margin-left: 20px;" class="" data-id="{$buy->id}" data-confirm-sweetalert2="delete" data-success-click="#removeMaterialNeedBuyPart{$buy->id}"><i class="fa fa-trash text-danger"></i></span>
+                                                                            <span style="display: none;" class="removeMaterialNeedBuyPart" data-id="{$buy->id}" id="removeMaterialNeedBuyPart{$buy->id}"></span>
+                                                                        </td>
+                                                                    </tr>
+                                                                {/foreach}
+                                                            {/if}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {else}
+                                            {_'Nutno objednat lze přidat až je výjezd poprvé uložen.'}<br/><br/>
+                                        {/ifset}
+                                    {/snippet}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="accordion6">
+                        <div class="card mb-2">
+                            <div class="card-header">
+                                <a class="card-link" data-toggle="collapse" href="#collapse6">
+                                    <i class="fa fa-plus"></i> {_'Evidenční kniha'}
+                                </a>
+                            </div>
+                            <div id="collapse6" class="collapse" data-parent="#accordion6">
+                                <div class="card-body">
+                                    <div class="form-row">
+                                        {include bootstrap-input $form, 'demadgeOther', 3}
+                                        {include bootstrap-input $form, 'writeEvidenceBook', 3}
+                                        {include bootstrap-input $form, 'evidenceBook', 3}
+                                        {include bootstrap-input $form, 'refrigerantProducer', 3}
+                                        {include bootstrap-input $form, 'refrigerantManufactureYear', 3}
+                                        {include bootstrap-input $form, 'refrigerantDetector', 3}
+                                        {include bootstrap-autocomplete $form, 'refrigerant', 3, 'getRefrigerantMaterials', '', ''}
+                                        {include bootstrap-input $form, 'amountCooling', 3}
+                                        {include bootstrap-input $form, 'refrigerantDetectionSystem', 3}
+                                        {include bootstrap-input $form, 'refrigerantDevicesIsOk', 3}
+                                        {include bootstrap-input $form, 'refrigerantTypeRevision', 3}
+                                        {include bootstrap-input $form, 'refrigerantDemadge', 3}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="accordion7">
+                        <div class="card mb-2">
+                            <div class="card-header">
+                                <a class="card-link" data-toggle="collapse" href="#collapse7">
+                                    <i class="fa fa-plus"></i> {_'Trvání výjezdu'}
+                                </a>
+                            </div>
+                            <div id="collapse7" class="collapse show" data-parent="#accordion7">
+                                <div class="card-body">
+                                    <div class="form-row">
+                                        {include bootstrap-input $form, 'dateStart', 3}
+                                        {include bootstrap-input $form, 'onceTimes', 3}
+                                        {include bootstrap-input $form, 'durationHours', 3}
+                                        {include bootstrap-input $form, 'durationMinutes', 3}
+                                    </div>
+                                    <span n:snippet="serviceWorkerMsg" style="color: red">
+                                        {ifset $serviceWorker} {$serviceWorker} {/ifset}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="accordion8">
+                        <div class="card mb-2">
+                            <div class="card-header">
+                                <a class="card-link" data-toggle="collapse" href="#collapse8">
+                                    <i class="fa fa-plus"></i> {_'Informace o zákazníkovi'}
+                                </a>
+                            </div>
+                            <div id="collapse8" class="collapse" data-parent="#accordion8">
+                                <div class="card-body">
+                                    <div class="form-row">
+                                        {include bootstrap-input $form, 'handover', 6}
+                                        {include bootstrap-input $form, 'nameCustomer', 6}
+                                        {input signature}
+                                    </div>
+                                </div>
+                                <div class="card-header border_top_card">
+                                    {_'Podpis'}
+                                    <div class="ml-auto mr-auto">
+                                        <input type="file" id="signatureFile" accept="image/*" style="display: none;">
+                                        <button id="createSignature" type="button" class="btn btn-outline-dark btn-sm">Vytvořit podpis</button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    {var $data = $form['signature']->getValue()}
+                                    <img id="signaturePreview" src="{$data|nocheck}" style="max-width: 300px; max-height: 75px;" alt="">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <a n:href="Visit:default" class="btn btn-outline-primary">
+                                <span class="fa fa-arrow-left" aria-hidden="true"></span>
+                                {_'Zpět'}
+                            </a>
+                            <span class="pull-right">
+                                <button name="sendBack" type="submit" class="btn btn-primary">Uložit a zpět</button>
+                                <button name="sendSave" type="submit" class="btn btn-primary">Uložit a pokračovat</button>
+                                <button name="sendNew" type="submit" class="btn btn-primary">Uložit a nový</button>
+                                <button name="ajSend" id="ajSend" type="submit" style="display: none;" class="ajax">&nbsp;</button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="bozp" class="tab-pane tabs-animation fade {if $openTab == '#bozp'}show active{/if}">
+                    <div class="card mb-2">
+                        <div class="card-header">
+                            {_'BOZP'}
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-12 col-md-6">
+                                    {include bootstrap-input $form, 'bozp', 12}
+                                </div>
+                            </div>
+                            <br><br>
+                            <div id="bozpParamFrm">
+                                <div class="row">
+                                    <div class="col-xs-12 com-sm-6 col-md-3">
+                                        {include bootstrap-input $form, 'bozpElVoltage', 12}
+                                        <div id="bozpElVoltageTextM">
+                                            {include bootstrap-input $form, 'bozpElVoltageText', 12}
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12 com-sm-6 col-md-3">
+                                        {include bootstrap-input $form, 'bozpHeight', 12}
+                                        <div id="bozpHeightTextM">
+                                            {include bootstrap-input $form, 'bozpHeightText', 12}
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12 com-sm-6 col-md-3">
+                                        {include bootstrap-input $form, 'bozpHazardVoltage', 12}
+                                        <div id="bozpHazardVoltageTextM">
+                                            {include bootstrap-input $form, 'bozpHazardVoltageText', 12}
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12 com-sm-6 col-md-3">
+                                        {include bootstrap-input $form, 'bozpArea', 12}
+                                        <div id="bozpAreaTextM">
+                                            {include bootstrap-input $form, 'bozpAreaText', 12}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-12 com-sm-6 col-md-3">
+                                        {include bootstrap-input $form, 'bozpUnderBurden', 12}
+                                        <div id="bozpUnderBurdenTextM">
+                                            {include bootstrap-input $form, 'bozpUnderBurdenText', 12}
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12 com-sm-6 col-md-3">
+                                        {include bootstrap-input $form, 'bozpVzv', 12}
+                                        <div id="bozpVzvTextM">
+                                            {include bootstrap-input $form, 'bozpVzvText', 12}
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12 com-sm-6 col-md-3">
+                                        {include bootstrap-input $form, 'bozpHurt', 12}
+                                        <div id="bozpHurtTextM">
+                                            {include bootstrap-input $form, 'bozpHurtText', 12}
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12 com-sm-6 col-md-3">
+                                        {include bootstrap-input $form, 'bozpCut', 12}
+                                        <div id="bozpCutTextM">
+                                            {include bootstrap-input $form, 'bozpCutText', 12}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-12 com-sm-6 col-md-3">
+                                        {include bootstrap-input $form, 'bozpWelding', 12}
+                                        <div id="bozpWeldingTextM">
+                                            {include bootstrap-input $form, 'bozpWeldingText', 12}
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12 com-sm-6 col-md-3">
+                                        {include bootstrap-input $form, 'bozpCooling', 12}
+                                        <div id="bozpCoolingTextM">
+                                            {include bootstrap-input $form, 'bozpCoolingText', 12}
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12 com-sm-6 col-md-3">
+                                        {include bootstrap-input $form, 'bozpChemikals', 12}
+                                        <div id="bozpChemikalsTextM">
+                                            {include bootstrap-input $form, 'bozpChemikalsText', 12}
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12 com-sm-6 col-md-3">
+                                        {include bootstrap-input $form, 'bozpOxygen', 12}
+                                        <div id="bozpOxygenTextM">
+                                            {include bootstrap-input $form, 'bozpOxygenText', 12}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-12 com-sm-6 col-md-3">
+                                        {include bootstrap-input $form, 'bozpBurden', 12}
+                                        <div id="bozpBurdenTextM">
+                                            {include bootstrap-input $form, 'bozpBurdenText', 12}
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12 com-sm-6 col-md-3">
+                                        {include bootstrap-input $form, 'bozpFall', 12}
+                                        <div id="bozpFallTextM">
+                                            {include bootstrap-input $form, 'bozpFallText', 12}
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12 com-sm-6 col-md-3">
+                                        {include bootstrap-input $form, 'bozpFlySubject', 12}
+                                        <div id="bozpFlySubjectTextM">
+                                            {include bootstrap-input $form, 'bozpFlySubjectText', 12}
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12 com-sm-6 col-md-3">
+                                        {include bootstrap-input $form, 'bozpRotateSubject', 12}
+                                        <div id="bozpRotateSubjectTextM">
+                                            {include bootstrap-input $form, 'bozpRotateSubjectText', 12}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-12 com-sm-6 col-md-3">
+                                        {include bootstrap-input $form, 'bozpNoise', 12}
+                                        <div id="bozpNoiseTextM">
+                                            {include bootstrap-input $form, 'bozpNoiseText', 12}
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12 com-sm-6 col-md-3">
+                                        {include bootstrap-input $form, 'bozpAsbest', 12}
+                                        <div id="bozpAsbestTextM">
+                                            {include bootstrap-input $form, 'bozpAsbestText', 12}
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12 com-sm-6 col-md-3">
+                                        {include bootstrap-input $form, 'bozpOther', 12}
+                                        <div id="bozpOtherTextM">
+                                            {include bootstrap-input $form, 'bozpOtherText', 12}
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12 com-sm-6 col-md-3">
+                                        {include bootstrap-input $form, 'bozpClothes', 12}
+                                    {*<div id="bozpClothesTextM">
+                                        {include bootstrap-input $form, 'bozpClothesText', 12}
+                                    </div>*}
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-12 com-sm-6 col-md-3">
+                                        {include bootstrap-input $form, 'bozpUseClothes', 12}
+                                        <div id="bozpUseClothesTextM">
+                                            {include bootstrap-input $form, 'bozpUseClothesText', 12}
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12 com-sm-6 col-md-3">
+                                        {include bootstrap-input $form, 'bozpCheck', 12}
+                                        <div id="bozpCheckTextM">
+                                            {include bootstrap-input $form, 'bozpCheckText', 12}
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12 com-sm-6 col-md-3">
+                                        {include bootstrap-input $form, 'bozpInformationOther', 12}
+                                        <div id="bozpInformationOtherTextM">
+                                            {include bootstrap-input $form, 'bozpInformationOtherText', 12}
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12 com-sm-6 col-md-3">
+                                        {include bootstrap-input $form, 'bozpSafety', 12}
+                                        <div id="bozpSafetyTextM">
+                                            {include bootstrap-input $form, 'bozpSafetyText', 12}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <a n:href="Visit:default" class="btn btn-outline-primary">
+                                <span class="fa fa-arrow-left" aria-hidden="true"></span>
+                                {_'Zpět'}
+                            </a>
+                            <span class="pull-right">
+                                <button name="sendBack" type="submit" class="btn btn-primary">Uložit a zpět</button>
+                                <button name="sendSave" type="submit" class="btn btn-primary">Uložit a pokračovat</button>
+                                <button name="sendNew" type="submit" class="btn btn-primary">Uložit a nový</button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div id="docs" n:if="isset($entity)" class="tab-pane tabs-animation fade {if $openTab == '#docs'}show active{/if}">
+                    <div class="card mb-2">
+                        <div class="card-header">
+                            {_'Dokumenty'}
+                        </div>
+                        <div class="card-body">
+                            {if isset($entity)}
+                                <div class="row">
+                                    <div class="col-md-6 pr-md-5">
+                                        <div class="dropzone ajax" id="files-dropzone">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6" n:snippet="product-documents">
+                                        <button name="downloadDocs" type="submit" class="btn btn-warning btn-sm">Stáhnout označené dokumenty</button>
+                                        <button name="sendEmailDocs" type="submit" class="btn btn-warning btn-sm">Odeslat označené dokumenty</button>
+                                        <button name="sendInvoicingDocs" type="submit" class="btn btn-warning btn-sm">Odeslat na fakturaci</button>
+                                        <br><br>
+                                        <table class="table table-bordered table-sm" id="sortable-table">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 3%;">#</th>
+                                                    <th style="width: 2%;">#</th>
+                                                    <th style="width: 25%;">Název</th>
+                                                    <th style="width: 10%;">Přidal</th>
+                                                    <th style="width: 10%;">Datum</th>
+                                                    <th style="width: 10%;">Náhled</th>
+                                                    <th style="width: 10%;">Akce</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {if isset($documents) && $documents}
+                                                    {foreach $documents as $document}
+                                                        <tr>
+                                                            <td><input type="checkbox" name="doc/{$document->id}" id="doc/{$document->id}"></td>
+                                                            <td class="text-center">{$iterator}.</td>
+                                                            <td style="word-break: break-word;">
+                                                                {$document->name}
+                                                                {*substr($document->document, strrpos($document->document, '/') + 1)*}
+                                                            </td>
+                                                            <td>
+                                                                {if $document->user}{$document->user->name}{/if}
+                                                            </td>
+                                                            <td>
+                                                                {$document->createdAt->format('d.m.Y H:i:s')}
+                                                            </td>
+                                                            <td>
+                                                                <a n:if="$document->document && file_exists($document->document) && exif_imagetype($document->document)" data-fancybox="gallery" href="{$basePath}/{$document->document}">
+                                                                    <img src="{$basePath}/{$document->document}" style="max-height: 50px; max-width: 150px;">
+                                                                </a>
+                                                            </td>
+                                                            <td>
+                                                                <a style="cursor: pointer" class="" href="{$basePath}/{$document->document}" download="{$document->name}"><i class="fa fa-download text-success pl-2 pr-3"></i></a>
+                                                                <a style="cursor: pointer" class="" n:href="deleteVisitDocument! documentId => $document->id" data-confirm-sweetalert2="delete"><i class="fa fa-trash text-danger"></i></a>
+                                                            </td>
+                                                        </tr>
+                                                    {/foreach}
+                                                {/if}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            {else}
+                                <div>{_'Dokumenty můžete vkládat, až bude návštěna poprvé uložena.'}</div>
+                            {/if}
+                        </div>
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <a n:href="Visit:default" class="btn btn-outline-primary">
+                                <span class="fa fa-arrow-left" aria-hidden="true"></span>
+                                {_'Zpět'}
+                            </a>
+                            <span class="pull-right">
+                                <button name="sendBack" type="submit" class="btn btn-primary">Uložit a zpět</button>
+                                <button name="sendSave" type="submit" class="btn btn-primary">Uložit a pokračovat</button>
+                                <button name="sendNew" type="submit" class="btn btn-primary">Uložit a nový</button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="workflowChange" n:if="isset($entity) && $usrGrp != 2" class="tab-pane tabs-animation fade {if $openTab == '#workflowChange'}show active{/if}">
+                    <div class="card mb-2">
+                        <div class="card-header">
+                            {_'Změny workflow'}
+                        </div>
+                        <div class="card-body">
+                            {if isset($entity)}
+                                {if $entity->visitLog && count($entity->visitLog)}
+                                    <table class="table table-bordered table-sm" id="sortable-table">
+                                        <thead>
+                                            <tr>
+                                                <th class="" style="width: 20%;">Datum</th>
+                                                <th class="" style="width: 20%;">Změnil</th>
+                                                <th class="" style="width: 20%;">Změna</th>
+                                                <th class="" style="width: 20%;">Z</th>
+                                                <th class="" style="width: 20%;">Na</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {foreach $entity->visitLog as $log}
+                                                <tr>
+                                                    <td class="" style="">{$log->foundedDate|date:'j.n.Y H:i:s'}</td>
+                                                    <td class="" style="">{if $log->user}{$log->user->name}{/if}</td>
+                                                    <td class="" style="word-break: break-word;">{$log->text}</td>
+                                                    <td class="" style="word-break: break-word;">{$log->oldText}</td>
+                                                    <td class="" style="word-break: break-word;">{$log->newText}</td>
+                                                </tr>
+                                            {/foreach}
+                                        </tbody>
+                                    </table>
+                                {else}
+                                    <div>{_'Nepodařilo se najít žádné změny.'}</div>
+                                {/if}
+                            {else}
+                                <div>{_'Změny lze sledovat, až bude návštěna poprvé uložena.'}</div>
+                            {/if}
+                        </div>
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <a n:href="Visit:default" class="btn btn-outline-primary">
+                                <span class="fa fa-arrow-left" aria-hidden="true"></span>
+                                {_'Zpět'}
+                            </a>
+                            <span class="pull-right">
+                                <button name="sendBack" type="submit" class="btn btn-primary">Uložit a zpět</button>
+                                <button name="sendSave" type="submit" class="btn btn-primary">Uložit a pokračovat</button>
+                                <button name="sendNew" type="submit" class="btn btn-primary">Uložit a nový</button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        {/form}
+    {/snippetArea}
+{/block}
+{block scriptsBot}
+    <div id="signatureModal" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Vytvoření podpisu</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <canvas id="signatureCanvas" width="470" height="117.5"></canvas>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="insertSignature">Vložit</button>
+                    <button type="button" class="btn btn-dark" data-dismiss="modal">Zavřít</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {snippetArea materialModalParent}
+        <div n:ifset="$entity" class="modal fade" id="materialModal" tabindex="-1" role="dialog" aria-labelledby="materialModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+                <div class="modal-content" n:snippet="materialModal">
+                    {form materialModalForm}
+                        {input 'id'}
+                        <input type="hidden" name="visit_id" value="{$entity->id}">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="partModalLabel">Materiál</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <style type="text/css">
+
+                        </style>
+                        <div class="modal-body compact-my-modal">
+                            <div class="row">
+                                {include bootstrap-input $form, 'number', 4}
+                                {include bootstrap-autocomplete $form, 'material', 4, 'getMaterials', '', 'handleMaterialsAutocmplt'}
+                                {include bootstrap-input $form, 'count', 4}
+                                {include bootstrap-input $form, 'unit', 4}
+                                {include bootstrap-input $form, 'stock', 4}
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button name="sendMat" type="submit" class="btn btn-primary">Uložit</button>
+                            <button name="sendMatNew" type="submit" class="btn btn-primary ajax">Uložit a nový</button>
+                            <button type="button" class="btn btn-dark" data-dismiss="modal">Zavřít</button>
+                        </div>
+                        <script type="text/javascript">
+                            $(document).ready(function () {
+                                setTimeout(function () {
+                                    $(document).find('input[data-toggle="completer"]').completer();
+                                    $(document).find('input[data-toggle="completer"]').completer('place');
+                                }, 2000);
+                            });
+                        </script>
+                    {/form}
+                </div>
+            </div>
+        </div>
+    {/snippetArea}
+<script>
+    {if isset($entity)}
+        {var $visitId = $entity->id}
+    {else}
+        {var $visitId = 0}
+    {/if}
+    Dropzone.options.filesDropzone = { // camelized version of the `id`
+        dictDefaultMessage: 'Pro nahrání souborů je přetáhněte sem nebo klikněte zde a vyberte.',
+        url: {link editFile! idVisit => $visitId},
+        init : function() {
+            this.on("queuecomplete", function(file) {
+                $.nette.ajax({
+                    'url': {link updateFiles!}
+                });
+            });
+        }
+    };
+
+    $(function () {
+
+        var matClick = false;
+        var matClickRemove = false;
+        var matNeedBuyClickRemove = false;
+        var matNeedBuyId = null;
+        var matIdGlob = 0;
+
+        $(document).ajaxComplete(function () {
+            if (matClick) {
+                prepareModalMaterial(matIdGlob);
+                matClick = false;
+            }
+            if (matClickRemove) {
+                removeModalMaterial(matIdGlob);
+                matClickRemove = false;
+            }
+            if (matNeedBuyClickRemove) {
+                removeMaterialNeedBuyPart(matNeedBuyId);
+                matNeedBuyClickRemove = false;
+                matNeedBuyId = null;
+            }
+            $(document).find('input[data-toggle="completer"]').completer();
+            $(document).find('input[data-toggle="completer"]').completer('place');
+        });
+
+        $(document).on('click', '#files-dropzone', function (e) {
+            e.preventDefault();
+            $("button[name='ajSend']").click();
+        });
+
+        $(document).on('click', '.checkMaterialPart', function (e) {
+            $('.spinner-wrap').show();
+            var matId = $(this).attr('data-id');
+            e.preventDefault();
+            matIdGlob = matId;
+            $("button[name='ajSend']").click();
+            matClick = true;
+        });
+        function prepareModalMaterial(matId) {
+            $.nette.ajax({
+                url: {link checkMaterialPart!},
+                type: 'POST',
+                data: {
+                    material : matId
+                },
+                success: function(data){
+                    $('.spinner-wrap').hide();
+                    $('#materialModal').modal('show');
+                    setTimeout(function () {
+                        $(document).find('input[data-toggle="completer"]').completer();
+                        $(document).find('input[data-toggle="completer"]').completer('place');
+                    }, 2000);
+                }
+            });
+        }
+
+        $(document).on('click', '.removeMaterialPart', function (e) {
+            $('.spinner-wrap').show();
+            var matId = $(this).attr('data-id');
+            e.preventDefault();
+            matIdGlob = matId;
+            $("button[name='ajSend']").click();
+            matClickRemove = true;
+        });
+        function removeModalMaterial(matId) {
+            $.nette.ajax({
+                url: {link removeMaterialPart!},
+                type: 'POST',
+                data: {
+                    material : matId
+                },
+                success: function(data){
+                    $('.spinner-wrap').hide();
+                }
+            });
+        }
+
+        $(document).on('click', '.removeMaterialNeedBuyPart', function (e) {
+            $('.spinner-wrap').show();
+            matNeedBuyId = $(this).attr('data-id');
+            e.preventDefault();
+            $("button[name='ajSend']").click();
+            matNeedBuyClickRemove = true;
+        });
+        function removeMaterialNeedBuyPart(matNeedBuyIdPart) {
+            $.nette.ajax({
+                url: {link removeMaterialNeedBuyPart!},
+                type: 'POST',
+                data: {
+                    matNeedBuy : matNeedBuyIdPart
+                },
+                success: function(data){
+                    $('.spinner-wrap').hide();
+                }
+            });
+        }
+
+        /* signature pad start */
+        $(document).on('change', '#signatureFile', function() {
+            var preview = document.getElementById('signaturePreview');
+            var file    = this.files[0];
+            var reader  = new FileReader();
+
+            reader.onloadend = function () {
+                preview.src = reader.result;
+                $('input[name="signature"]').val(reader.result);
+            }
+
+            if (file) {
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = "";
+            }
+        });
+
+        var canvas = document.querySelector("canvas");
+
+        var signaturePad = new SignaturePad(canvas);
+
+        $(document).on('click', '#createSignature', function() {
+            $('#signatureModal').modal('show');
+            signaturePad.clear();
+            signaturePad.on();
+        });
+
+        $(document).on('click', '#insertSignature', function() {
+            $('#signatureModal').modal('hide');
+            let data = signaturePad.toDataURL();
+            $('input[name="signature"]').val(data);
+            var preview = document.getElementById('signaturePreview');
+            preview.src = data;
+            $('#signatureFile').val('');
+        });
+
+        function resizeCanvas() {
+            var ratio =  Math.max(window.devicePixelRatio || 1, 1);
+            canvas.width = canvas.offsetWidth * ratio;
+            canvas.height = canvas.offsetHeight * ratio;
+            canvas.getContext("2d").scale(ratio, ratio);
+            signaturePad.clear(); // otherwise isEmpty() might return incorrect value
+        }
+        /* signature pad end */
+
+        $(document).on('change', '[name=dateStart], [name=onceTimes]', function (e) {
+            e.preventDefault();
+            let indexed_array = {};
+            $.map($('form').serializeArray(), function(n, i){
+                indexed_array[n['name']] = n['value'];
+            });
+
+            $.nette.ajax({
+                method: 'post',
+                url: {link checkServiceWorker!},
+                data: {
+                    data: indexed_array
+                }
+            });
+        });
+
+        $(document).on('change', '#frm-form-service', function (e) {
+            if($(this).is(':checked')) {
+                $('#frm-worker').val({if $todayService}{$todayService->worker->id}{else}null{/if});
+                checkSelectedWorker();
+            } else {
+                $.nette.ajax({
+                    method: 'post',
+                    url: {link checkTrafficWorker!},
+                    data: {
+                        traffic: $('input[name=traffic]').val()
+                    },
+                    success: function(data){
+                        var workerdata = JSON.parse(data.data);
+                        setWorkerFromTraffic( workerdata['worker'], workerdata['workerSubstitute']);
+                    }
+                });
+            }
+        });
+
+    });
+
+    function handleTrafficsAutocmplt(data, p1, p2) {
+        if(data[1]['ships']) {
+            $('[name=ships]').val(data[1]['ships']);
+        }
+        if(data[1]['customerOrdered']) {
+            $('#customerOrdered').val(data[1]['customerOrdered']);
+            let order = $('#textcustomerOrdered');
+            order.val(data[1]['textcustomerOrdered']);
+            order.attr('readonly', true);
+        }
+        if(data[1]['customer']) {
+            $('#customer').val(data[1]['customer']);
+            let order = $('#textcustomer');
+            order.val(data[1]['textcustomer']);
+            order.attr('readonly', true);
+        }
+        if(data[1]['worker']) {
+            setWorkerFromTraffic(data[1]['worker'], data[1]['workerSubstitute']);
+        }
+    }
+
+    function handleVisitProcessAutocmplt(data, p1, p2) {
+        if(data[1]['orderId']) {
+            let orderId = $('#frm-orderId');
+            orderId.val(data[1]['orderId']);
+            orderId.attr('readonly', true);
+            let orderId2 = $('#frm-orderId2');
+            orderId2.val(data[1]['orderId']);
+            orderId2.attr('readonly', true);
+            let orderName = $('#frm-name');
+            orderName.val(data[0]);
+            orderName.attr('readonly', true);
+        }
+    }
+
+    function handleMaterialsAutocmplt(data, p1, p2) {
+        if(data[1]['number']) {
+            $('#frm-materialModalForm #frm-materialModalForm-number').val(data[1]['number']);
+        }
+        if(data[1]['unit']) {
+            $('#frm-materialModalForm #frm-materialModalForm-unit').val(data[1]['unit']);
+        }
+        if(data[1]['stock']) {
+            $('#frm-materialModalForm #frm-materialModalForm-stock').val(data[1]['stock']);
+        }
+    }
+
+    function setWorkerFromTraffic(dataWorker, dataWorkerSubstitute) {
+        var todayAbsence = {$todayAbsence};
+        var abs = false;
+        dataWorker.forEach(cId =>{
+            if(todayAbsence.includes(cId)){
+                abs = true;
+            }
+        });
+        if(abs){
+            $('#frm-worker').val(dataWorkerSubstitute);
+        }else {
+            $('#frm-worker').val(dataWorker);
+        }
+        checkSelectedWorker();
+    }
+
+    function checkSelectedWorker() {
+        var workerArr = new Array();
+        $('#frm-worker :selected').each(function(i, sel){
+            workerArr.push($(sel).html());
+        });
+        if (workerArr && !workerArr.length) {
+            workerArr.push('Nic není vybráno');
+        }
+        $('#frm-worker').siblings('button').children().children().children().html(workerArr.join(', '));
+    }
+
+    /* custom change input start */
+    function changeBozpFrm() {
+        if($( "#frm-bozp option:selected" ).val() == 1) {
+            $('#bozpParamFrm').show();
+        } else {
+            $('#bozpParamFrm').hide();
+        }
+    }
+
+    function changeSelectEvidenceWriting() {
+        if($( "#frm-form-writeEvidenceBook option:selected" ).val() == 1) {
+            $('#frm-form-evidenceBook').parent().parent().show();
+            $('#frm-form-amountCooling').parent().parent().show();
+        }else if($( "#frm-form-writeEvidenceBook option:selected" ).val() == 2){
+            $('#frm-form-evidenceBook').parent().parent().hide();
+            $('#frm-form-amountCooling').parent().parent().hide();
+        }else if($( "#frm-form-writeEvidenceBook option:selected" ).val() == 3){
+            $('#frm-form-evidenceBook').parent().parent().hide();
+            $('#frm-form-amountCooling').parent().parent().show();
+        } else {
+            $('#frm-form-evidenceBook').parent().parent().hide();
+            $('#frm-form-amountCooling').parent().parent().hide();
+        }
+
+        if ($( "#frm-form-writeEvidenceBook option:selected" ).val() == 1) {
+            $('#frm-form-refrigerantProducer').parent().parent().show();
+            $('#frm-form-refrigerantManufactureYear').parent().parent().show();
+            $('#frm-form-refrigerantDetector').parent().parent().show();
+            $('#refrigerant').parent().parent().parent().show();
+            $('#textrefrigerant').parent().parent().parent().show();
+            $('#frm-form-refrigerantDetectionSystem').parent().parent().show();
+            $('#frm-form-refrigerantDevicesIsOk').parent().parent().show();
+            $('#frm-form-refrigerantDemadge').parent().parent().show();
+            $('#frm-form-refrigerantTypeRevision').parent().parent().show();
+        } else {
+            $('#frm-form-refrigerantProducer').parent().parent().hide();
+            $('#frm-form-refrigerantManufactureYear').parent().parent().hide();
+            $('#frm-form-refrigerantDetector').parent().parent().hide();
+            $('#refrigerant').parent().parent().parent().hide();
+            $('#textrefrigerant').parent().parent().parent().hide();
+            $('#frm-form-refrigerantDetectionSystem').parent().parent().hide();
+            $('#frm-form-refrigerantDevicesIsOk').parent().parent().hide();
+            $('#frm-form-refrigerantDemadge').parent().parent().hide();
+            $('#frm-form-refrigerantTypeRevision').parent().parent().hide();
+        }
+    }
+
+    function changeBozpElVoltage() {
+        if($( "#frm-bozpElVoltage option:selected" ).val() == 1) {
+            $('#bozpElVoltageTextM').show();
+        } else {
+            $('#bozpElVoltageTextM').hide();
+        }
+    }
+    function changeBozpHeight() {
+        if($( "#frm-bozpHeight option:selected" ).val() == 1) {
+            $('#bozpHeightTextM').show();
+        } else {
+            $('#bozpHeightTextM').hide();
+        }
+    }
+    function changeBozpHazardVoltage() {
+        if($( "#frm-bozpHazardVoltage option:selected" ).val() == 1) {
+            $('#bozpHazardVoltageTextM').show();
+        } else {
+            $('#bozpHazardVoltageTextM').hide();
+        }
+    }
+    function changeBozpArea() {
+        if($( "#frm-bozpArea option:selected" ).val() == 1) {
+            $('#bozpAreaTextM').show();
+        } else {
+            $('#bozpAreaTextM').hide();
+        }
+    }
+    function changeBozpUnderBurden() {
+        if($( "#frm-bozpUnderBurden option:selected" ).val() == 1) {
+            $('#bozpUnderBurdenTextM').show();
+        } else {
+            $('#bozpUnderBurdenTextM').hide();
+        }
+    }
+    function changeBozpVzv() {
+        if($( "#frm-bozpVzv option:selected" ).val() == 1) {
+            $('#bozpVzvTextM').show();
+        } else {
+            $('#bozpVzvTextM').hide();
+        }
+    }
+    function changeBozpHurt() {
+        if($( "#frm-bozpHurt option:selected" ).val() == 1) {
+            $('#bozpHurtTextM').show();
+        } else {
+            $('#bozpHurtTextM').hide();
+        }
+    }
+    function changeBozpCut() {
+        if($( "#frm-bozpCut option:selected" ).val() == 1) {
+            $('#bozpCutTextM').show();
+        } else {
+            $('#bozpCutTextM').hide();
+        }
+    }
+    function changeBozpWelding() {
+        if($( "#frm-bozpWelding option:selected" ).val() == 1) {
+            $('#bozpWeldingTextM').show();
+        } else {
+            $('#bozpWeldingTextM').hide();
+        }
+    }
+    function changeBozpCooling() {
+        if($( "#frm-bozpCooling option:selected" ).val() == 1) {
+            $('#bozpCoolingTextM').show();
+        } else {
+            $('#bozpCoolingTextM').hide();
+        }
+    }
+    function changeBozpChemikals() {
+        if($( "#frm-bozpChemikals option:selected" ).val() == 1) {
+            $('#bozpChemikalsTextM').show();
+        } else {
+            $('#bozpChemikalsTextM').hide();
+        }
+    }
+    function changeBozpOxygen() {
+        if($( "#frm-bozpOxygen option:selected" ).val() == 1) {
+            $('#bozpOxygenTextM').show();
+        } else {
+            $('#bozpOxygenTextM').hide();
+        }
+    }
+    function changeBozpBurden() {
+        if($( "#frm-bozpBurden option:selected" ).val() == 1) {
+            $('#bozpBurdenTextM').show();
+        } else {
+            $('#bozpBurdenTextM').hide();
+        }
+    }
+    function changeBozpFall() {
+        if($( "#frm-bozpFall option:selected" ).val() == 1) {
+            $('#bozpFallTextM').show();
+        } else {
+            $('#bozpFallTextM').hide();
+        }
+    }
+    function changeBozpFlySubject() {
+        if($( "#frm-bozpFlySubject option:selected" ).val() == 1) {
+            $('#bozpFlySubjectTextM').show();
+        } else {
+            $('#bozpFlySubjectTextM').hide();
+        }
+    }
+    function changeBozpRotateSubject() {
+        if($( "#frm-bozpRotateSubject option:selected" ).val() == 1) {
+            $('#bozpRotateSubjectTextM').show();
+        } else {
+            $('#bozpRotateSubjectTextM').hide();
+        }
+    }
+    function changeBozpNoise() {
+        if($( "#frm-bozpNoise option:selected" ).val() == 1) {
+            $('#bozpNoiseTextM').show();
+        } else {
+            $('#bozpNoiseTextM').hide();
+        }
+    }
+    function changeBozpAsbest() {
+        if($( "#frm-bozpAsbest option:selected" ).val() == 1) {
+            $('#bozpAsbestTextM').show();
+        } else {
+            $('#bozpAsbestTextM').hide();
+        }
+    }
+    function changeBozpOther() {
+        if($( "#frm-bozpOther option:selected" ).val() == 1) {
+            $('#bozpOtherTextM').show();
+        } else {
+            $('#bozpOtherTextM').hide();
+        }
+    }
+    /*function changeBozpClothes() {
+        if($( "#frm-bozpClothes option:selected" ).val() == 1) {
+            $('#bozpClothesTextM').show();
+        } else {
+            $('#bozpClothesTextM').hide();
+        }
+    }*/
+    function changeBozpUseClothes() {
+        if($( "#frm-bozpUseClothes option:selected" ).val() == 1) {
+            $('#bozpUseClothesTextM').show();
+        } else {
+            $('#bozpUseClothesTextM').hide();
+        }
+    }
+    function changeBozpCheck() {
+        if($( "#frm-bozpCheck option:selected" ).val() == 1) {
+            $('#bozpCheckTextM').show();
+        } else {
+            $('#bozpCheckTextM').hide();
+        }
+    }
+    function changeBozpInformationOther() {
+        if($( "#frm-bozpInformationOther option:selected" ).val() == 1) {
+            $('#bozpInformationOtherTextM').show();
+        } else {
+            $('#bozpInformationOtherTextM').hide();
+        }
+    }
+    function changeBozpSafety() {
+        if($( "#frm-bozpSafety option:selected" ).val() == 0) {
+            $('#bozpSafetyTextM').show();
+        } else {
+            $('#bozpSafetyTextM').hide();
+        }
+    }
+
+    $(document).on('change', '#frm-bozp', function (e) {
+        changeBozpFrm();
+    });
+
+    $(document).on('change', '#frm-form-writeEvidenceBook', function (e) {
+        changeSelectEvidenceWriting();
+    });
+
+    $(document).on('change', '#frm-bozpElVoltage', function (e) {
+        changeBozpElVoltage();
+    });
+    $(document).on('change', '#frm-bozpHeight', function (e) {
+        changeBozpHeight();
+    });
+    $(document).on('change', '#frm-bozpHazardVoltage', function (e) {
+        changeBozpHazardVoltage();
+    });
+    $(document).on('change', '#frm-bozpArea', function (e) {
+        changeBozpArea();
+    });
+    $(document).on('change', '#frm-bozpUnderBurden', function (e) {
+        changeBozpUnderBurden();
+    });
+    $(document).on('change', '#frm-bozpVzv', function (e) {
+        changeBozpVzv();
+    });
+    $(document).on('change', '#frm-bozpHurt', function (e) {
+        changeBozpHurt();
+    });
+    $(document).on('change', '#frm-bozpCut', function (e) {
+        changeBozpCut();
+    });
+    $(document).on('change', '#frm-bozpWelding', function (e) {
+        changeBozpWelding();
+    });
+    $(document).on('change', '#frm-bozpCooling', function (e) {
+        changeBozpCooling();
+    });
+    $(document).on('change', '#frm-bozpChemikals', function (e) {
+        changeBozpChemikals();
+    });
+    $(document).on('change', '#frm-bozpOxygen', function (e) {
+        changeBozpOxygen();
+    });
+    $(document).on('change', '#frm-bozpBurden', function (e) {
+        changeBozpBurden();
+    });
+    $(document).on('change', '#frm-bozpFall', function (e) {
+        changeBozpFall();
+    });
+    $(document).on('change', '#frm-bozpFlySubject', function (e) {
+        changeBozpFlySubject();
+    });
+    $(document).on('change', '#frm-bozpRotateSubject', function (e) {
+        changeBozpRotateSubject();
+    });
+    $(document).on('change', '#frm-bozpNoise', function (e) {
+        changeBozpNoise();
+    });
+    $(document).on('change', '#frm-bozpAsbest', function (e) {
+        changeBozpAsbest();
+    });
+    $(document).on('change', '#frm-bozpOther', function (e) {
+        changeBozpOther();
+    });
+    /*$(document).on('change', '#frm-bozpClothes', function (e) {
+        changeBozpClothes();
+    });*/
+    $(document).on('change', '#frm-bozpUseClothes', function (e) {
+        changeBozpUseClothes();
+    });
+    $(document).on('change', '#frm-bozpCheck', function (e) {
+        changeBozpCheck();
+    });
+    $(document).on('change', '#frm-bozpInformationOther', function (e) {
+        changeBozpInformationOther();
+    });
+    $(document).on('change', '#frm-bozpSafety', function (e) {
+        changeBozpSafety();
+    });
+
+    $(document).ready( function (e) {
+        changeBozpFrm();
+        changeSelectEvidenceWriting();
+
+        changeBozpElVoltage();
+        changeBozpHeight();
+        changeBozpHazardVoltage();
+        changeBozpArea();
+        changeBozpUnderBurden();
+        changeBozpVzv();
+        changeBozpHurt();
+        changeBozpCut();
+        changeBozpWelding();
+        changeBozpCooling();
+        changeBozpChemikals();
+        changeBozpOxygen();
+        changeBozpBurden();
+        changeBozpFall();
+        changeBozpFlySubject();
+        changeBozpRotateSubject();
+        changeBozpNoise();
+        changeBozpAsbest();
+        changeBozpOther();
+        /*changeBozpClothes();*/
+        changeBozpUseClothes();
+        changeBozpCheck();
+        changeBozpInformationOther();
+        changeBozpSafety();
+
+        if ($('#frm-orderId').val() != '') {
+            $('#frm-orderId').attr('readonly', true);
+        }
+        if ($('#frm-orderId2').val() != '') {
+            $('#frm-orderId2').attr('readonly', true);
+        }
+        if ($('#frm-name').val() != '') {
+            $('#frm-name').attr('readonly', true);
+        }
+    });
+    /* custom change input end */
+
+</script>
+    {ifset $canDownloadZip}
+        <script>
+            function downloadURI(uri) {
+                let link = document.createElement("a");
+                link.href = uri;
+                link.click();
+            }
+            $(document).ready(function() {
+                downloadURI({link downloadZip!});
+            });
+        </script>
+    {/ifset}
+{/block}

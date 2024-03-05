@@ -1,0 +1,16 @@
+parameters:
+	level: 6
+
+	paths:
+		- app
+		- bin
+		- www
+
+	excludes_analyse:
+		- www/adminer
+		- www/checker
+		- www/updater
+
+
+includes:
+	- vendor/phpstan/phpstan-nette/extension.neon

@@ -1,0 +1,133 @@
+{block title}{_'Profil'}{/block}
+{block content}
+
+    <div class="mb-3">
+        <a n:href="User:reservation" class="btn btn-outline-primary m-1">Moje rezervace <i class="fa fa-calendar-week"></i></a>
+    </div>
+
+    {form profileForm}
+        <div class="card mb-2">
+            <div class="card-header">
+                {_'Základní informace'}
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {include bootstrap-input $form, 'company', 6}
+                    <div class="col-md-6"></div>
+                    {include bootstrap-input $form, 'name', 6}
+                    {include bootstrap-input $form, 'surname', 6}
+                    {include bootstrap-input $form, 'email', 6}
+                    {include bootstrap-input $form, 'phone', 6}
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-2">
+            <div class="card-header">
+                {_'Heslo'}
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {include bootstrap-input $form, 'password', 6}
+                    {include bootstrap-input $form, 'passwordVerify', 6}
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-2">
+            <div class="card-header">
+                {_'Fakturační údaje'}
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {include bootstrap-input $form, 'idNo', 6}
+                    {include bootstrap-input $form, 'vatNo', 6}
+                    {include bootstrap-input $form, 'street', 6}
+                    {include bootstrap-input $form, 'city', 6}
+                    {include bootstrap-input $form, 'zip', 6}
+                </div>
+            </div>
+        </div>
+
+        {*<div class="card mb-2">
+            <div class="card-header">
+                Doručovací údaje &nbsp;<small>(jenom pokud jsou jiné než fakturační)</small>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {include bootstrap-input $form, 'contactPerson', 6}
+                {include bootstrap-input $form, 'emailDelivery', 6}
+                {include bootstrap-input $form, 'phoneDelivery', 6}
+                {include bootstrap-input $form, 'streetDelivery', 6}
+                {include bootstrap-input $form, 'cityDelivery', 6}
+                {include bootstrap-input $form, 'zipDelivery', 6}
+                </div>
+            </div>
+        </div>*}
+
+        {*<div class="card mb-2">
+            <div class="card-header">
+                Doplňující údaje
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {include bootstrap-input $form, 'accountNumber', 6}
+                {include bootstrap-input $form, 'bankCode', 6}
+                {include bootstrap-input $form, 'constantSymbol', 6}
+                {include bootstrap-input $form, 'bankName', 6}
+                {include bootstrap-input $form, 'maturity', 6}
+                {include bootstrap-input $form, 'www', 6}
+                {include bootstrap-input $form, 'description', 6}
+                </div>
+            </div>
+        </div>*}
+
+       {*} <div class="card mb-2">
+            <div class="card-header">
+                Notifikační e-maily objednávek vyšetření
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6">
+                        {if $customerType == App\Model\Database\Entity\Customer::TYPE_ANIMAL && in_array(App\Model\Database\Entity\Customer::TYPE_ANIMAL, $customerTypes)}
+                            <h6>Stavy</h6>
+                            {include bootstrap-checkbox $form['notifications'], false}
+                            <br>
+                            <h6>Mimo zákaznický portál</h6>
+                            {include bootstrap-checkbox $form['contractNotify'], true}
+                        {/if}
+                        {if $customerType == App\Model\Database\Entity\Customer::TYPE_FOOD && in_array(App\Model\Database\Entity\Customer::TYPE_FOOD, $customerTypes)}
+                            <h6>Zakázky</h6>
+                            {include bootstrap-checkbox $form['contractNotify'], true}
+                        {/if}
+                    </div>
+                    <div class="col-6" n:snippet="notify-emails">
+                        <h6>Další e-mailové adresy</h6>
+                        <div class="input-group">
+                            <input type="email" name="notifyEmail" class="form-control" placeholder="E-mail">
+                            <button type="submit" name="addNotifyEmail" class="btn btn-primary ajax">Přidat e-mail</button>
+                        </div>
+
+                        {if $customer && $customer->notifyEmails}
+                            {foreach $customer->notifyEmails as $notifyEmail}
+                                {$notifyEmail->email|noescape}
+                                <a n:href="removeNotifyEmail! email => $notifyEmail->email" class="text-danger font-size-lg p-2 ajax">
+                                    <i class="fa fa-times"></i>
+                                </a>
+                                {if !$iterator->isLast()}<br>{/if}
+                            {/foreach}
+                        {/if}
+                    </div>
+                </div>
+            </div>
+        </div>{*}
+
+        <div class="card border-0">
+            <div class="card-body">
+                <span class="pull-right">
+                    <button n:name="send">{$form['send']->getCaption()}</button>
+                </span>
+            </div>
+        </div>
+    {/form}
+{/block}

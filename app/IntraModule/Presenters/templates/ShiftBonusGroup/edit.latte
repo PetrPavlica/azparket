@@ -1,0 +1,229 @@
+{block title}
+    {ifset $entity}
+        {_'Editace šablony směn'}
+    {else}
+        {_'Přidání šablony směn'}
+    {/ifset}
+{/block}
+{block description}
+    {ifset $entity}
+        {_'Editace šablony vedlejších směn'}
+    {else}
+        {_'Přidání šablony vedlejších směn'}
+    {/ifset}
+{/block}
+{block header-icon}<i class="fa fa-user-clock icon-gradient bg-mean-fruit"></i>{/block}
+{block content}
+
+    <div class="tab-content">
+        {ifset $entity}
+            <div class="card mb-3">
+                <div class="card-header">
+                    Směny navíc
+                    <span style="cursor: pointer" class="checkShiftBonus btn btn-primary ml-auto" data-toggle="modal" data-target="#planModal" data-id="0">
+                            <i class="fa fa-plus"></i> Přidat směnu navíc
+                        </span>
+                </div>
+                <div class="card-body" n:snippet="bonusTable">
+                    <table class="table table-bordered table-sm" id="sortable-table">
+                        <thead>
+                        <tr>
+                            <th style="width: 10%;">Směna</th>
+                            <th style="width: 10%;">Ranní/Noční</th>
+                            <th style="width: 20%;">Linka</th>
+                            <th style="width: 20%;">Den v týdnu</th>
+                            <th style="width: 30%;">Poslední datum</th>
+                            <th style="width: 10%;">Akce</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {if isset($shiftBonuses) && $shiftBonuses}
+                            {foreach $shiftBonuses as $shiftBonus}
+                                <tr>
+                                    <td>
+                                        {$shiftBonus->shift}
+                                    </td>
+                                    <td>
+                                        {$nameTrans[$shiftBonus->name]}
+                                    </td>
+                                    <td>
+                                        {$lineTrans[$shiftBonus->productionLine]}
+                                    </td>
+                                    <td>
+                                        {$dayTrans[$shiftBonus->dayOfWeek]}
+                                    </td>
+                                    <td>
+                                        {if $shiftBonus->dateEnd}{$shiftBonus->dateEnd->format('j. n. Y')}{else}-{/if}
+                                    </td>
+                                    <td>
+                                        <span style="cursor: pointer" class="checkShiftBonus" data-toggle="modal" data-target="#planModal" data-id="{$shiftBonus->id}"><i class="fa fa-pen text-info pl-2 pr-3"></i></span>
+                                        <span style="cursor: pointer" class="removeShiftBonus" data-id="{$shiftBonus->id}"><i class="fa fa-trash text-danger"></i></span>
+                                    </td>
+                                </tr>
+                            {/foreach}
+                        {else}
+                            <tr>
+                                <td colspan="6">
+                                    {_'Žádný směna navíc není zadána'}
+                                </td>
+                            </tr>
+                        {/if}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {/ifset}
+
+        <div n:snippet='owf-form'>
+            {form form}
+                {*input id*}
+
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <div class="form-row">
+                            {include bootstrap-input $form, 'name', 6}
+                            {include bootstrap-input $form, 'description', 6}
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <a
+                            href="{link ShiftBonusGroup:default}"
+                            class="btn btn-outline-primary"
+                        >
+                            <span class="fa fa-arrow-left" aria-hidden="true"></span>
+                            Zpět
+                        </a>
+                        <span class="pull-right">
+                            <button name="sendBack" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a zpět</button>
+                            <button name="send" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit</button>
+                            <button name="sendNew" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a nový</button>
+                        </span>
+                    </div>
+                </div>
+                {*input ajax*}
+            {/form}
+        </div>
+    </div>
+
+{/block}
+
+{block scriptsBot}
+    <div n:ifset="$entity" class="modal fade" id="planModal" tabindex="-1" role="dialog" aria-labelledby="planModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content" n:snippet="planModal">
+                {form planModalForm}
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="planModalLabel">Směna navíc</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input n:ifset="$modalBonus" type="hidden" name="bonus" data-autosubmit="" id="frm-bonus" value="{$modalBonus->id}">
+                        <input type="hidden" name="shiftBonusGroup" data-autosubmit="" id="frm-shiftBonusGroup" value="{$entity->id}">
+                        <div class="col-md-12 mb-4">
+                            <div class="row">
+                                <div class="col-md-4 pt-2">
+                                    <span>Směna</span>
+                                </div>
+                                <div class="col-md-8">
+                                    <select name="shift" class="form-control" id="frm-shift">
+                                        {foreach $shiftTrans as $kkey => $value}
+                                            <option value="{$kkey}" {if isset($modalBonus) && $modalBonus->shift == $kkey}selected{/if}>{$value}</option>
+                                        {/foreach}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-4 pt-2">
+                                    <span>Ranní/Noční</span>
+                                </div>
+                                <div class="col-md-8">
+                                    <select name="name" class="form-control" id="frm-name">
+                                        {foreach $nameTrans as $kkey => $value}
+                                            <option value="{$kkey}" {if isset($modalBonus) && $modalBonus->name == $kkey}selected{/if}>{$value}</option>
+                                        {/foreach}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-4 pt-2">
+                                    <span>Linka</span>
+                                </div>
+                                <div class="col-md-8">
+                                    <select name="line" class="form-control" id="frm-line">
+                                        {foreach $lineTrans as $kkey => $value}
+                                            <option value="{$kkey}" {if isset($modalBonus) && $modalBonus->productionLine == $kkey}selected{/if}>{$value}</option>
+                                        {/foreach}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-4 pt-2">
+                                    <span>Den v týdnu</span>
+                                </div>
+                                <div class="col-md-8">
+                                    <select name="day" class="form-control" id="frm-day">
+                                        {foreach $dayTrans as $kkey => $value}
+                                            <option value="{$kkey}" {if isset($modalBonus) && $modalBonus->dayOfWeek == $kkey}selected{/if}>{$value}</option>
+                                        {/foreach}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-4 pt-2">
+                                    <span>Poslední datum</span>
+                                </div>
+                                <div class="col-md-8">
+                                    <input type="text" name="dateEnd" id="frm-dateEnd" class="form-control form-control" data-provide="datepicker"
+                                           data-date-orientation="bottom" data-date-format="d. m. yyyy" data-date-today-highlight="true" data-date-autoclose="true" data-date-language="cs" autocomplete="off"
+                                           value="{if isset($modalBonus) && $modalBonus->dateEnd}{$modalBonus->dateEnd->format('d. m. Y')}{else}{/if}" data-lfv-initialized="true" data-lfv-message-id="frm-dateEnd_message">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Uložit</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Zavřít</button>
+                    </div>
+                {/form}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $( function() {
+            $(document).on('click', '.checkShiftBonus', function (e) {
+                $.nette.ajax({
+                    url: {link checkShiftBonus!},
+                    type: 'POST',
+                    data: {
+                        bonus : $(this).attr('data-id')
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        $( function() {
+            $(document).on('click', '.removeShiftBonus', function (e) {
+                $.nette.ajax({
+                    url: {link removeShiftBonus!},
+                    type: 'POST',
+                    data: {
+                        bonus : $(this).attr('data-id')
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+    </script>
+{/block}

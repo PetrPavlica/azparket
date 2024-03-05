@@ -1,0 +1,11 @@
+{block title}{_'Výjezdy'} {if isset($visitState) && $visitState}- {$visitState->name}{/if}{/block}
+{block description}{_'Seznam výjezdů'}{/block}
+{block header-icon}<i class="fa fa-suitcase icon-gradient bg-happy-itmeo"></i>{/block}
+{block header-actions}
+    <a n:href="Visit:edit" class="btn btn-primary">
+        {_'Nový výjezd'}
+    </a>
+{/block}
+{block content}
+    {control table}
+{/block}

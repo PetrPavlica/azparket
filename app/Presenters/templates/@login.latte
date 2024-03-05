@@ -1,0 +1,50 @@
+{import '../../Components/templates/form.latte'}
+
+<!DOCTYPE html>
+<html lang="{$locale}" class="login-site">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <meta name="author" content="WebRex s.r.o."/>
+    <title>{_'Zákaznický portál Webrex demo'}</title>
+    <meta name="robots" content="noindex,nofollow"/>
+    <meta name="googlebot" content="noindex,nofollow,noarchive"/>
+
+    <link rel="shortcut icon" href="{$basePath}/favicon.ico" type="image/x-icon">
+
+    <link href="{$basePath}/assets/css/app.css?v={php echo filemtime('assets/css/app.css')}" rel="stylesheet">
+</head>
+
+<body>
+
+{include content}
+
+{block scriptsIntra}
+    <script type="text/javascript"
+            src="{$basePath}/assets/js/app.bundle.js?v={php echo filemtime('assets/js/app.bundle.js')}"></script>
+
+    <script src="{$basePath}/assets/js/live-form-validation.js"></script>
+
+    <script>
+        LiveForm.setOptions({
+            messageErrorPrefix: '',
+            wait: 500
+        });
+    </script>
+
+{snippet flashess}
+{foreach $flashes as $flash}
+    <script>
+        $(document).ready(function () {
+            toastr[{$flash->type}]({$flash->message|translate});
+        });
+    </script>
+{/foreach}
+{/snippet}
+{/block}
+
+</body>
+</html>

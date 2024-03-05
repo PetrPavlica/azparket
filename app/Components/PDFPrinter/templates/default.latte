@@ -1,0 +1,9 @@
+{if $type=='order'}
+    <a class="btn btn-default" n:href="createOrder! orderId=>$id" >
+        <i class="fa fa-file-pdf-o"></i>
+        {$text|translate}
+    </a>
+{else}
+    Undefinded element - PDFPrinter
+{/if}
+

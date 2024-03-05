@@ -1,0 +1,49 @@
+{block title}
+    {ifset $entity}
+        {_'Editace ceny dopravy'}
+    {else}
+        {_'Přidání ceny dopravy'}
+    {/ifset}
+{/block}
+{block description}
+    {ifset $entity}
+        {_'Editace stávající ceny dopravy'}
+    {else}
+        {_'Přidání nové ceny dopravy'}
+    {/ifset}
+{/block}
+{block header-icon}<i class="fa fa-dolly-flatbed icon-gradient bg-mean-fruit"></i>{/block}
+
+{block content}
+<div n:snippet='owf-form'>
+    {form form}
+        {input id}
+        <div class="card mb-2">
+            <div class="card-body">
+                <div class="form-row">
+                    {include bootstrap-input $form, 'minDist', 4}
+                    {include bootstrap-input $form, 'maxDist', 4}
+                    {include bootstrap-input $form, 'price', 4}
+                    {include bootstrap-input $form, 'flat', 12}
+
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <a n:href="DeliveryPrice:default" class="btn btn-outline-primary">
+                    <span class="fa fa-arrow-left" aria-hidden="true"></span>
+                    Zpět
+                </a>
+                <span class="pull-right">
+                    <button name="sendBack" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a zpět</button>
+                    <button name="sendSave" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a pokračovat</button>
+                    <button name="sendNew" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a nový</button>
+                </span>
+            </div>
+        </div>
+    {/form}
+</div>
+{/block}

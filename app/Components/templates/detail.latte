@@ -1,0 +1,21 @@
+{define detail $gridGen}
+    <div id="detail-item">
+        {foreach $gridGen->getSections() as $section}
+        <div class="card mb-2" n:if="$gridGen->getSectionProperty($section)">
+            <div class="card-header" n:if="$gridGen->getSectionTitle($section)">{$gridGen->getSectionTitle($section)|noescape}</div>
+            <div class="card-body">
+                <div class="row">
+                    {foreach $gridGen->getSectionProperty($section) as $name}
+                        <div class="col-item col-lg-3 col-md-4 col-6" n:if="$gridGen->existProperty($name)">
+                            <div class="detail-item">
+                                <div class="detail-title" n:if="$gridGen->getPropertyTitle($name)">{$gridGen->getPropertyTitle($name)|noescape}</div>
+                                <div class="detail-value">{$gridGen->getPropertyValue($name)|noescape}</div>
+                            </div>
+                        </div>
+                    {/foreach}
+                </div>
+            </div>
+        </div>
+        {/foreach}
+    </div>
+{/define}

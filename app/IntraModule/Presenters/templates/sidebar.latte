@@ -1,0 +1,1088 @@
+<div class="app-sidebar sidebar-shadow">
+    <div class="app-header__logo">
+        <div class="logo-src"></div>
+        <div class="header__pane ml-auto">
+            <div>
+                <button type="button" class="hamburger close-sidebar-btn hamburger--elastic" data-class="closed-sidebar">
+                    <span class="hamburger-box">
+                        <span class="hamburger-inner"></span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="app-header__mobile-menu">
+        <div>
+            <button type="button" class="hamburger hamburger--elastic mobile-toggle-nav">
+                <span class="hamburger-box">
+                    <span class="hamburger-inner"></span>
+                </span>
+            </button>
+        </div>
+    </div>
+    <div class="app-header__menu">
+        <span>
+            <button type="button" class="btn-icon btn-icon-only btn btn-primary btn-sm mobile-toggle-header-nav">
+                <span class="btn-icon-wrapper">
+                    <i class="fa fa-ellipsis-v fa-w-6"></i>
+                </span>
+            </button>
+        </span>
+    </div>
+    <div class="scrollbar-sidebar">
+        <div class="app-sidebar__inner">
+            <ul class="vertical-nav-menu">
+                <div id="accordionSidebar1">
+                    <a class="card-link" data-toggle="collapse" onClick="showMenuGroup(1);" href="#collapseSidebar1">
+                        <li class="app-sidebar__heading">{_'Webové složky'}</li>
+                    </a>
+                    <div id="collapseSidebar1" class="collapse {if $usrMenu[1]}show{/if}" data-parent="#accordionSidebar1">
+
+                        <li>
+                            <a n:href="Homepage:" {if $aMenu == 'Homepage' && $aSubView != 'pass'}class="mm-active"{/if} title="{_'Dashboard'}" data-toggle="tooltip" data-placement="right">
+                                <i class="metismenu-icon fa fa-city"></i>
+                                {_'Dashboard'}
+                            </a>
+                        </li>
+
+                        {*capture $li}
+                            <li class="app-sidebar__group">
+                                <a n:href="Reservation:" {if $aMenu == 'Reservation'}class="mm-active"{/if} title="{_'Rezervace'}" data-toggle="tooltip" data-placement="right">
+                                    <i class="metismenu-icon fa fa-calendar-week"></i>
+                                    {_'Rezervace'}
+                                </a>
+                                <a n:href="Reservation:edit">
+                                    <i class="fa fa-plus"></i>
+                                </a>
+                            </li>
+                        {/capture}
+                        {control acl $li, 'Rezervace', 'reservation_menu', 'Reservation', 'menu'*}
+
+                        {*capture $li}
+                            <li class="app-sidebar__group">
+                                <a n:href="Customer:" {if $aMenu == 'Customer'}class="mm-active"{/if} title="{_'Zákazníci'}" data-toggle="tooltip" data-placement="right">
+                                    <i class="metismenu-icon fa fa-users"></i>
+                                    {_'Zákazníci'}
+                                </a>
+                                <a n:href="Customer:edit">
+                                    <i class="fa fa-plus"></i>
+                                </a>
+                            </li>
+                        {/capture}
+                        {control acl $li, 'Zákazníci', 'customer_menu', 'Customer', 'menu'*}
+
+                        {*capture $li}
+                            <li class="app-sidebar__group">
+                                <a n:href="DailyPlan:" {if $aMenu == 'DailyPlan'}class="mm-active"{/if} title="{_'Plán zakázek'}" data-toggle="tooltip" data-placement="right">
+                                    <i class="metismenu-icon fa fa-calendar-alt"></i>
+                                    {_'Plán zakázek'}
+                                </a>
+                            </li>
+                        {/capture}
+                        {control acl $li, 'Plán zakázek', 'daily_plan_menu', 'DailyPlan', 'menu'*}
+
+                        {*capture $li}
+                            <li>
+                                <a n:href="Meetings:" {if $aMenu == 'Meetings'}class="mm-active"{/if} title="{_'Kalendář schůzek'}" data-toggle="tooltip" data-placement="right">
+                                    <i class="metismenu-icon fa fa-calendar-day"></i>
+                                    {_'Kalendář schůzek'}
+                                </a>
+                            </li>
+                        {/capture}
+                        {control acl $li, 'Kalendář schůzek', 'meetings_menu', 'Meetings', 'menu'*}
+
+                        {*capture $li}
+                            <li class="app-sidebar__group">
+                                <a n:href="Task:" {if $aMenu == 'Task'}class="mm-active"{/if} title="{_'Úkoly - nástěnka'}" data-toggle="tooltip" data-placement="right">
+                                    <i class="metismenu-icon fa fa-th"></i>
+                                    {_'Úkoly - nástěnka'}
+                                </a>
+                                <a n:href="Task:table">
+                                    <i class="fa fa-list"></i>
+                                </a>
+                            </li>
+                        {/capture}
+                        {control acl $li, 'Úkoly', 'task_menu', 'Task', 'menu'*}
+
+                    </div>
+                </div>
+                {*
+                {capture $ul}
+                    <div id="accordionSidebar2">
+                        <a class="card-link" data-toggle="collapse" onClick="showMenuGroup(2);" href="#collapseSidebar2">
+                            <li class="app-sidebar__heading">{_'Obchodní případy'}</li>
+                        </a>
+                        <div id="collapseSidebar2" class="collapse {if $usrMenu[2]}show{/if}" data-parent="#accordionSidebar2">
+
+                            {capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="VisitProcess: " {if $aMenu == 'VisitProcess' && !$aSubMenu}class="mm-active"{/if} title="Všechny obchodní případy" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-book"></i>
+                                        Všechny obchodní případy
+                                    </a>
+                                    <a n:href="VisitProcess:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                                <div class="sidebar_submenu" n:if="isset($visitProcessStates) && is_array($visitProcessStates)">
+                                    {foreach $visitProcessStates as $vpState}
+                                        {var $num = $visitProcessStateCounts[$vpState->id] ?? 0}
+                                        <li class="app-sidebar__group">
+                                            <a n:href="VisitProcess: slug=>$vpState->id" {if $aMenu == 'VisitProcess' && $aSubMenu == $vpState->id}class="mm-active"{/if} title="{$vpState->name}" data-toggle="tooltip" data-placement="right">
+                                                <i class="metismenu-icon fa">{$iterator}.</i>
+                                                {$vpState->name|noescape} ({$num})
+                                            </a>
+                                        </li>
+                                    {/foreach}
+                                </div>
+                            {/capture}
+                            {control acl $li, 'OP výjezdy', 'visit_process_menu', 'VisitProcess', 'menu'}
+
+                        </div>
+                    </div>
+                {/capture}
+                {control acl $ul, 'OP výjezdy sekce', 'menu_visit_process_section', '', 'global-element'}
+                
+                {capture $ul}
+                    <div id="accordionSidebar3">
+                        <a class="card-link" data-toggle="collapse" onClick="showMenuGroup(3);" href="#collapseSidebar3">
+                            <li class="app-sidebar__heading">{_'Výjezdy'}</li>
+                        </a>
+                        <div id="collapseSidebar3" class="collapse {if $usrMenu[3]}show{/if}" data-parent="#accordionSidebar3">
+
+                            {capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="Visit: " {if $aMenu == 'Visit' && !$aSubMenu}class="mm-active"{/if} title="Všechny výjezdy" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-suitcase"></i>
+                                        Všechny výjezdy
+                                    </a>
+                                    <a n:href="Visit:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                                <div class="sidebar_submenu" n:if="isset($visitStates) && is_array($visitStates)">
+                                    {foreach $visitStates as $vState}
+                                        {var $num = $visitStateCounts[$vState->id] ?? 0}
+                                        <li class="app-sidebar__group">
+                                            <a n:href="Visit: slug=>$vState->id" {if $aMenu == 'Visit' && $aSubMenu == $vState->id}class="mm-active"{/if} title="{$vState->name}" data-toggle="tooltip" data-placement="right">
+                                                <i class="metismenu-icon fa">{$iterator}.</i>
+                                                {$vState->name|noescape} ({$num})
+                                            </a>
+                                        </li>
+                                    {/foreach}
+                                </div>
+                            {/capture}
+                            {control acl $li, 'Výjezdy', 'visit_menu', 'Visit', 'menu'}
+
+                        </div>
+                    </div>
+                {/capture}
+                {control acl $ul, 'Výjezdy sekce', 'menu_visit_section', '', 'global-element'}
+
+                {capture $ul}
+                    <div id="accordionSidebar4">
+                        <a class="card-link" data-toggle="collapse" onClick="showMenuGroup(4);" href="#collapseSidebar4">
+                            <li class="app-sidebar__heading">{_'Absence'}</li>
+                        </a>
+                        <div id="collapseSidebar4" class="collapse {if $usrMenu[4]}show{/if}" data-parent="#accordionSidebar4">
+
+                            {capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="Absence: " {if $aMenu == 'Absence' && !$aSubMenu}class="mm-active"{/if} title="Všechny absence" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-user-times"></i>
+                                        Všechny absence
+                                    </a>
+                                    <a n:href="Absence:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                                <div class="sidebar_submenu" n:if="isset($absenceStates) && is_array($absenceStates)">
+                                    {foreach $absenceStates as $aState}
+                                        {var $num = $absenceStateCounts[$aState->id] ?? 0}
+                                        <li class="app-sidebar__group">
+                                            <a n:href="Absence: slug=>$aState->id" {if $aMenu == 'Absence' && $aSubMenu == $aState->id}class="mm-active"{/if} title="{$aState->name}" data-toggle="tooltip" data-placement="right">
+                                                <i class="metismenu-icon fa">{$iterator}.</i>
+                                                {$aState->name|noescape} ({$num})
+                                            </a>
+                                        </li>
+                                    {/foreach}
+                                </div>
+                            {/capture}
+                            {control acl $li, 'Absence', 'absence_menu', 'Absence', 'menu'}
+
+                        </div>
+                    </div>
+                {/capture}
+                {control acl $ul, 'Absence sekce', 'menu_absence_section', '', 'global-element'}
+                *}
+
+                {*capture $ul}
+                    <div id="accordionSidebar5">
+                        <a class="card-link" data-toggle="collapse" onClick="showMenuGroup(5);" href="#collapseSidebar5">
+                            <li class="app-sidebar__heading">{_'Obchod'}</li>
+                        </a>
+                        <div id="collapseSidebar5" class="collapse {if $usrMenu[5]}show{/if}" data-parent="#accordionSidebar5">
+
+                            {capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="Inquiry:" {if $aMenu == 'Inquiry'}class="mm-active"{/if} title="{_'Poptávky'}" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-address-card"></i>
+                                        {_'Poptávky'}
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Poptávka', 'inquiry_menu', 'Inquiry', 'menu'}
+
+                            {capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="Offer:" {if $aMenu == 'Offer'}class="mm-active"{/if} title="{_'Nabídky'}" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-file-invoice"></i>
+                                        {_'Nabídky'}
+                                    </a>
+                                    <a n:href="Offer:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Nabídky', 'offer_menu', 'Offer', 'menu'}
+
+                            {capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="Product:" {if $aMenu == 'Product'}class="mm-active"{/if} title="{_'Produkty'}" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-boxes"></i>
+                                        {_'Produkty'}
+                                    </a>
+                                    <a n:href="Product:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Produkt', 'product_menu', 'Product', 'menu'}
+
+                        </div>
+                    </div>
+                {/capture}
+                {control acl $ul, 'Zákazníci sekce', 'menu_customer_section', '', 'global-element'*}
+
+                {*
+                {capture $ul}
+                    <div id="accordionSidebar6">
+                        <a class="card-link" data-toggle="collapse" onClick="showMenuGroup(6);" href="#collapseSidebar6">
+                            <li class="app-sidebar__heading">{_'Služby / materiály'}</li>
+                        </a>
+                        <div id="collapseSidebar6" class="collapse {if $usrMenu[6]}show{/if}" data-parent="#accordionSidebar6">
+
+                            {capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="Service:" {if $aMenu == 'Service'}class="mm-active"{/if} title="{_'Služby'}" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-medkit"></i>
+                                        {_'Služby'}
+                                    </a>
+                                    <a n:href="Service:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Služby', 'service_menu', 'Service', 'menu'}
+
+                            {capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="Material:" {if $aMenu == 'Material'}class="mm-active"{/if} title="{_'Materiály'}" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-cubes"></i>
+                                        {_'Materiály'}
+                                    </a>
+                                    <a n:href="Material:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Materiály', 'material_menu', 'Material', 'menu'}
+
+                            {capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="MaterialNeedBuy:" {if $aMenu == 'MaterialNeedBuy'}class="mm-active"{/if} title="{_'Materiály nutno objednat'}" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-shopping-basket"></i>
+                                        {_'Materiály nutno objednat'}
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Materiály nutno objednat', 'material_need_buy_menu', 'MaterialNeedBuy', 'menu'}
+
+                            {capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="MaterialOnVisit:" {if $aMenu == 'MaterialOnVisit'}class="mm-active"{/if} title="{_'Spotřebovaný materiál'}" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-coins"></i>
+                                        {_'Spotřebovaný materiál'}
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Spotřebovaný materiál', 'material_on_visit_menu', 'MaterialOnVisit', 'menu'}
+
+                        </div>
+                    </div>
+                {/capture}
+                {control acl $ul, 'Služby / materiály sekce', 'menu_service_material_section', '', 'global-element'}
+                
+                {capture $ul}
+                    <div id="accordionSidebar7">
+                        <a class="card-link" data-toggle="collapse" onClick="showMenuGroup(7);" href="#collapseSidebar7">
+                            <li class="app-sidebar__heading">{_'Externí servis'}</li>
+                        </a>
+                        <div id="collapseSidebar7" class="collapse {if $usrMenu[7]}show{/if}" data-parent="#accordionSidebar7">
+
+                            {capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="Machine:" {if $aMenu == 'Machine'}class="mm-active"{/if} title="{_'Stroje / zařízení'}" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-car-battery"></i>
+                                        {_'Stroje / zařízení'}
+                                    </a>
+                                    <a n:href="Machine:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Stroje / zařízení', 'machine_menu', 'Machine', 'menu'}
+
+                            {capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="ExternServiceVisit:" {if $aMenu == 'ExternServiceVisit'}class="mm-active"{/if} title="{_'Servis strojů'}" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-wrench"></i>
+                                        {_'Servis strojů'}
+                                    </a>
+                                    <a n:href="ExternServiceVisit:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Servis strojů', 'extern_service_visit_menu', 'ExternServiceVisit', 'menu'}
+
+                        </div>
+                    </div>
+                {/capture}
+                {control acl $ul, 'Externí servis sekce', 'menu_extern_service_section', '', 'global-element'}
+                *}
+
+                {capture $ul}
+                    <div id="accordionSidebar11">
+                        <a class="card-link" data-toggle="collapse" onClick="showMenuGroup(11);" href="#collapseSidebar11">
+                            <li class="app-sidebar__heading">{_'Webová administrace'}</li>
+                        </a>
+                        <div id="collapseSidebar11" class="collapse {if $usrMenu[11]}show{/if}" data-parent="#accordionSidebar11">
+
+                            {capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="Menu: " {if $aMenu == 'Menu' && !$aSubMenu}class="mm-active"{/if} title="Menu" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-columns"></i>
+                                        Menu
+                                    </a>
+                                    <a n:href="Menu:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Menu', 'menu_menu', 'Menu', 'menu'}
+                            {capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="Article: " {if $aMenu == 'Article' && (!$aSubMenu && $aSubView == 'default')}class="mm-active"{/if} title="Články" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-align-left"></i>
+                                        Články
+                                    </a>
+                                    <a n:href="Article:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                                <li class="app-sidebar__group">
+                                    <a n:href="Article:news " {if $aMenu == 'Article' && ($aSubView == 'news' || $aSubMenu == 'new')}class="mm-active"{/if} title="Aktuality" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-newspaper  fa-fw"></i>
+                                        Aktuality
+                                    </a>
+                                    <a n:href="Article:edit slug => 'new'">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                                <li class="app-sidebar__group">
+                                    <a n:href="Article:events " {if $aMenu == 'Article' && ($aSubView == 'events' || $aSubMenu == 'event')}class="mm-active"{/if} title="Události" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-calendar"></i>
+                                        Události
+                                    </a>
+                                    <a n:href="Article:edit slug => 'event'">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Články', 'article_menu', 'Article', 'menu'}
+                            {capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="Banner: " {if $aMenu == 'Banner' && !$aSubMenu}class="mm-active"{/if} title="Bannery" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-image"></i>
+                                        Bannery
+                                    </a>
+                                    <a n:href="Banner:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Bannery', 'banner_menu', 'Banner', 'menu'}
+                            {*capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="BannerPartner: " {if $aMenu == 'BannerPartner' && !$aSubMenu}class="mm-active"{/if} title="Bannery partnerů" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-images"></i>
+                                        Bannery partnerů
+                                    </a>
+                                    <a n:href="BannerPartner:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Bannery partnerů', 'banner_partner_menu', 'BannerPartner', 'menu'*}
+                            {capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="Language: " {if $aMenu == 'Language' && !$aSubMenu}class="mm-active"{/if} title="Jazyky" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-globe"></i>
+                                        Jazyky
+                                    </a>
+                                    <a n:href="Language:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Jazyky', 'language_menu', 'Language', 'menu'}
+                            {capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="Translation: " {if $aMenu == 'Translation' && !$aSubMenu}class="mm-active"{/if} title="Překlady" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-language"></i>
+                                        Překlady
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Překlady', 'translation_menu', 'Language', 'menu'}
+                            {capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="WebSetting: " {if $aMenu == 'WebSetting' && !$aSubMenu}class="mm-active"{/if} title="Webová nastavení" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-clone"></i>
+                                        {_'Webová nastavení'}
+                                    </a>
+                                    {*<a n:href="WebSetting:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>*}
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Webová nastavení', 'web_setting_menu', 'WebSetting', 'menu'}
+                            {capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="Setting: " {if $aMenu == 'Setting' && !$aSubMenu}class="mm-active"{/if} title="Webová nastavení" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-cogs"></i>
+                                        {_'Systémová nastavení'}
+                                    </a>
+                                    {*<a n:href="WebSetting:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>*}
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Systémová nastavení', 'setting_menu', 'Setting', 'menu'}
+                            
+
+                        </div>
+                    </div>
+                {/capture}
+                {control acl $ul, 'Menu sekce', 'menu_menu_section', '', 'global-element'}
+                
+                {*}
+                {capture $ul}
+                    <div id="accordionSidebar8">
+                        <a class="card-link" data-toggle="collapse" onClick="showMenuGroup(8);" href="#collapseSidebar8">
+                            <li class="app-sidebar__heading">{_'Číselníky'}</li>
+                        </a>
+                        <div id="collapseSidebar8" class="collapse {if $usrMenu[8]}show{/if}" data-parent="#accordionSidebar8">
+                *}
+                            {*
+                            {capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="VisitState:" {if $aMenu == 'VisitState'}class="mm-active"{/if} title="{_'Výjezdy stavy workflow'}" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-stream"></i>
+                                        {_'Stavy workflow'}
+                                    </a>
+                                    <a n:href="VisitState:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Stavy workflow', 'visit_state_menu', 'VisitState', 'menu'}
+
+                            {capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="VisitStatus:" {if $aMenu == 'VisitStatus'}class="mm-active"{/if} title="{_'Stavy výjezdů'}" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-stream"></i>
+                                        {_'Stavy výjezdů'}
+                                    </a>
+                                    <a n:href="VisitStatus:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Stavy výjezdů', 'visit_status_menu', 'VisitStatus', 'menu'}
+
+                            {capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="VisitProcessState:" {if $aMenu == 'VisitProcessState'}class="mm-active"{/if} title="{_'Stavy OP'}" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-stream"></i>
+                                        {_'Stavy OP'}
+                                    </a>
+                                    <a n:href="VisitProcessState:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Stavy OP', 'visit_process_state_menu', 'VisitProcessState', 'menu'}
+                            *}
+
+                            {*capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="MaterialStock:" {if $aMenu == 'MaterialStock'}class="mm-active"{/if} title="{_'Sklady materiálů'}" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-warehouse"></i>
+                                        {_'Sklady materiálů'}
+                                    </a>
+                                    <a n:href="MaterialStock:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Sklady materiálů', 'material_stock_menu', 'MaterialStock', 'menu'*}
+
+                            {*capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="MaterialGroup:" {if $aMenu == 'MaterialGroup'}class="mm-active"{/if} title="{_'Skupiny materiálů'}" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-th"></i>
+                                        {_'Skupiny materiálů'}
+                                    </a>
+                                    <a n:href="MaterialGroup:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Skupiny materiálů', 'material_group_menu', 'MaterialGroup', 'menu'*}
+                            {*
+                            {capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="AbsenceReason:" {if $aMenu == 'AbsenceReason'}class="mm-active"{/if} title="{_'Důvody absencí'}" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-calendar-times"></i>
+                                        {_'Důvody absencí'}
+                                    </a>
+                                    <a n:href="AbsenceReason:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Důvody absencí', 'absence_reason_menu', 'AbsenceReason', 'menu'}
+                            *}
+                            {*capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="Vat:" {if $aMenu == 'Vat'}class="mm-active"{/if} title="{_'DPH'}" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-hand-holding-usd"></i>
+                                        {_'DPH'}
+                                    </a>
+                                    <a n:href="Vat:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Důvody absencí', 'absence_reason_menu', 'AbsenceReason', 'menu'*}
+
+                {*
+                        </div>
+                    </div>
+                {/capture}
+                {control acl $ul, 'Číselníky sekce', 'menu_dial_section', '', 'global-element'}
+                *}
+
+                {*capture $ul}
+                    <li class="app-sidebar__heading">{_'Plánování výroby'}</li>
+                    {capture $li}
+                        <li class="app-sidebar__group">
+                            <a n:href="ProductionPlan: type=>'KTL'" {if $aMenu == 'ProductionPlan' && $aSubView == 'default' && isset($aaType) && $aaType == 'KTL'}class="mm-active"{/if} title="{_'Plán KTL'}" data-toggle="tooltip" data-placement="right">
+                                <i class="metismenu-icon fa fa-box"></i>
+                                {_'Plán KTL'}
+                            </a>
+                        </li>
+                    {/capture}
+                    {control acl $li, 'Plán KTL', 'productionPlan_def_ktl_menu', 'ProductionPlan', 'menu'}
+
+                    {capture $li}
+                        <li class="app-sidebar__group">
+                            <a n:href="ProductionPlan: type=>'Zn'" {if $aMenu == 'ProductionPlan' && $aSubView == 'default' && isset($aaType) && $aaType == 'Zn'}class="mm-active"{/if} title="{_'Plán ZN'}" data-toggle="tooltip" data-placement="right">
+                                <i class="metismenu-icon fa fa-box"></i>
+                                {_'Plán ZN'}
+                            </a>
+                        </li>
+                    {/capture}
+                    {control acl $li, 'Plán ZN', 'productionPlan_def_zn_menu', 'ProductionPlan', 'menu'}
+
+                    {capture $li}
+                        <li class="app-sidebar__group">
+                            <a n:href="ProductionPlan:view type=>'KTL'" {if $aMenu == 'ProductionPlan' && $aSubView == 'view' && isset($aaType) && $aaType == 'KTL'}class="mm-active"{/if} title="{_'Přehled KTL'}" data-toggle="tooltip" data-placement="right">
+                                <i class="metismenu-icon fa fa-list-ul"></i>
+                                {_'Přehled KTL'}
+                            </a>
+                        </li>
+                    {/capture}
+                    {control acl $li, 'Přehled KTL', 'productionPlan_view_ktl_menu', 'ProductionPlan', 'menu'}
+
+                    {capture $li}
+                        <li class="app-sidebar__group">
+                            <a n:href="ProductionPlan:view type=>'Zn'" {if $aMenu == 'ProductionPlan' && $aSubView == 'view' && isset($aaType) && $aaType == 'Zn'}class="mm-active"{/if} title="{_'Přehled ZN'}" data-toggle="tooltip" data-placement="right">
+                                <i class="metismenu-icon fa fa-list-ul"></i>
+                                {_'Přehled ZN'}
+                            </a>
+                        </li>
+                    {/capture}
+                    {control acl $li, 'Přehled ZN', 'productionPlan_view_zn_menu', 'ProductionPlan', 'menu'}
+
+                {/capture}
+                {control acl $ul, 'Plánování výroby', 'menu_production_plan', '', 'global-element'*}
+
+
+                {*capture $ul}
+                    <li class="app-sidebar__heading">{_'Plánování směn'}</li>
+                    {capture $li}
+                        <li class="app-sidebar__group">
+                            <a n:href="ShiftPlan: type=>'1'" {if $aMenu == 'ShiftPlan' && $aSubView == 'default' && isset($aaType) && $aaType == '1'}class="mm-active"{/if} title="{_'Plán KTL'}" data-toggle="tooltip" data-placement="right">
+                                <i class="metismenu-icon fa fa-calendar-alt"></i>
+                                {_'Plán KTL'}
+                            </a>
+                        </li>
+                    {/capture}
+                    {control acl $li, 'Plán KTL', 'shift_plan_ktl_menu', 'ShiftPlan', 'menu'}
+
+                    {capture $li}
+                        <li class="app-sidebar__group">
+                            <a n:href="ShiftPlan: type=>'2'" {if $aMenu == 'ShiftPlan' && $aSubView == 'default' && isset($aaType) && $aaType == '2'}class="mm-active"{/if} title="{_'Plán ZN'}" data-toggle="tooltip" data-placement="right">
+                                <i class="metismenu-icon fa fa-calendar-alt"></i>
+                                {_'Plán ZN'}
+                            </a>
+                        </li>
+                    {/capture}
+                    {control acl $li, 'Plán ZN', 'shift_plan_zn_menu', 'ShiftPlan', 'menu'}
+
+                    {capture $li}
+                        <li class="app-sidebar__group">
+                            <a n:href="ShiftPlan:fund" {if $aMenu == 'ShiftPlan' && $aSubView == 'fund'}class="mm-active"{/if} title="{_'Plánování fondů'}" data-toggle="tooltip" data-placement="right">
+                                <i class="metismenu-icon fa fa-hourglass-half"></i>
+                                {_'Plánování fondů'}
+                            </a>
+                        </li>
+                    {/capture}
+                    {control acl $li, 'Plánování fondů', 'vacation_fonds_menu', 'ShiftPlan', 'menu'}
+
+                    {capture $li}
+                        <li class="app-sidebar__group">
+                            <a n:href="ShiftPlan:overview" {if $aMenu == 'ShiftPlan' && $aSubView == 'overview'}class="mm-active"{/if} title="{_'Přehled hodin'}" data-toggle="tooltip" data-placement="right">
+                                <i class="metismenu-icon fa fa-history"></i>
+                                {_'Přehled hodin'}
+                            </a>
+                        </li>
+                    {/capture}
+                    {control acl $li, 'Přehled hodin', 'worker_hours_menu', 'ShiftPlan', 'menu'}
+
+                    {capture $li}
+                        <li class="app-sidebar__group">
+                            <a n:href="Vacation:" {if $aMenu == 'Vacation' && $aSubView != 'fund'}class="mm-active"{/if} title="{_'Absence'}" data-toggle="tooltip" data-placement="right">
+                                <i class="metismenu-icon fa fa-calendar-minus"></i>
+                                {_'Absence'}
+                            </a>
+
+                                <a n:href="Vacation:edit">
+                                    <i class="fa fa-plus"></i>
+                                </a>
+
+                        </li>
+
+                        <li class="app-sidebar__group">
+                            <a n:href="Vacation:fund" {if $aMenu == 'Vacation' && $aSubView == 'fund'}class="mm-active"{/if} title="{_'Přehled dovolené'}" data-toggle="tooltip" data-placement="right">
+                                <i class="metismenu-icon fa fa-calendar-week"></i>
+                                {_'Přehled dovolené'}
+                            </a>
+                        </li>
+                    {/capture}
+                    {control acl $li, 'Absence', 'vacation_menu', 'Vacation', 'menu'}
+
+                    {*{capture $li}
+                        <li class="app-sidebar__group">
+                            <a n:href="Departments:" {if $aMenu == 'Departments'}class="mm-active"{/if} title="{_'Oddělení'}" data-toggle="tooltip" data-placement="right">
+                                <i class="metismenu-icon fa fa-square"></i>
+                                {_'Oddělení'}
+                            </a>
+                            <a n:href="Departments:edit">
+                                <i class="fa fa-plus"></i>
+                            </a>
+                        </li>
+                    {/capture}
+                    {control acl $li, 'Oddělení', 'departments_menu', 'Departments', 'menu'}*}
+{*}
+                {/capture}
+                {control acl $ul, 'Plánování směn', 'menu_shift_plan', '', 'global-element'*}
+
+                {*capture $ul}
+                    <li class="app-sidebar__heading">{_'Posouzení nabídek'}</li>
+                    {capture $li}
+                        <li class="app-sidebar__group">
+                            <a n:href="Approve: " {if $aMenu == 'Approve' && !$aSubMenu}class="mm-active"{/if} title="Všechna posouzení" data-toggle="tooltip" data-placement="right">
+                                <i class="metismenu-icon fa">#</i>
+                                Všechna posouzení
+                            </a>
+                            <a n:href="Approve:edit">
+                                <i class="fa fa-plus"></i>
+                            </a>
+                        </li>
+                        {foreach $approveStates as $aState}
+                            <li class="app-sidebar__group">
+                                <a n:href="Approve: slug=>$aState->id" {if $aMenu == 'Approve' && $aSubMenu == $aState->id}class="mm-active"{/if} title="{$aState->name}" data-toggle="tooltip" data-placement="right">
+                                    <i class="metismenu-icon fa">{$aState->id}</i>
+                                    {$aState->name}
+                                </a>
+                            </li>
+                        {/foreach}
+                    {/capture}
+                    {control acl $li, 'Posouzení nabídek', 'approve_menu', 'Approve', 'menu'}
+
+                {/capture}
+                {control acl $ul, 'Posouzení nabídek', 'menu_Approve', '', 'global-element'*}
+
+                {*capture $ul}
+                    <li class="app-sidebar__heading">{_'Provozní deník'}</li>
+                    {capture $li}
+                        <li class="app-sidebar__group">
+                            <a n:href="OperationLog: type=>'1'" {if $aMenu == 'OperationLog' && $aSubView == 'default' && isset($aaType) && $aaType == '1'}class="mm-active"{/if} title="{_'Provozní deník KTL'}" data-toggle="tooltip" data-placement="right">
+                                <i class="metismenu-icon fa fa-calendar-check"></i>
+                                {_'Provozní deník KTL'}
+                            </a>
+                        </li>
+                    {/capture}
+                    {control acl $li, 'Provozní deník KTL', 'operation_log_ktl_menu', 'OperationLog', 'menu'}
+
+                    {capture $li}
+                        <li class="app-sidebar__group">
+                            <a n:href="OperationLog: type=>'2'" {if $aMenu == 'OperationLog' && $aSubView == 'default' && isset($aaType) && $aaType == '2'}class="mm-active"{/if} title="{_'Provozní deník ZN'}" data-toggle="tooltip" data-placement="right">
+                                <i class="metismenu-icon fa fa-calendar-check"></i>
+                                {_'Provozní deník ZN'}
+                            </a>
+                        </li>
+                    {/capture}
+                    {control acl $li, 'Provozní deník ZN', 'operation_log_zn_menu', 'OperationLog', 'menu'}
+
+                {/capture}
+                {control acl $ul, 'Provozní deník', 'menu_OperationLog', '', 'global-element'*}
+
+                {*capture $ul}
+                    <li class="app-sidebar__heading">{_'Řízení změn a rizik'}</li>
+                    {capture $li}
+                        <li class="app-sidebar__group">
+                            <a n:href="ChangeManager:" {if $aMenu == 'ChangeManager'}class="mm-active"{/if} title="{_'Řízení změn'}" data-toggle="tooltip" data-placement="right">
+                                <i class="metismenu-icon fa fa-exchange-alt"></i>
+                                {_'Řízení změn'}
+                            </a>
+                            <a n:href="ChangeManager:edit">
+                                <i class="fa fa-plus"></i>
+                            </a>
+                        </li>
+                    {/capture}
+                    {control acl $li, 'Řízení změn', 'change_manager_menu', 'ChangeManager', 'menu'}
+
+                    {capture $li}
+                        <li class="app-sidebar__group">
+                            <a n:href="RiscManager:" {if $aMenu == 'RiscManager'}class="mm-active"{/if} title="{_'Řízení rizik'}" data-toggle="tooltip" data-placement="right">
+                                <i class="metismenu-icon fa fa-percent"></i>
+                                {_'Řízení rizik'}
+                            </a>
+                            <a n:href="RiscManager:edit">
+                                <i class="fa fa-plus"></i>
+                            </a>
+                        </li>
+                    {/capture}
+                    {control acl $li, 'Řízení rizik', 'risc_manager_menu', 'RiscManager', 'menu'}
+
+                {/capture}
+                {control acl $ul, 'Řízení změn a rizik', 'menu_ChangeManager', '', 'global-element'*}
+
+                {*capture $ul}
+                    <li class="app-sidebar__heading">{_'Školení a dovednosti'}</li>
+                    {capture $li}
+                        <li class="app-sidebar__group">
+                            <a n:href="WorkerTender:" {if $aMenu == 'WorkerTender'}class="mm-active"{/if} title="{_'Školení zaměstnanců'}" data-toggle="tooltip" data-placement="right">
+                                <i class="metismenu-icon fa fa-book-reader"></i>
+                                {_'Školení zaměstnanců'}
+                            </a>
+                            <a n:href="WorkerTender:edit">
+                                <i class="fa fa-plus"></i>
+                            </a>
+                        </li>
+                    {/capture}
+                    {control acl $li, 'Školení zaměstnanců', 'worker_tender_menu', 'WorkerTender', 'menu'}
+
+                    {capture $li}
+                        <li class="app-sidebar__group">
+                            <a n:href="Skill:" {if $aMenu == 'Skill'}class="mm-active"{/if} title="{_'Dovednosti pro pracovní pozice'}" data-toggle="tooltip" data-placement="right">
+                                <i class="metismenu-icon fa fa-user-cog"></i>
+                                {_'Pracovní dovednosti'}
+                            </a>
+                            <a n:href="Skill:edit">
+                                <i class="fa fa-plus"></i>
+                            </a>
+                        </li>
+                    {/capture}
+                    {control acl $li, 'Pracovní dovednosti', 'skill_menu', 'Skill', 'menu'}
+
+                {/capture}
+                {control acl $ul, 'Školení a dovednosti', 'menu_WorkerTender', '', 'global-element'*}
+
+                {*capture $ul}
+                    <li class="app-sidebar__heading">{_'Průběh výroby'}</li>
+                    {capture $li}
+                        <li class="app-sidebar__group">
+                            <a n:href="ProductionProgressReport: type=>'1', week => null, year => null, dateRange => null" {if $aMenu == 'ProductionProgressReport' && isset($aaType) && $aaType == '1'}class="mm-active"{/if} title="{_'Sestava KTL'}" data-toggle="tooltip" data-placement="right">
+                                <i class="metismenu-icon fa fa-calendar-check"></i>
+                                {_'Sestava KTL'}
+                            </a>
+                        </li>
+                    {/capture}
+                    {control acl $li, 'Sestava KTL', 'production_progress_report_ktl_menu', 'ProductionProgressReport', 'menu'}
+
+                    {capture $li}
+                        <li class="app-sidebar__group">
+                            <a n:href="ProductionProgressReport: type=>'2', week => null, year => null, dateRange => null" {if $aMenu == 'ProductionProgressReport' && isset($aaType) && $aaType == '2'}class="mm-active"{/if} title="{_'Sestava ZN'}" data-toggle="tooltip" data-placement="right">
+                                <i class="metismenu-icon fa fa-calendar-check"></i>
+                                {_'Sestava ZN'}
+                            </a>
+                        </li>
+                    {/capture}
+                    {control acl $li, 'Sestava ZN', 'production_progress_report_zn_menu', 'ProductionProgressReport', 'menu'}
+
+                {/capture}
+                {control acl $ul, 'Průběh výroby', 'menu_ProductionProgressReport', '', 'global-element'*}
+
+                <div id="accordionSidebar9">
+                    <a class="card-link" data-toggle="collapse" onClick="showMenuGroup(9);" href="#collapseSidebar9">
+                        <li class="app-sidebar__heading">{_'Uživatel'}</li>
+                    </a>
+                    <div id="collapseSidebar9" class="collapse {if $usrMenu[9]}show{/if}" data-parent="#accordionSidebar9">
+
+                        <li>
+                            <a n:href="Homepage:pass" {if $aMenu == 'Homepage' && $aSubView == 'pass'}class="mm-active"{/if} title="{_'Změna hesla'}" data-toggle="tooltip" data-placement="right">
+                                <i class="metismenu-icon fa fa-key"></i>
+                                {_'Změna hesla'}
+                            </a>
+                        </li>
+
+                    </div>
+                </div>
+
+                {capture $ul}
+                    <div id="accordionSidebarAdm">
+                        <a class="card-link" data-toggle="collapse" onClick="showMenuGroup(10);" href="#collapseSidebarAdm">
+                            <li class="app-sidebar__heading">{_'Administrace'}</li>
+                        </a>
+                        <div id="collapseSidebarAdm" class="collapse {if $usrMenu[10]}show{/if}" data-parent="#accordionSidebarAdm">
+
+                            {*capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="Worker:" {if $aMenu == 'Worker'}class="mm-active"{/if} title="{_'Zaměstnanci'}" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-users-cog"></i>
+                                        {_'Zaměstnanci'}
+                                    </a>
+                                    <a n:href="Worker:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Zaměstnanci', 'worker_menu', 'Worker', 'menu'*}
+
+                            {*capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="Workplace:" {if $aMenu == 'Workplace'}class="mm-active"{/if} title="{_'Pracoviště'}" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-people-carry"></i>
+                                        {_'Pracoviště'}
+                                    </a>
+                                    <a n:href="Workplace:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Pracoviště', 'workplace_menu', 'Workplace', 'menu'*}
+
+                            {*capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="ProductionLine:" {if $aMenu == 'ProductionLine'}class="mm-active"{/if} title="{_'Výrobní linky'}" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-ruler-combined"></i>
+                                        {_'Výrobní linky'}
+                                    </a>
+                                    <a n:href="ProductionLine:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Výrobní linky', 'production_line_menu', 'ProductionLine', 'menu'}
+
+                            {capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="ProductionSetting:" {if $aMenu == 'ProductionSetting'}class="mm-active"{/if} title="{_'Nastavení výroby'}" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-cogs"></i>
+                                        {_'Nastavení výroby'}
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Nastavení výroby', 'production_setting_menu', 'ProductionSetting', 'menu'*}
+
+                            {*capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="WorkerPosition:" {if $aMenu == 'WorkerPosition'}class="mm-active"{/if} title="{_'Pracovní pozice'}" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-briefcase"></i>
+                                        {_'Pracovní pozice'}
+                                    </a>
+                                    <a n:href="WorkerPosition:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Pracovní pozice', 'worker_position_menu', 'WorkerPosition', 'menu'}
+
+                            {capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="SkillType:" {if $aMenu == 'SkillType'}class="mm-active"{/if} title="{_'Typy dovedností pro pracovní pozice a školení'}" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-cogs"></i>
+                                        {_'Typy dovedností'}
+                                    </a>
+                                    <a n:href="SkillType:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Typy dovedností', 'skill_type_menu', 'SkillType', 'menu'*}
+
+                            {*capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="OperationLogSuggestion:" {if $aMenu == 'OperationLogSuggestion'}class="mm-active"{/if} title="{_'Náměty a připomínky'}" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-question"></i>
+                                        {_'Náměty a připomínky'}
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Náměty a připomínky', 'operation_log_suggestion_menu', 'OperationLogSuggestion', 'menu'}
+
+                            {capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="ApproveTime:" {if $aMenu == 'ApproveTime'}class="mm-active"{/if} title="{_'Doby posouzení'}" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-hourglass"></i>
+                                        {_'Doby posouzení'}
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Doby posouzení', 'approve_time_menu', 'ApproveTime', 'menu'}
+
+                            {capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="ApproveNorm:" {if $aMenu == 'ApproveNorm'}class="mm-active"{/if} title="{_'Normy'}" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-book"></i>
+                                        {_'Normy'}
+                                    </a>
+                                    <a n:href="ApproveNorm:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Normy', 'approve_norm_menu', 'ApproveNorm', 'menu'}
+
+                            {capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="ShiftBonusGroup:" {if $aMenu == 'ShiftBonusGroup'}class="mm-active"{/if} title="{_'Šablony směn'}" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-user-clock"></i>
+                                        {_'Šablony směn'}
+                                    </a>
+                                    <a n:href="ShiftBonusGroup:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Šablony směn', 'shift_bonus_group_menu', 'ShiftBonusGroup', 'menu'*}
+
+                            {*capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="VacationType:" {if $aMenu == 'VacationType'}class="mm-active"{/if} title="{_'Důvody absencí'}" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-pen-fancy"></i>
+                                        {_'Důvody absencí'}
+                                    </a>
+                                    <a n:href="VacationType:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Důvody absencí', 'vacation_type_menu', 'VacationType', 'menu'*}
+
+                            {*capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="TaskState:" {if $aMenu == 'TaskState'}class="mm-active"{/if} title="{_'Stavy úkolů'}" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-stream"></i>
+                                        {_'Stavy úkolů'}
+                                    </a>
+                                    <a n:href="TaskState:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Stavy úkolů', 'task_state_menu', 'TaskState', 'menu'}
+
+                            {capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="TaskLog:" {if $aMenu == 'TaskLog'}class="mm-active"{/if} title="{_'Změny v úkolech'}" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-chart-bar"></i>
+                                        {_'Změny v úkolech'}
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Změny v úkolech', 'task_log_menu', 'TaskLog', 'menu'*}
+
+                            {*capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="VisitLog:" {if $aMenu == 'VisitLog'}class="mm-active"{/if} title="{_'Změny ve výjezdech'}" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-chart-bar"></i>
+                                        {_'Změny ve výjezdech'}
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Změny ve výjezdech', 'visit_log_menu', 'VisitLog', 'menu'*}
+
+                            {capture $li}
+                                <li class="app-sidebar__group">
+                                    <a n:href="Users:" {if $aMenu == 'Users'}class="mm-active"{/if} title="{_'Uživatelé'}" data-toggle="tooltip" data-placement="right">
+                                        <i class="metismenu-icon fa fa-user"></i>
+                                        {_'Uživatelé'}
+                                    </a>
+                                    <a n:href="Users:edit">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </li>
+                            {/capture}
+                            {control acl $li, 'Uživatelé', 'users_menu', 'Users', 'menu'}
+
+                        </div>
+                    </div>
+                {/capture}
+                {control acl $ul, 'Administrace', 'menu_administration', '', 'global-element'}
+
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function showMenuGroup(id) {
+            $.nette.ajax({
+                url: {link menuToggle!},
+                type: 'POST',
+                data: {
+                    item : id
+                },
+                off: {
+                    snippets: true
+                }
+            });
+        }
+    </script>
+</div>

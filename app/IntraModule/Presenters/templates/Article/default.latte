@@ -1,0 +1,75 @@
+{block title}Články{/block}
+{block description}Správa článků na přední stránce webu{/block}
+{block header-icon}<i class="fa fa-align-left icon-gradient bg-mean-fruit"></i>{/block}
+{block header-actions}
+<div class="dropdown">
+    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownArticleAdd" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Přidat nový článek <span class="caret"></span>
+    </button>
+    <div class="dropdown-menu" aria-labelledby="dropdownArticleAdd">
+        <a class="dropdown-item" n:href="Article:edit slug => 'default'">Základní</a>
+        <a class="dropdown-item" n:href="Article:edit slug => 'template'">Reference</a>
+    </div>
+</div>
+{/block}
+{block content}
+    <div class="d-flex align-items-end">
+        <div class="dropdown mb-3">
+            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Výběr menu
+                <span class="caret"></span></button>
+            <div id="tree-menu" class="dropdown-menu">
+                {var $childs = isset($structureMenu) ? $structureMenu : []}
+                {var $depth = 0}
+                {block tree}
+                    {if $depth == 0}
+                        <a class="dropdown-item" n:href="resetFilter!">Vše</a>
+                    {/if}
+                    {foreach $childs as $s}
+                        <a class="dropdown-item" id="tree-menu-{$s->id}" n:href="Article:default menu => $s->id">
+                            {for $i = 0; $i < $depth; $i++}&nbsp;{/for}
+                            {if $depth > 0}<i class="fa fa-arrow-right small"></i>&nbsp;{/if}
+                            {$s->name}
+                        </a>
+                        {ifset $s['children']}
+                            {include tree childs => $s['children'], depth => ++$depth}
+                        {/ifset}
+                        {var $depth = 0}
+                    {/foreach}
+                {/block}
+            </div>
+        </div>
+        <div style="flex-basis: 600px">
+            {form searchForm}
+                {*control renderer $form, 'menu', 'classic', 'getMenu', '', 'handleSelect'*}
+                {include bootstrap-autocomplete $form, 'menu', 6, 'getMenu', '', 'handleSelect'}
+            {/form}
+        </div>
+    </div>
+    {control table}
+{/block}
+
+{block scriptsBot}
+
+    {*if !$activeMenu}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            treeMenu.jstree().clear_state();
+        });
+    </script>
+    {/if}
+    {if $activeMenu}
+        <script type="text/javascript">
+            $(document).ready(function() {
+                treeMenu.jstree('select_node', 'tree-menu-' + {$activeMenu});
+            });
+        </script>
+    {/if*}
+    <script type="text/javascript">
+        $(document).on('click', '.remove-autocomplete-value', function(e) {
+            window.location.href = {link resetFilter!};
+        });
+        handleSelect = function(data, inputCm, inputRes) {
+            inputCm.closest('form').submit();
+        };
+    </script>
+{/block}

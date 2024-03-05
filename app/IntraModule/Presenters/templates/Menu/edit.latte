@@ -1,0 +1,134 @@
+{block title}
+    {ifset $menu}
+        Úprava menu
+    {else}
+        Přidání nového menu
+    {/ifset}
+{/block}
+{block description}
+    {ifset $menu}
+        Editace menu na přední stránce webu
+    {else}
+        Přidání menu na přední stránce webu
+    {/ifset}
+{/block}
+{block header-icon}<i class="fa fa-columns icon-gradient bg-mean-fruit"></i>{/block}
+{block header-actions}{/block}
+{block content}
+    {form menuForm, class=>"form-horizontal"}
+        <div class="card mb-2">
+            <div class="card-header">{_'Obecné'}</div>
+            <div class="card-body">
+                <div class="row">
+                    {include bootstrap-input $menuForm, 'parentMenu', 6}
+                    {include bootstrap-input $menuForm, 'orderPage', 6}
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            {label image /}<br>
+                            {input image}
+                            {snippet img}
+                                {ifset $menu->image}
+                                    <div n:if="$menu->image" class="col-md-6 col-md-offset-4" style="padding-bottom: 20px">
+                                        <img src="{$basePath}/{$menu->image}?time={php echo time()}" style="max-height: 100px; width: auto;">
+                                        <a n:href="deleteImg! menuId => $menu->id" class="btn btn-xs btn-danger ajax">
+                                            <span class="fa fa-trash"></span>
+                                        </a>
+                                    </div>
+                                {/ifset}
+                            {/snippet}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-2">
+            <div class="card-header">
+                {_'Jazyková nastavení'}
+                <ul class="w-auto ml-auto py-1 body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
+                    {foreach $langs as $l}
+                        <li class="nav-item"><a class="nav-link {if $locale == $l->code}show active{/if}" data-toggle="tab" href="#{$l->code}" role="tab"><span>{$l->name}</span></a></li>
+                    {/foreach}
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content">
+                {foreach $langs as $l}
+                    <div id="{$l->code}" class="tab-pane tabs-animation fade {if $locale == $l->code}show active{/if}">
+                        <input type="hidden" name="langId[{$l->code}]" value="{ifset $dataLang[$l->code]['id']}{$dataLang[$l->code]['id']}{/ifset}">
+                        <div class="row">
+                            <div class="col-sm-12 col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label">Název</label>
+                                    <input type="text" name="name[{$l->code}]" placeholder="Název" class="form-control" value="{ifset $dataLang[$l->code]['name']}{$dataLang[$l->code]['name']}{/ifset}">
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label">URL</label>
+                                    <input type="text" name="url[{$l->code}]" placeholder="URL" class="form-control" value="{ifset $dataLang[$l->code]['url']}{$dataLang[$l->code]['url']}{/ifset}">
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label">Odkaz</label>
+                                    <input type="text" name="link[{$l->code}]" placeholder="Odkaz" class="form-control" value="{ifset $dataLang[$l->code]['link']}{$dataLang[$l->code]['link']}{/ifset}">
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-6">
+                                <label class="control-label"></label>
+                                <div class="form-group">
+                                    <label for="visible[{$l->code}]" class="pr-2"><input type="checkbox" id="visible[{$l->code}]" name="visible[{$l->code}]" {if (isset($dataLang[$l->code]['visible']) && $dataLang[$l->code]['visible']) || !isset($dataLang)}checked{/if}> Zobrazit</label>
+                                    <label for="showUp[{$l->code}]" class="pr-2"><input type="checkbox" id="showUp[{$l->code}]" name="showUp[{$l->code}]" {if isset($dataLang[$l->code]['showUp']) && $dataLang[$l->code]['showUp']}checked{/if}> Horní menu</label>
+                                    <label for="newWindow[{$l->code}]" class="pr-2"><input type="checkbox" id="newWindow[{$l->code}]" name="newWindow[{$l->code}]" {if isset($dataLang[$l->code]['newWindow']) && $dataLang[$l->code]['newWindow']}checked{/if}> Nové okno</label>
+                                    <label for="showOnHomepage[{$l->code}]" class="pr-2"><input type="checkbox" id="showOnHomepage[{$l->code}]" name="showOnHomepage[{$l->code}]" {if isset($dataLang[$l->code]['showOnHomepage']) && $dataLang[$l->code]['showOnHomepage']}checked{/if}> Zobrazit na úvodu</label>
+                                    <label for="showSignpost[{$l->code}]" class="pr-2"><input type="checkbox" id="showSignpost[{$l->code}]" name="showSignpost[{$l->code}]" {if isset($dataLang[$l->code]['showSignpost']) && $dataLang[$l->code]['showSignpost']}checked{/if}> Zobrazit rozcestník</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label">Title</label>
+                                    <input type="text" name="title[{$l->code}]" placeholder="Title" class="form-control" value="{ifset $dataLang[$l->code]['title']}{$dataLang[$l->code]['title']}{/ifset}">
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label">Keywords</label>
+                                    <textarea name="keywords[{$l->code}]" placeholder="Keywords" class="form-control">{ifset $dataLang[$l->code]['keywords']}{$dataLang[$l->code]['keywords']}{/ifset}</textarea>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label">Description</label>
+                                    <textarea name="description[{$l->code}]" placeholder="Description" class="form-control">{ifset $dataLang[$l->code]['description']}{$dataLang[$l->code]['description']}{/ifset}</textarea>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label">Název na úvod</label>
+                                    <input type="text" name="nameOnFront[{$l->code}]" placeholder="Název" class="form-control" value="{ifset $dataLang[$l->code]['nameOnFront']}{$dataLang[$l->code]['nameOnFront']}{/ifset}">
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label">Název na podstránce</label>
+                                    <input type="text" name="nameOnSubFront[{$l->code}]" placeholder="Název" class="form-control" value="{ifset $dataLang[$l->code]['nameOnSubFront']}{$dataLang[$l->code]['nameOnSubFront']}{/ifset}">
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-12">
+                                <div class="form-group">
+                                    <label>Text na úvodu</label>
+                                    <textarea name="menuDescription[{$l->code}]" placeholder="Text na úvodu" class="form-control ckeditor">{ifset $dataLang[$l->code]['menuDescription']}{$dataLang[$l->code]['menuDescription']}{/ifset}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {/foreach}
+                </div>
+            </div>
+        </div>
+        {control renderer $menuForm, 'btns'}
+    {/form}
+{/block}

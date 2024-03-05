@@ -1,0 +1,304 @@
+
+{import '../../templates/form.latte'}
+
+{if $adminMode}
+    <script>
+    
+        $(document).on('change', '#reservationAdminModal input[name="repeat"]', (e) => {
+            let $el = $(e.target);
+            if ($el.is(':checked')) {
+                $('#repeat-part').show();
+            } else {
+                $('#repeat-part').hide();
+            }
+        });
+
+        $(document).on('change', '#reservationAdminModal input[name="newCustomer"]', (e) => {
+            $el = $(e.target);
+            if ($el.is(':checked')) {
+                $('#r-new-customer').show();
+                $('#r-existing-customer').hide();
+            } else {
+                $('#r-new-customer').hide();
+                $('#r-existing-customer').show();
+            }
+        });
+
+        $.nette.ext('snippets').after(function (el) {
+            console.log(el);
+            if (typeof el.data('modal') !== 'undefined') {
+                console.log('openModal:' + el.data('modal'));
+                /*if (el.data('modal') === 'meeting') {
+                    el.find(".ckEditor").each(function(i, e) {
+                        let editor = CKEDITOR.replace(e);
+                        editor.on('change', function( e ) {
+                            this.updateElement();
+                        });
+                    });
+                };*/
+                setTimeout(
+                    function() {
+                        $('#' + el.data('modal') + 'Modal').modal('show');
+                    }
+                    , 50
+                );
+            }
+        });
+        
+        $(document).ajaxComplete(function (event, xhr, settings) {
+            /*if (typeof settings.nette === 'undefined' || !settings.nette.form) {
+                return;
+            }*/
+            if (
+                //settings.nette.form.hasClass('r-form')
+                //&&
+                (typeof xhr.responseJSON.close !== 'undefined') 
+            ) {
+                $('#reservationAdminModal').modal('hide');
+            }
+            Ladda.stopAll();
+        });
+
+        $(document).on('click', '.reservation-item .r-grid table td', (e) => {
+            
+            let $el = $(e.target);
+            if ($el.prop('tagName') != 'TD') {
+                $el = $el.parents('td')[0];
+            }
+
+            if ($el.hasClass('r-reserved')) {
+                $.nette.ajax({
+                    url: {link modalFormEdit!},
+                    data: {
+                        modal: 'reservationAdmin',
+                        id: $el.data('reservation-id')
+                    },
+                    type: 'POST'
+                });
+            } else {
+                reservationCellSelect($el);
+            }
+        });
+
+        $(document).on('click', '#newReservationButt', function(e) {
+            $('#reservationAdminModal').modal('show');
+            console.log('open');
+            /*$.nette.ajax({
+                url: {link modalFormReset!},
+                type: 'POST',
+                data: {
+                    modal: $(this).data('modal')
+                }
+            });*/
+        });
+    </script>
+{/if}
+
+
+<script>
+    var selectedRanges = [];
+
+    function minutesToTimeStr(minutes) {
+        let minutesPart = minutes % 60 ;
+        return Math.floor(minutes / 60) + ':' +  (minutesPart < 10 ? ('0' + minutesPart) : minutesPart);
+    }
+
+    function reservationCellSelect($el)
+    {
+        // ignore unselectable
+        if ($el.hasClass('r-unreservable')
+            || $el.hasClass('r-reserved')
+            || $el.hasClass('r-past')
+        ) {
+            return;
+        } else {
+            // select / unselect
+
+            // prepare new object
+            let clickedItem =  {
+                minuteFrom: $el.data('minute-from'),
+                minuteTo: $el.data('minute-to'),
+                date: $el.parents('tr').data('date')
+            }
+
+            // check date (row)
+            if (selectedRanges.length) {
+                if (clickedItem.date != selectedRanges[0].date ) {
+                    resetSelectedRanges();
+                    reservationCellSelect($el);
+                    return;
+                }
+            }
+
+            if ($el.hasClass('r-selected')) {
+                // unselect
+
+                // remove from start or end
+                if (selectedRanges.length > 1) {
+                    if (selectedRanges[1].minuteFrom > clickedItem.minuteFrom) {
+                        // check they are following
+                        if (clickedItem.minuteTo != selectedRanges[1].minuteFrom) {
+                            return;
+                        }
+                        // remove from the beginning
+                        selectedRanges.shift();
+                    } else {
+                        // check they are following
+                        if (clickedItem.minuteFrom != selectedRanges[selectedRanges.length - 2].minuteTo) {
+                            return;
+                        }
+                        selectedRanges.pop()
+                    }
+                } else {
+                    selectedRanges.pop();
+                }
+
+                $el.removeClass('r-selected');
+                //$el.addClass('table-success');
+                $el.text('Volno');
+            
+            } else {
+                // select
+
+                // add to start or end
+                if (selectedRanges.length) {
+                    if (selectedRanges[0].minuteFrom > clickedItem.minuteFrom) {
+                        // check they are following
+                        if (clickedItem.minuteTo != selectedRanges[0].minuteFrom) {
+                            resetSelectedRanges();
+                            reservationCellSelect($el);
+                            return;
+                        }
+                        // add to the beginning
+                        selectedRanges.unshift(clickedItem);
+                    } else {
+                        // check they are following
+                        if (clickedItem.minuteFrom != selectedRanges[selectedRanges.length - 1].minuteTo) {
+                            resetSelectedRanges();
+                            reservationCellSelect($el);
+                            return;
+                        }
+                        selectedRanges.push(clickedItem)
+                    }
+                } else {
+                    selectedRanges.push(clickedItem);
+                }
+
+                $el.addClass('r-selected');
+                //$el.removeClass('table-success');
+                $el.text('Vybráno');
+            }
+
+
+            // recalculate date and time
+            {if $adminMode}
+                let $elRi = $('#reservationAdminModal');
+                let $elReservationItemInput = $elRi.find('.r-form select[name="reservationItem"]');
+            {else}
+                let $elRi = $el.parents('.reservation-item');
+            {/if}
+            let $elDateInput = $elRi.find('.r-form input[name="date"]');
+            let $elTimeFromInput = $elRi.find('.r-form input[name="timeFrom"]');
+            let $elTimeToInput = $elRi.find('.r-form input[name="timeTo"]');
+
+            if (selectedRanges.length > 0) {
+                let date = new Date(selectedRanges[0].date);
+                $elDateInput.val(date.toLocaleDateString('cs-CZ'));
+                $elTimeFromInput.val(minutesToTimeStr(selectedRanges[0].minuteFrom));
+                $elTimeToInput.val(minutesToTimeStr(selectedRanges[selectedRanges.length - 1].minuteTo));
+                {if $adminMode}
+                    $elReservationItemInput.selectpicker('val', $el.parents('.reservation-item').data('riid'));
+                    
+
+                    console.log($elReservationItemInput);
+                    console.log($el.parents('.reservation-item'));
+                    console.log($el.parents('.reservation-item').data('riid'));
+                {/if}
+            } else {
+                $elDateInput.val('');
+                $elTimeFromInput.val('');
+                $elTimeToInput.val('');
+
+                {if $adminMode}
+                    $elReservationItemInput.val('');
+                {/if}
+            }
+        }
+    }
+
+    function resetSelectedRanges() {
+        $('.reservation-item .r-grid table td.r-selected')
+            .removeClass('r-selected');
+            //.addClass('table-success');
+        
+        selectedRanges = [];
+    }
+
+    {if !$adminMode}
+        // grid click
+        $(document).on('click', '.reservation-item .r-grid table td', (e) => {
+            let $el = $(e.target);
+            if ($el.prop('tagName') != 'TD') {
+                $el = $el.parents('td')[0];
+            }
+            reservationCellSelect($el);
+        });
+    {/if}
+
+    // grid hovers
+    $(document)
+        .on('mouseenter', '.reservation-item .r-grid table td', (e) => {
+            let $el = $(e.target);
+            if ($el.prop('tagName') != 'TD') {
+                $el = $el.parents('td')[0];
+            }
+            if ($el.hasClass('unreservable')) {
+                $el.text('Mimo termín');
+            } else if ($el.hasClass('r-reserved')) {
+                $el.text('Obsazeno');
+            } else if ($el.hasClass('r-past')) {
+                $el.text('Uplynulé');
+            } else if ($el.hasClass('r-selected')) {
+                $el.text('Vybráno');
+            } else {
+                $el.text('Volno');
+            }
+        })
+        .on('mouseleave', '.reservation-item .r-grid table td', (e) => {
+            let $el = $(e.target);
+            if ($el.prop('tagName') != 'TD') {
+                $el = $el.parents('td')[0];
+            }
+            $el.text('');
+
+            /*if ($el.hasClass('unreservable')) {
+            } else if ($el.hasClass('r-reserved')) {
+            } else if ($el.hasClass('r-past')) {
+            } else if ($el.hasClass('r-selected')) {
+            } else {
+            }*/
+        })
+    ;
+
+    // week change
+    $(document).on('change', '.reservation-item input[name="weekpicker"]', (e) => {
+        $el = $(e.target);
+        $el.parents('.reservation-item').find('.spinner-wrap').show();
+        $.nette.ajax({
+            url: {link changeDate!},
+            type: 'POST',
+            data: {
+                date : $el.val()
+            },
+            /*off: {
+                snippets: true
+            }*/
+        });
+    });
+
+    // spinner
+    $(document).on('click', '.reservation-item .spinner-on', (e) => {
+        $el = $(e.target);
+        $el.parents('.reservation-item').find('.spinner-wrap').show();
+    });
+</script>

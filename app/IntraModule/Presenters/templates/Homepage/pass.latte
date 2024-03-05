@@ -1,0 +1,15 @@
+{block title}
+    {_'Změna hesla uživatele'}
+{/block}
+{block content}
+    <div class="card">
+        <div class="card-body">
+            {form passForm}
+                {include bootstrap-input $form, 'oldPass', 6}
+                {include bootstrap-input $form, 'newPass', 6}
+                {include bootstrap-input $form, 'newPassCheck', 6}
+                {include bootstrap-input $form, 'send', 6}
+            {/form}
+        </div>
+    </div>
+{/block}

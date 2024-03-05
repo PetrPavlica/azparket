@@ -1,0 +1,604 @@
+{block title}
+    {ifset $entity}
+        {_'Úprava nabídky'}
+    {else}
+        {_'Nová nabídka'}
+    {/ifset}
+{/block}
+{block description}
+    {ifset $entity}
+        {_'Editace stávající nabídky'}
+    {else}
+        {_'Přidání nové nabídky'}
+    {/ifset}
+{/block}
+{block header-icon}<i class="fa fa-file-invoice icon-gradient bg-mean-fruit"></i>{/block}
+{block header-actions}
+    <button type="button" style="cursor: pointer" class="printOffer btn btn-primary" 
+        {if !isset($entity)}disabled{/if}>
+        {_'Generovat do PDF'}<i class="fa fa-file-import pl-2"></i>
+    </button>
+    <button type="button" style="cursor: pointer" id="sendOffer" class="btn btn-primary" 
+        {if !isset($entity)}disabled{/if}
+        data-toggle="modal" data-target="#sendOfferModal">
+        {_'Odeslat nabídku'}<i class="fa fa-share pl-2"></i>
+    </button>
+{/block}
+{block body-start}
+    <div class="spinner-wrap spinner-fixed" id="spin-full-overlay" style="display: none;"><div class="spinner-dual-ring"></div></div>
+{/block}
+{block content}
+{snippetArea owf-form}
+    {form form}
+        <div class="card mb-2">
+            <div class="card-header">
+                <div>{_'Základní informace'}</div>
+                {ifset $entity}<div class="ml-auto text-shadow">{if $entity->sendDate}Odesláno {$entity->sendDate|date:'H:i j. n. Y'}{else}{_'Neodesláno'}{/if}</div>{/ifset}
+            </div>
+            <div class="card-body">
+                <div class="form-row">
+                    {include bootstrap-input $form, 'offerNo', 2}
+                    {include bootstrap-input $form, 'state', 2}
+                    {include bootstrap-input $form, 'new', 2}
+                    {include bootstrap-autocomplete $form, 'salesman', 6, 'getSalesmans', '', ''}
+                    <div class="col-md-6">
+                        <div class="form-row">
+                            {include bootstrap-autocomplete $form, 'customer', 9, 'getCustomers', '', ''}
+                            <div class="col-md-3"><label>&nbsp;</label><br><a n:if="isset($entity) && $entity->customer" target="_blank" n:href="Customer:edit $entity->customer->id" class="btn btn-outline-primary w-100">{_'Přejít na zákazníka'}</a></div>
+                            {*include bootstrap-input $form, 'customerText', 6*}
+                            {include bootstrap-autocomplete $form, 'inquiry', 9, 'getInquiries', '', ''}
+                            <div class="col-md-3"><label>&nbsp;</label><br><a n:if="isset($entity) && $entity->inquiry" target="_blank" n:href="Inquiry:edit $entity->inquiry->id" class="btn btn-outline-primary w-100">{_'Přejít na poptávku'}</a></div>                        
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-row">
+                            {include bootstrap-input $form, 'plannedSendDate', 9}
+                            {include bootstrap-input $form, 'autoSend', 3}
+                            <div class="col-md-12">
+                                {if isset($entity) && $entity->acceptCode}
+                                    Odkaz k potvrzení nabídky:<br>
+                                    <a n:href=":Offer:accept acceptCode => $entity->acceptCode">
+                                        {link :Offer:accept acceptCode => $entity->acceptCode}
+                                    </a>
+                                {/if}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-row">
+                            {include bootstrap-input $form, 'priceDelivery', 9}
+                            <div class="col-md-3"><label>&nbsp;</label><br><button name="calcPriceDelivery" n:if="isset($entity)" class="btn btn-outline-primary w-100">{_'Dopočítat'}</button></div>
+                            {include bootstrap-input $form, 'priceInstall', 9}
+                            <div class="col-md-3"><label>&nbsp;</label><br><button name="calcPriceInstall" n:if="isset($entity)" class="btn btn-outline-primary w-100">{_'Dopočítat'}</button></div>
+                            {include bootstrap-input $form, 'price', 9}
+                            <div class="col-md-3"><label>&nbsp;</label><br><button name="calcPrice" class="btn btn-outline-primary w-100">{_'Dopočítat'}</button></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-row">
+                            {include bootstrap-input $form, 'installWorkers', 6}
+                            {include bootstrap-input $form, 'transportTime', 6}
+                        </div>
+                        <div class="form-row">
+                            {include bootstrap-input $form, 'installDistance', 6}
+                            {include bootstrap-input $form, 'transportCount', 6}
+                            {include bootstrap-input $form, 'priceCrane', 12}
+                        </div>
+                    </div>
+                    {include bootstrap-input $form, 'vat', 3}
+                    <div class="col-md-3 d-flex align-items-center">*Všechny ceny jsou bez DPH</div>
+                    {include bootstrap-input $form, 'description', 12}
+                    {*include bootstrap-input $form, 'unit', 3*}
+                </div>
+            </div>
+            <div class="card-footer">
+                <a class="btn btn-outline-primary mr-1" href="{link Offer:default}">
+                    <span class="fa fa-arrow-left" aria-hidden="true"></span>
+                    Zpět
+                </a>
+                <button name="sendBack" type="submit" class="btn btn-primary mx-1">Uložit</button>
+                <button name="send" type="submit" class="btn btn-primary mx-1">Uložit a pokračovat</button>
+                <button name="sendNew" type="submit" class="btn btn-primary mx-1">Uložit a nový</button>
+                <button name="sendAjax" id="sendAjax" type="submit" class="d-none ajax mx-1"></button>
+            </div>
+        </div>
+
+        <div id="accordion9">
+            <div class="card mb-2">
+                <div class="card-header">
+                    <a class="card-link" data-toggle="collapse" href="#collapse9">
+                        <i class="fa fa-plus"></i> {_'Produkty'}
+                    </a>
+                    <span n:if="isset($entity)" style="cursor: pointer" class="checkProduct btn btn-primary ml-auto" data-id="0">
+                        <i class="fa fa-plus"></i> Přidat produkt
+                    </span>
+                </div>
+                <div id="collapse9" class="collapse show" data-parent="#accordion9">
+                    <div class="card-body">
+                        <div class="">
+                            {snippet offer-product}
+                                {if isset($entity)}
+                                    <div class="table-responsive">
+                                        <table id="operationTable" class="table table-bordered table-stripped">
+                                            <thead>
+                                            <tr>
+                                                <th class="text-left">
+                                                    {_'Klíč'}
+                                                </th>
+                                                <th class="text-center">
+                                                    {_'Produkt'}
+                                                </th>
+                                                <th class="text-center">
+                                                    {_'Cena/mj'}
+                                                </th>
+                                                <th class="text-center">
+                                                    {_'Počet'}
+                                                </th>
+                                                <th class="text-center">
+                                                    {_'Akce'}
+                                                </th>
+                                            </thead>
+                                            <tbody>
+                                            {foreach $entity->products as $oProd}
+                                                <tr>
+                                                    <td class="text-left">
+                                                        {$iterator}
+                                                    </td>
+                                                    <td>
+                                                        {if $oProd->product}
+                                                            <a n:href="Product:edit id => $oProd->product->id">
+                                                                {$oProd->product->klic_polozky}: {$oProd->product->nazev_polozky}
+                                                            </a>
+                                                        {/if}
+                                                    </td>
+                                                    <td class="text-center">
+                                                        {$oProd->price|number:2, '.', ' '}
+                                                    </td>
+                                                    <td class="text-center">
+                                                        {$oProd->count}
+                                                    </td>
+                                                    <td class="text-center p-0">
+                                                        <span style="cursor: pointer; font-size: 16px;" class="checkProduct m-2" data-id="{$oProd->id}"><i class="fa fa-edit"></i></span>
+                                                        <span style="cursor: pointer; font-size: 16px" class="m-2" data-id="{$oProd->id}" data-confirm-sweetalert2="delete" data-success-click="#removeProduct{$oProd->id}"><i class="fa fa-trash text-danger"></i></span>
+                                                        <span style="display: none;" class="removeProduct" data-id="{$oProd->id}" id="removeProduct{$oProd->id}"></span>
+                                                    </td>
+                                                </tr>
+                                            {/foreach}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                {else}
+                                    {_'Produkt lze přidat až po uložení nabídky'}<br/><br/>
+                                {/if}
+                            {/snippet}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {*
+        <div id="offer-editor">
+            <div class="card mb-2">
+                <div class="card-header">
+                    Obsah nabídky
+                </div>
+                <div class="card-body">
+                    <div class="form-row mt-n2">
+                        <h5 class="col-md-2 d-flex align-items-center my-0">Generovat části:</h5>
+                        {include bootstrap-input $form, 'addTOC', 1}
+                        {include bootstrap-input $form, 'addPricing', 1}
+                        {include bootstrap-input $form, 'addFooter', 2}
+                        {include bootstrap-input $form, 'productDescription', 3}
+                        {include bootstrap-input $form, 'reference', 3}
+                    </div>
+                    <div class="mx-n3 mb-4">
+                        <hr class="mt-2">
+                    </div>
+                    {ifset $entity}
+                        <div class="position-relative mx-n3 px-3 mt-n3 pt-3">
+                            <div class="form-row">
+                                <div class="col">
+                                    <div class="spinner-wrap" id="lds-main"><div class="spinner-dual-ring spinner-sticky"></div></div>
+                                    {snippet parts-snippet}
+                                            {foreach $parts as $k => $part}
+                                                <h4>{$part->name}</h4>
+                                                <div class="card">
+                                                    <div class="card-body form-row">
+                                                        <div class="form-group col-md-1">
+                                                        <label for="partsOrder[]">Pořadí</label>
+                                                            <select name="partsOrder[]" class="form-control selectpicker" autocomplete="off" value="{$part->order}" data-id="{$part->id}">
+                                                                {for $i = 1; $i <= count($parts); $i++}
+                                                                    <option {if $i == $part->order}selected{/if}>{=$i}</option>
+                                                                {/for}
+                                                            </select>
+                                                        </div>
+                                                    <div class="form-group col-md-6">
+                                                        <label for="partsName[]">Titulek</label>
+                                                            <input type="text" name="partsName[]" id="partsName{$part->id}" class="form-control" autocomplete="off" value="{$part->name}" data-id="{$part->id}">
+                                                        </div>
+                                                        <div class="form-group col-md-2">
+                                                        <label for="partsPrice[]">Cena</label>
+                                                            <input type="text" name="partsPrice[]" id="partsPrice{$part->id}" class="form-control" step="0.01" autocomplete="off" value="{$part->price}" data-id="{$part->id}" placeholder="Text ceny">
+                                                        </div>
+                                                        <div class="form-group col-md-2 d-flex flex-wrap align-items-center">
+                                                            <div class="form-check form-check-inline w-100">
+                                                                <input type="checkbox" name="partsIsChapter[]" id="partsIsChapter{$part->id}" class="form-check-input" {if $part->isChapter}checked{/if} data-id="{$part->id}">
+                                                                <label for="partsIsChapter[]" class="form-check-label">Kapitola</label>
+                                                            </div>
+                                                            <div class="form-check form-check-inline w-100">
+                                                                <input type="checkbox" name="partsPageBreak[]" id="partsPageBreak{$part->id}" class="form-check-input" {if $part->pageBreak}checked{/if} data-id="{$part->id}">
+                                                                <label for="partsPageBreak[]" class="form-check-label">Nová stránka</label>
+                                                            </div>
+                                                            <div class="form-check form-check-inline w-100">
+                                                                <input type="checkbox" name="partsIsAfterPricing[]" id="partsIsAfterPricing{$part->id}" class="form-check-input" {if $part->isAfterPricing}checked{/if} data-id="{$part->id}">
+                                                                <label for="partsIsAfterPricing[]" class="form-check-label">Za ceník</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-1 text-center d-flex flex-wrap align-items-center justify-content-end">
+                                                            <span class="remove-part text-danger" style="font-size:24px" data-id="{$part->id}" title="Odstranit"><i class="fa fa-times"></i></span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-row">
+                                                        <div class="col-md-12">
+                                                            <textarea class="form-control editor" name="partsContent[]" id="partsContent{$part->id}" data-id="{$part->id}">
+                                                                {$part->content}
+                                                            </textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {/foreach}
+                                            {if count($parts)}
+                                                <div class="mx-n3">
+                                                    <hr>
+                                                </div>
+                                            {/if}
+                                    {/snippet}
+
+                                    <div class="form-row">
+                                        <div class="col-12" id="addPart">
+                                            <select name="addPart" class="form-control selectpicker">
+                                                <option value="" selected disabled>Přidat šablonu</option>
+                                                {foreach $templates as $template}
+                                                    <option value="{$template->id}">{$template->name}</option>
+                                                {/foreach}
+                                                <option value="newTemplate"><span>+ Nová šablona</span></option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col offer-sidebar p-0 pr-2">
+                                    <div class="position-sticky" style="top:75px">
+                                        <div class="spinner-wrap" id="lds-sub"><div class="spinner-dual-ring spinner-sm" style="width:20px;height:20px"></div></div>
+                                        <button type="button" class="printOffer btn btn-sm btn-primary w-100 mb-1" title="Generovat do PDF"
+                                            {if !isset($entity)}disabled{/if}>
+                                            <i class="fa fa-file-import"></i>
+                                        </button>
+                                        <button name="send" type="submit" class="btn btn-sm btn-primary w-100" title="Uložit">
+                                            <i class="fa fa-save"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {else}
+                        <div class="form-row">
+                            <div class="col-12">
+                                <button name="send" type="submit" class="btn btn-primary w-100 text-left"><i class="fa fa-floppy-o"></i>Uložit pro přidání šablon</button>
+                            </div>
+                        </div>
+                    {/ifset}
+                </div>
+            </div>
+        </div>*}
+    {/form}
+{/snippetArea}
+{/block}
+
+{block scriptsBot}
+    <div n:ifset="$entity" class="modal fade" id="sendOfferModal" tabindex="-1" role="dialog" aria-labelledby="sendOfferModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content" n:snippet="sendOfferModal">
+                {form sendOfferModalForm}
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="sendOfferModalLabel">{_'Odeslání nabídky'}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-row">
+                            {input id}
+                            {include bootstrap-input $sendOfferModalForm, 'emailTo', 6}
+                            {include bootstrap-input $sendOfferModalForm, 'emailCopy', 6}
+                            {include bootstrap-input $sendOfferModalForm, 'subject', 12}
+                            {include bootstrap-input $sendOfferModalForm, 'text', 12}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Odeslat</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Zavřít</button>
+                    </div>
+                {/form}
+            </div>
+        </div>
+    </div>
+
+    {snippetArea productModalParent}
+        <div n:ifset="$entity" class="modal fade" id="productModal" tabindex="-1" role="dialog" aria-labelledby="productModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-content" n:snippet="productModal">
+                    {form productModalForm}
+                        {input 'id'}
+                        <input type="hidden" name="visit_id" value="{$entity->id}">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="partModalLabel">Produkt</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <style type="text/css">
+
+                        </style>
+                        <div class="modal-body compact-my-modal">
+                            <div class="form-row">
+                                {include bootstrap-autocomplete $form, 'product', 12, 'getProducts', '', 'handleProductSuccess'}
+                                {include bootstrap-input $form, 'price', 6}
+                                {include bootstrap-input $form, 'count', 6}
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button name="sendProduct" type="submit" class="btn btn-primary ajax">Uložit</button>
+                            <button name="sendProductNew" type="submit" class="btn btn-primary ajax">Uložit a nový</button>
+                            <button type="button" class="btn btn-dark" data-dismiss="modal">Zavřít</button>
+                        </div>
+                    {/form}
+                </div>
+            </div>
+        </div>
+    {/snippetArea}
+
+{* offer product scripts *}
+<script>
+
+    $(document).ajaxComplete(function (e, comm, $el) {
+        if (
+            typeof $el.nette !== 'undefined'
+            && $el.nette.form.length != 0
+            && $el.nette.form.attr('id') == 'frm-productModalForm'
+            && $el.nette.el.length != 0
+            && $el.nette.el.attr('name') == 'sendProduct'
+        ) {
+            $('#productModal').modal('hide');
+        }
+    });
+
+    $.nette.ext('snippets').after(function ($el) {
+        if ($el.attr('id') === 'snippet--productModal') {
+            $(document).find('#productModal input[data-toggle="completer"]').completer();
+        }
+    });
+
+    $(document).on('click', '.checkProduct', function (e) {
+        e.preventDefault();
+        $('#spin-full-overlay').show();
+        let productId = $(this).attr('data-id');
+        prepareModalProduct(productId);
+    });
+    function prepareModalProduct(productId) {
+        $.nette.ajax({
+            url: {link checkProduct!},
+            type: 'POST',
+            data: {
+                productId : productId
+            },
+            success: function(data){
+                $('#spin-full-overlay').hide();
+                $('#productModal').modal('show');
+            }
+        });
+    }
+
+    $(document).on('click', '.removeProduct', function (e) {
+        e.preventDefault();
+        $('#spin-full-overlay').show();
+        let productId = $(this).attr('data-id');
+        removeModalProduct(productId);
+    });
+    function removeModalProduct(productId) {
+        $.nette.ajax({
+            url: {link removeProduct!},
+            type: 'POST',
+            data: {
+                productId : productId
+            },
+            success: function(data){
+                $('#spin-full-overlay').hide();
+            }
+        });
+    }
+
+    function handleProductSuccess(data) {
+        if (typeof data[3] !== 'undefined') {
+            $('#frm-productModalForm #frm-price').val(data[3]);
+        }
+    }
+</script>
+
+{* other offer scripts - parts, print and send *}
+<script>
+    {*ifset $entity}
+        var mainLoader;
+        var subLoader;
+        var download = false;
+        $(function() {
+            initEvents();
+
+            $(document).on('change', '#addPart select', function (e) {
+                if ($(this).val() == 'newTemplate') {
+                    window.location.href = {link Offer:editTemplate};
+                    return;
+                }
+
+                commonAjax({
+                    url: {link addPart!},
+                    data: {
+                        template : $(this).val()
+                    },
+                    silent: false
+                });
+
+                $(this).val('');
+                $('#addPart button .filter-option-inner-inner').text('Přidat šablonu');
+            });
+            
+            $.nette.ext('snippets').after(function ($el) {
+                for (var i in CKEDITOR.instances) {
+                    CKEDITOR.instances[i].destroy();
+                }
+                initEvents();
+                if (download) {
+                    download = false;
+                    mainLoader.hide();
+                    window.open({link printOffer 'id' => $entity->id}, '_blank');
+                }
+            });
+
+            $(document).on('click', '.printOffer', function (e) {
+                if (!download) {
+                    mainLoader.show();
+                    download = true;
+                    $('#sendAjax').click();
+                }
+            });
+
+            $(document).on('click', '.remove-part', function (e) {
+                commonAjax({
+                    url: {link removePart!},
+                    data: {
+                        id : $(this).data('id')
+                    },
+                    silent: false
+                });
+            });
+
+            $(document).on('change', 'select[name="partsOrder[]"]', function (e) {
+                commonAjax({
+                    url: {link changePartOrder!},
+                    data: {
+                        id : $(this).data('id'),
+                        toOrder : $(this).val()
+                    },
+                    silent: false
+                });
+            });
+
+            $(document).on('change', 'input[name="partsName[]"]', function (e) {
+                savePart($(this).data('id'), { name: $(this).val() });
+            });
+            
+            $(document).on('change', 'input[name="partsPrice[]"]', function (e) {
+                savePart($(this).data('id'), { price: $(this).val() });
+            });
+
+            $(document).on('change', 'input[name="partsIsChapter[]"]', function (e) {
+                savePart($(this).data('id'), { isChapter: ($(this).prop('checked') ? '1' : '0') });
+            });
+            
+            $(document).on('change', 'input[name="partsPageBreak[]"]', function (e) {
+                savePart($(this).data('id'), { pageBreak: ($(this).prop('checked') ? '1' : '0') });
+            });
+ 
+            $(document).on('change', 'input[name="partsIsAfterPricing[]"]', function (e) {
+                savePart($(this).data('id'), { isAfterPricing: ($(this).prop('checked') ? '1' : '0') });
+            });
+        });
+
+        function initEvents() {
+            $(".editor").each(function(i, e) {
+                CKEDITOR.replace(e, {
+                    height: 300,
+                    //stylesSet: 'my_styles:'+{$basePath}+'/css/pdf_offer.css'
+                });
+            });
+            
+            for (var i in CKEDITOR.instances) {
+                CKEDITOR.instances[i].on('blur', function( e ) {
+                    savePart(
+                        this.element.$.dataset.id,
+                        { content: this.getData() }
+                    );
+                });
+            }
+
+            mainLoader = $('#lds-main');
+            subLoader = $('#lds-sub');
+        }
+
+        function savePart(id, data = null) {
+            if (data) {
+                data.id = id;
+            } else {
+                data = {
+                    id: id,
+                    name: $('#partsName' + id).val(),
+                    price: $('#partsPrice' + id).val(),
+                    content: $('#partsContent' + id).val(),
+                    pageBreak: $('#partsPageBreak' + id).val(),
+                    isChapter: $('#partsIsChapter' + id).val(),
+                    isAfterPricing: $('#partsIsAfterPricing' + id).val(),
+                }
+            }
+
+            commonAjax({
+                url: {link savePart!},
+                data: data,
+                silent: true
+            });
+        }
+
+        function commonAjax(params) {
+            setFieldsDisabled(true);
+            // silent - no loader, disable field
+            if (!params.silent) {
+                mainLoader.show();
+            }
+            subLoader.show();
+
+            $.nette.ajax({
+                url: params.url,
+                type: 'POST',
+                data: params.data,
+                timeout: 5000,
+                success: function(response) {
+                    setFieldsDisabled(false);
+                    if (typeof params.success !== 'undefined') {
+                        params.success();
+                    }
+                },
+                error: function(xmlhttprequest, textstatus, message) {
+                    if (textstatus === "timeout") {
+                        toastr['error']('{_'Vypršel časovač automatického ukládání. Opakujte akci nebo uložte manuálně'|noescape}');
+                    } else {
+                        //toastr['error']('{_'Nastala chyba při automatickém ukládání<br>Obnovte stránku a opakujte akci'|noescape}');
+                    }
+                    if (typeof params.error !== 'undefined') {
+                        error();
+                    }
+                },
+                complete: function() {
+                    if (!params.silent) {
+                        mainLoader.hide();
+                    }
+                    subLoader.hide();
+                }
+            });
+        }
+
+        function setFieldsDisabled(disabled) {
+            $('select[name="partsOrder[]"]').next('button').prop('disabled', disabled);
+            $('#addPart select').next('button').prop('disabled', disabled);
+        }
+    {/ifset*}
+</script>
+{/block}

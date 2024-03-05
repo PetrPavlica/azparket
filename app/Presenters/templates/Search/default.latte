@@ -1,0 +1,39 @@
+{block title}{_'Vyhledávání'}{/block}
+
+{block content}
+    <div class="d-flex">
+        <h2>{_'Vyhledávání'}:</h2>
+        
+        <div class="search-web mb-3 ml-3">
+            <form action="{link Search:}" method="get">
+                <div class="d-flex justify-content-start align-items-center">
+                <input type="text" name="term" placeholder="hledat na webu..." value="{$searchTerm|noescape}" class="form-control form-control-lg w-auto d-inline-block">
+                <button type="submit" value="" class="btn btn-light" style="font-size:1.2rem"><i class="fa fa-search"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {if count($searchArticles)}
+        <ul>
+            {foreach $searchArticles as $s}
+                {var $slug = Nette\Utils\Strings::webalize($s->name ? $s->name : '')}
+                <li>
+                    <a n:href="Article:default id => $s->id, slug => $slug">{$s->name|noescape}</a>
+                </li>
+            {/foreach}
+        </ul>
+    {else}
+        {_'Žádné články nebyly nalezeny.'}
+    {/if}
+
+    {*<p>&nbsp;</p>
+
+    {if count($searchProducts)}
+        {foreach $searchProducts as $p}
+            <div><a n:href="Product:default id => $p->id">{$p->name|noescape}</a></div>
+        {/foreach}
+    {else}
+        {_'Žádné produkty nebyly nalezeny.'}
+    {/if*}
+{/block}

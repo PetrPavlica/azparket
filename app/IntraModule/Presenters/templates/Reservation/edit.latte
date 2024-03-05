@@ -1,0 +1,88 @@
+{block title}
+    {ifset $entity}
+        {_'Editace rezervace'}
+    {else}
+        {_'Přidání rezervace'}
+    {/ifset}
+{/block}
+{block description}
+{/block}
+{block header-icon}<i class="fa fa-calendar-week icon-gradient bg-mean-fruit"></i>{/block}
+{block content}
+{form form}
+    {input id}
+    <div class="card">
+        <div class="card-body">
+            <div class="form-row">
+                <div class="col-md-12">
+                    <div class="form-row">
+                        {include bootstrap-autocomplete $form, 'customer', 6, 'getCustomers', '', ''}
+                        <div class="col-md-6">
+                            <label>&nbsp;</label>
+                            <div class="form-group">
+                                <a class="btn btn-outline-primary" n:href="Customer:edit" target="_blank">
+                                    {_'Nový zákazník'}
+                                    <i class="fa fa-plus"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {include bootstrap-input $form, 'reservationItem', 6}
+                {*<div class="col-md-6"></div>*}
+                {include bootstrap-input $form, 'canceled', 6}
+                {include bootstrap-input $form, 'date', 6}
+                {include bootstrap-input $form, 'price', 6}
+                {include bootstrap-input $form, 'timeFrom', 3}
+                {include bootstrap-input $form, 'timeTo', 3}
+                <div class="col-md-6"></div>
+                {include bootstrap-input $form, 'repeat', 12}
+                <div class="col-md-12" style="display:none" id="repeat-part">
+                    <div class="form-row">
+                        {include bootstrap-input $form, 'repeatByValue', 3}
+                        {include bootstrap-input $form, 'repeatBy', 3}
+                        {include bootstrap-input $form, 'repeatDateTo', 6}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-2">
+        <div class="card-body">
+            <a class="btn btn-outline-primary"
+                    {ifset $backUrl}
+               href="{$backUrl}">
+                {else}
+                href="{link Reservation:default}">
+                {/ifset}
+                <span class="fa fa-arrow-left" aria-hidden="true"></span>
+                Zpět
+            </a>
+
+            <button name="send" type="submit" class="btn btn-primary"><i class="fa fa-floppy-o"></i> Uložit</button>
+            <button name="sendBack" type="submit" class="btn btn-primary"><i class="fa fa-floppy-o"></i> Uložit a zpět</button>
+        </div>
+    </div>
+{/form}
+{/block}
+{block scriptsBot}
+<script>
+    $(document).ready(function () {
+        $('.flatPick').flatpickr({
+            enableTime: true,
+            enableSeconds: false,
+            dateFormat: "j. n. Y H:i"
+        });
+    });
+
+    $(document).on('change', '#frm-form-repeat', (e) => {
+        let $el = $(e.target);
+        if ($el.is(':checked')) {
+            $('#repeat-part').show();
+        } else {
+            $('#repeat-part').hide();
+        }
+    });
+</script>
+{/block}

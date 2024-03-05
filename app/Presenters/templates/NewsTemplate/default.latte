@@ -1,0 +1,38 @@
+{block title}{$article->name}{/block}
+
+{block content}
+    <article n:if="$article" class="new">
+        <h2 n:if="$article->show_name">{$article->name}</h2>
+        {* <span class="date">{$article->publish|date:'j. n. Y'}</span> *}
+        <div>
+            {$article->content|noescape}
+            <div class="clearfix"></div>
+        </div>
+        {if $images}
+            <div class="images">
+                {foreach $images as $i}
+                    <div class="item">
+                        <a href="{$basePath}/{$i->path}" data-fancybox="new{$article->id}">
+                            <img n:img="$i->path, '200x200'" alt="{$i->alt|noescape}">
+                        </a>
+                    </div>
+                {/foreach}
+            </div>
+        {/if}
+        {if $files}
+            <div class="files">
+                {foreach $files as $f}
+                    <div class="item">
+                        <a href="{$basePath}/{$f->path}" target="_blank" title="{$f->alt}">
+                            {var $ext = pathinfo($f->path, PATHINFO_EXTENSION)}
+                            <img src="{$basePath}/assets/img/file-icons/{$ext}.png" alt="{$f->alt}">
+                        </a>
+                        <p>
+                            <a href="{$basePath}/{$f->path}" target="_blank" title="{$f->alt}">{$f->alt}</a>
+                        </p>
+                    </div>
+                {/foreach}
+            </div>
+        {/if}
+    </article>
+{/block}

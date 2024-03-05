@@ -1,0 +1,239 @@
+{define form $formName}
+	<form n:name=$formName>
+	<ul class=error n:ifcontent>
+		<li n:foreach="$form->ownErrors as $error">{$error}</li>
+	</ul>
+
+	<table>
+	<tr n:foreach="$form->controls as $input"
+		n:if="!$input->getOption(rendered) && $input->getOption(type) !== hidden"
+		n:class="$input->required ? required">
+
+		<th>{label $input /}</th>
+		<td>{input $input} <span class=error n:ifcontent>{$input->error}</span></td>
+	</tr>
+	</table>
+	</form>
+{/define}
+
+
+{* for Bootstrap v4 *}
+{define bootstrap-form $formName}
+	<form n:name=$formName>
+		{var $btns = []}
+
+		{foreach $form->sections as $section}
+		<div class="form-row" n:ifset="$form->sectionProperties[$section]">
+		{foreach $form->sectionProperties[$section] as $name}
+			{var $input = $form[$name]}
+			{if $input->getOption('type') === 'hidden' && isset($input->getControlPart()->attrs['autocomplete'])}
+				{include bootstrap-autocomplete $form, $name}
+			{else}
+				{include bootstrap-input $form, $name}
+			{/if}
+		{/foreach}
+		</div>
+		{/foreach}
+		{foreach $form->controls as $input}
+			{if $input->getOption('type') === 'button'}
+				{capture $btn}
+					<button n:name="$input" class="btn btn-primary" data-style="expand-left">{$input->getCaption()}</button>
+				{/capture}
+				{var $btns[] = $btn}
+			{/if}
+		{/foreach}
+		{var $link = str_replace('Intra:', '', $control->getName().':')}
+		<a n:href="$link" class="btn btn-outline-primary">{_'Zpět'}</a>
+		{implode('', $btns)|noescape}
+	</form>
+{/define}
+
+{define bootstrap-input $form, $name, $column = null, $cssId = null}
+	{var $input = $form[$name] ?? null}
+	{if !$column && isset($form->propertiesColumn[$name])}
+		{var $column = $form->propertiesColumn[$name]}
+	{/if}
+	{if $input && $input->getOption(type) === hidden}
+		{input $input}
+	{elseif $input}
+	<div class="col-md-{if $column != null}{$column}{elseif $input->getOption('type') == 'textarea'}12{else}6{/if}" {if $cssId != null}id="{$cssId}"{/if}>
+		<div n:if="!$input->getOption(rendered)"
+		n:class="form-group, $input->required ? required, $input->error ? has-error">
+			{if $input->getOption('type') in ['text', 'textarea']}
+				{label $input /}
+				{input $input autocomplete => 'off'}
+			{elseif $input->getOption('type') in ['select']} {* Vlastní vykreslení selectu - při vykreslování 1. xxxx se ztratí 1. v názvu option *}
+				{label $input /}
+				<select {$input->getControl()->attributes()|noescape}>
+					<option value="" n:if="$input instanceOf Nette\Forms\Controls\SelectBox && $input->getPrompt()">{$input->getPrompt()|noescape}</option>
+					{foreach $input->getItems() as $k => $n}
+						{continueIf $k === ''}
+						<option value="{$k}" {if (is_array($input->getValue()) && in_array($k, $input->getValue())) || $input->getValue() == $k}selected{/if} {if is_array($input->disabled) && in_array($k, $input->disabled)}disabled{/if}>{$n|noescape}</option>
+					{/foreach}
+				</select>
+			{elseif $input->getOption('type') === 'checkbox'}
+				{if $input instanceOf Nette\Forms\Controls\CheckboxList}
+					<label>{$input->getCaption()}</label>
+					<div class="items">
+					{foreach $input->getItems() as $k => $i}
+						{var $part = $input->getControlPart($k)->attrs}
+						<div class="form-check form-check-inline">
+							<input type="{$part['type']}" name="{$part['name']}" id="{$part['id']}" class="form-check-input" value="{$part['value']}" {if $part['checked']}checked{/if} {if $part['disabled']}disabled{/if} {if $part['required']}required{/if} {if $part['data-nette-rules']}data-nette-rules="{$part['data-nette-rules']}"{/if}>
+							<label for="{$part['id']}" class="form-check-label">{$i}</label>
+						</div>
+					{/foreach}
+					</div>
+				{else}
+				<div class="mt-4 form-check">
+					{input $input : class=>"form-check-input"}
+					<label for="{$input->getHtmlId()}" class="form-check-label">{$input->getCaption()}</label>
+				</div>
+				{/if}
+			{elseif $input->getOption('type') === 'radio'}
+				<label>{$input->getCaption()}</label>
+				{if $input->getItems()}
+					<div class="items">
+					{foreach $input->getItems() as $k => $item}
+						{var $part = $input->getControlPart($k)->attrs}
+						<div class="position-relative form-check form-check-inline {ifset $input->getControlPart()->attrs['class']}{$input->getControlPart()->attrs['class']}{/ifset}">
+							<label class="form-check-label" for="{$part['id']}">
+								<input type="{$part['type']}" name="{$part['name']}" id="{$part['id']}" class="form-check-input" value="{$part['value']}" {if $part['checked']}checked{/if} {if $part['disabled']}disabled{/if} {if $part['required']}required{/if} {if $part['data-nette-rules']}data-nette-rules="{$part['data-nette-rules']}"{/if}> {$item}
+							</label>
+						</div>
+					{/foreach}
+					</div>
+				{/if}
+			{elseif $input->getOption('type') === 'file'}
+				{label $input /}
+				{if $input->getFileName() && file_exists($input->getFileName())}
+					<div class="mb-2">
+						{var $ext = pathinfo($input->getFileName(), PATHINFO_EXTENSION)}
+						{if !$ext}
+							{var $ext = '_blank'}
+						{/if}
+						<a href="{$basePath}/{$input->getFileName()}" target="_blank">
+							<img src="{$basePath}/assets/img/file-icons/{$ext}.png" alt="{$ext}">
+							{basename($input->getFileName())}
+						</a>
+						<label class="ml-3">
+							<input type="checkbox" name="{$input->getName()}_delete">
+							{_'Smazat'}
+						</label>
+					</div>
+				{/if}
+				{input $input}
+			{else}
+				{label $input /}
+				{input $input}
+			{/if}
+
+			{*<span class=help-block n:ifcontent>{$input->error ?: $input->getOption(description)}</span>*}
+		</div>
+	</div>
+	{/if}
+{/define}
+
+{define bootstrap-autocomplete $form, $name, $column = null, $dataSource = '', $dataSend = '', $dataSucc = ''}
+	{var $item = $form[$name] ?? null}
+	{if $item}
+	{var $attrs = $item->getControlPart()->attrs}
+	{if !$column && isset($form->propertiesColumn[$name])}
+		{var $column = $form->propertiesColumn[$name]}
+	{/if}
+	{if !$dataSource && isset($attrs['data-source'])}
+		{var $dataSource = $attrs['data-source']}
+	{/if}
+	{if !$dataSend && isset($attrs['data-send'])}
+		{var $dataSend = $attrs['data-send']}
+	{/if}
+	{if !$dataSucc && isset($attrs['data-success'])}
+		{var $dataSucc = $attrs['data-success']}
+	{/if}
+	<div class="col-md-{if $column}{$column}{else}12{/if}" n:if="$item">
+		{var $attrs = $item->control->attrs}
+		<label for="{$item->control->name}">{if isset($attrs['title'])} {$attrs['title']}{else} {$item->caption} {/if}</label>
+		<div class="form-group">
+			<div class="input-group">
+				<input
+					{foreach $item->control->attrs as $n => $v}
+						{if $n == 'value-autocmp'}
+							value={$v}
+							readonly="true"
+							{elseif $n == 'required' && $v}
+							required
+					{elseif !in_array($n, ['id', 'type', 'disabled', 'name', 'data-source', 'data-send', 'data-success', 'data-toggle', 'required'])}
+					{$n}={if is_array($v)}{json_encode($v)}{else}{$v}{/if}
+					{/if}
+					{/foreach}
+					{var $link = ''}
+					{if $dataSource}
+						{var $link = $control->link($dataSource.'!')}
+					{/if}
+					data-source="{$link}" data-to-send="{$dataSend}" data-toggle="completer"
+					data-output=".{$item->control->name}-autocomplete" type="text" name="text{$item->control->name}"
+					id="text{$item->control->name}" {if $item->getRules()->isRequired()}required data-nette-rules='[{"op":":filled","msg":"Toto je povinné pole!"}]'{/if}>
+					<input name="{$item->control->name}" id="{$item->getHtmlId()}" data-success="{$dataSucc}" class="{$item->control->name}-autocomplete" value="{$item->value}" type="hidden">
+					<span class="input-group-append">
+						<span class="input-group-text remove-autocomplete-value"><i class="fa fa-times"></i></span>
+					</span>
+			</div>
+			{*<div class="input-group">
+				<input
+				{foreach $attrs as $n => $v}
+					{if $n == 'value-autocmp'}
+						value={$v}
+						readonly="true"
+						{elseif !in_array($n, ['type', 'disabled', 'name', 'data-source', 'data-send', 'data-success'])}
+						{$n}={$v}
+					{/if}
+				{/foreach}
+				{var $link = ''}
+				{if $dataSource}
+					{var $link = $control->link($dataSource.'!')}
+				{/if}
+				data-source="{$link}" data-to-send="{$dataSend}"
+				data-output=".{$item->control->name}-autocomplete" type="text" name="text{$item->control->name}"
+				id="text{$item->control->name}" {if $item->getRules()->isRequired()}required data-nette-rules='[{"op":":filled","msg":"Toto je povinné pole!"}]'{/if}>
+				<input name="{$item->control->name}" id="{$item->control->name}" data-success="{$dataSucc}" class="{$item->control->name}-autocomplete" value="{$item->value}" type="hidden">
+				<span class="input-group-append">
+                    <span class="input-group-text remove-autocomplete-value"><i class="fa fa-times"></i></span>
+                </span>
+			</div>*}
+		</div>
+	</div>
+	{/if}
+{/define}
+
+{define bootstrap-switchtoggle $form, $name, $column = null, $trueText = 'Ano', $falseText = 'Ne', $trueStyle = '', $falseStyle = '', $dataStyle = null, $dataSize = null, $dataWidth = null, $dataHeight = null}
+	{var $input = $form[$name] ?? null}
+	{if !$column && isset($form->propertiesColumn[$name])}
+		{var $column = $form->propertiesColumn[$name]}
+	{/if}
+	{if $input}
+		<div class="col-md-{if $column != null}{$column}{else}6{/if}">
+			<div n:if="!$input->getOption(rendered)"
+		n:class="form-group, $input->required ? required, $input->error ? has-error">
+				<label for="{$input->getHtmlId()}" class="form-check-label">{$input->getCaption()}</label>
+				<div class="mt-2 form-toggle">
+					{input $input : class=>"form-check-input", data-toggle=>"toggle", data-on=>$trueText, data-off=>$falseText, data-onstyle=>$trueStyle, data-offstyle=>$falseStyle, data-style=>$dataStyle, data-size=>$dataSize, data-width=>$dataWidth, data-height=>$dataHeight}
+				</div>
+			</div>
+		</div>
+	{/if}
+{/define}
+
+{define bootstrap-customswitch $form, $name, $column = null, $class = ''}
+	{var $input = $form[$name] ?? null}
+	{if !$column && isset($form->propertiesColumn[$name])}
+		{var $column = $form->propertiesColumn[$name]}
+	{/if}
+	{if $input}
+		<div class="col-md-{if $column != null}{$column}{else}6{/if}">
+			<div n:if="!$input->getOption(rendered)"
+		n:class="form-group, $input->required ? required, $input->error ? has-error , custom-control, custom-switch ">
+				{input $input : class=>"form-control custom-control-input $class"}
+				<label class="custom-control-label" for="{$input->getHtmlId()}">{$input->getCaption()}</label>
+			</div>
+		</div>
+	{/if}
+{/define}

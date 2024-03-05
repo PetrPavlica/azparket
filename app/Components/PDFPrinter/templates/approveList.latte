@@ -1,0 +1,134 @@
+<div class="container">
+    <table border="1" cellspacing="0">
+        <tr>
+            <th rowspan="3"><img src="assets/img/logo.png" alt="" style="width: 100px"></th>
+            <td>Název formuláře:</td>
+            <td colspan="2" align="center">Zkratka zákazníka</td>
+        </tr>
+        <tr>
+            <th rowspan="3" style="width: 55%; font-size: 20px;"><b>{$approve->name}</b></th>
+            <th colspan="2" style="font-size: 20px;"><b>{$approve->customerShort}</b></th>
+        </tr>
+        <tr>
+            <td align="center">poptávka</td>
+            <td align="center">ze dne:</td>
+        </tr>
+        <tr>
+            <td align="center">Provoz: Humpolec</td>
+            <td align="center">{$approve->request}</td>
+            <td align="center">{$approve->startDate|date:'j.n.y'}</td>
+        </tr>
+    </table>
+</div>
+    <div class="container_body">
+        <table>
+            <tr>
+                <td colspan="7" class="border">Identifikace dílu</td>
+                <td class="border" colspan="9" >Technické požadavky zákazníka</td>
+                <td class="border" colspan="5">Internetní požadavky</td>
+                <td class="bottom_2 right_2">Trys.</td>
+                <td rowspan="4" class="bottom" >Poznámky</td>
+            </tr>
+            <tr>
+                <td colspan="7" class="border_bottom" >interní</td>
+                <td colspan="4" class="border">Tl. vrstvy (μm)</td>
+                <td class="border"></td>
+                <td rowspan="3"  class="bottom_right_left_"><p>Krýt závit/ <br> otvor/plochu</p> </td>
+                <td rowspan="3" class="bottom_3 right_2"><p>Kontrolovat<br> závit<br>/rozměr</p></td>
+                <td rowspan="3" class="bottom_3 right_2"><p>Zvláštni znak<br> (CC,SC,D<br> díl)</p></td>
+                <td rowspan="3" class="bottom_3 right_2"><p>Jiné<br> požadavky</p></td>
+                <td rowspan="3" class="bottom_3 right_2 left_3"><p>počet<br> ks/závěs</p></td>
+                <td rowspan="3" class="bottom_3 right_2">Čas navěš.</td>
+                <td rowspan="3" class="bottom_3 right_2"><p>kg/buben</p></td>
+                <td colspan="2">závěs</td>
+                <td rowspan="3" class="bottom_right_left_"> <p>kapacitní ověření <br>(%z celkových <br> kapacit)</p> </td>
+            </tr>
+            <tr>
+                <td rowspan="2" class="bottom right_2">poř.čís.</td>
+                <td rowspan="2" class="bottom right_2">označení</td>
+                <td rowspan="2" class="bottom right_2">zatřídění</td>
+                <td rowspan="2" class="bottom right_2">číslo výkresu</td>
+                <td rowspan="2" class="bottom right_2">název</td>
+                <td rowspan="2" class="bottom">plocha (dm²)</td>
+                <td rowspan="2" class="left_dotted_bottom">hmotnost</td>
+                <td class="left_right_bottom">celková</td>
+                <td class="border_bottom">Zn/ZnNi</td>
+                <td class="border_bottom">KTL</td>
+                <td class="border_bottom">Prá</td>
+                <td class="technicke border_bottom">norma*</td>
+                <td rowspan="2" class="bottom"> <p>standardní</p></td>
+                <td rowspan="2" class="bottom"><p>speciální</p></td>
+            </tr>
+            <tr>
+                <td class="left_right_bottom_">od do</td>
+                <td class="bottom">od do</td>
+                <td class="bottom">od do</td>
+                <td class="bottom">od do</td>
+                <td class="technicke_bottom">další norma*</td>
+            </tr>
+            <tr style=""><td style="padding: 3.75px 0 0;" class="bottom" colspan="23"></td></tr>
+
+{if isset($approveParts) && count($approveParts)}
+    {foreach $approveParts as $apPar}
+            <tr>
+                <td rowspan="2" class="border_bottom bottom_right">{$apPar->interNumber}</td>
+                <td rowspan="2" class="border_bottom bottom_right">{$apPar->interMark}</td>
+                <td rowspan="2" class="bottom bottom_right">{$apPar->interClass}</td>
+                <td rowspan="2" class="bottom bottom_right">{$apPar->cusNumber}</td>
+                <td rowspan="2" class="bottom bottom_right">{$apPar->interName}</td>
+                <td rowspan="2" class="border_bottom">{$apPar->interArea}</td>
+                <td rowspan="2" class="border_bottom_dott">{$apPar->cusName}</td>
+                <td class="left_right border_bottom">{$apPar->techTotalFrom}</td>
+                <td class="border_bottom">{if $apPar->techZnFrom}{$apPar->techZnFrom}{elseif $apPar->techZnFrom2}{$apPar->techZnFrom2}{else}{$apPar->techZnFrom3}{/if}</td>
+                <td class="border_bottom">{if $apPar->techKtlFrom}{$apPar->techKtlFrom}{elseif $apPar->techKtlFrom2}{$apPar->techKtlFrom2}{else}{$apPar->techKtlFrom3}{/if}</td>
+                <td class="border_bottom">{if $apPar->techPraFrom}{$apPar->techPraFrom}{elseif $apPar->techPraFrom2}{$apPar->techPraFrom2}{else}{$apPar->techPraFrom3}{/if}</td>
+                <td class="technicke border_bottom">{if $apPar->normFile1}{$normSelect[$apPar->normFile1]}{/if}</td>
+                <td rowspan="2" class="bottom_right" >{if $apPar->techDemand1}A{else}N{/if} / {if $apPar->techDemand2}A{else}N{/if} / {if $apPar->techDemand3}A{else}N{/if}</td>
+                <td rowspan="2" class="bottom_right" >{if $apPar->techDemand4}A{else}N{/if} / {if $apPar->techDemand5}A{else}N{/if}</td>
+                <td rowspan="2" class="bottom_right" >{$apPar->techDemand6}</td>
+                <td rowspan="2" class="bottom_right" >{$apPar->techDemand7}</td>
+                <td rowspan="2" class="bottom_right_left">{$apPar->interDemand1}</td>
+                <td rowspan="2" class="bottom_right">{$apPar->timeNorm}</td>
+                <td rowspan="2" class="bottom_right">{$apPar->interDemand2}</td>
+                <td rowspan="2" colspan="2" class="bottom_right" >{$apPar->interDemand3}</td>
+                <td class="bottom_right" >{if $apPar->blasting}A{else}N{/if}</td>
+                <td rowspan="2" class="bottom_right">{$apPar->note}</td>
+            </tr>
+            <tr>
+                <td class="left_right_bottom">{$apPar->techTotalTo}</td>
+                <td class="border_bottom">{if $apPar->techZnTo}{$apPar->techZnTo}{elseif $apPar->techZnTo2}{$apPar->techZnTo2}{else}{$apPar->techZnTo3}{/if}</td>
+                <td class="border_bottom">{if $apPar->techKtlTo}{$apPar->techKtlTo}{elseif $apPar->techKtlTo2}{$apPar->techKtlTo2}{else}{$apPar->techKtlTo3}{/if}</td>
+                <td class="border_bottom">{if $apPar->techPraTo}{$apPar->techPraTo}{elseif $apPar->techPraTo2}{$apPar->techPraTo2}{else}{$apPar->techPraTo3}{/if}</td>
+                <td class="border_bottom_tech">{$apPar->normFile2}</td>
+                <td class="bottom_2 right_2 left_2">{$apPar->capacity}</td>
+            </tr>
+    {/foreach}
+{/if}
+        </table>
+    </div>
+
+        <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+            <tr>
+                <td style="width: 10%; font-size: 10px;">*norma přiložena</td>
+                <td style="width: 8%; border: 1px solid black; font-size: 12px;">Poznámka:</td>
+                <td style="width: 82%; text-align: center; border: 1px solid black; font-size: 12px;">{$approve->description}</td>
+            </tr>
+        </table>
+
+        <div class="table_text">
+            <b > V rámci přezkoumání poptávky byly prověřeny příslušné  specifické požadavky zákazníka, které jsou uvedeny v přehledu CSR (např. rozsah a metodika vzorkování a četnost a rozsah rekvalififkačních zkoušek, atd..). <br>
+                Při přezkoumání byla prověřena znalostní databáze společnosti, kde jsou uvedeny zkušenosti z předchozích projektů (např. kvalita vstupního materiálu, způsob zavěšování atd..), také byly prověřeny kapacitní možnosti pro nabízenou technologii.
+            </b>
+            <br>
+            <br>
+            <b>
+                V případě, že <u>součet kapacitního výhledu pro celkovou nabídku tvoří více než 5% z celkových ročních kapacit technologie,</u> je schválení nabídky prováděno celým projektovým týmem.
+            </b>
+
+        </div>
+        <table class="table_nabidku">
+            <tr>
+                <td style="text-align: center; width: 20%; font-size: 11px; border-right: 1px solid;">Nabídku schválil / dne:</td>
+                <td style=""></td>
+            </tr>
+        </table>

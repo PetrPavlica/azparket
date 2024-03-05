@@ -1,0 +1,219 @@
+#
+# WARNING: it is CRITICAL that this file & directory are NOT accessible directly via a web browser!
+# https://nette.org/security-warning
+#
+parameters:
+    database:
+        driver: mysqli
+        host: 127.0.0.1
+        user: root
+        password:
+        dbname: unplugged
+        port: 3306
+
+application:
+	errorPresenter: Error
+	mapping:
+		*: App\*Module\Presenters\*Presenter
+
+session:
+	savePath: "%tempDir%/sessions"
+	expiration: 14 days
+	gcProbability: 1
+
+database:
+	dsn: 'mysql:host=%database.host%;dbname=%database.dbname%'
+	user: %database.user%
+	password: %database.password%
+	options:
+		lazy: yes
+
+#database:
+#	dsn: 'oci:dbname=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=213.226.247.26)(PORT=55400))(CONNECT_DATA=(SID=limsu)))'
+#	user: webrex
+#	password: jx93Ee
+
+services:
+	- App\Model\UserManager
+	- App\Forms\FormFactory
+	- App\Forms\SignInFormFactory
+	- App\Forms\SignUpFormFactory
+	- App\Router\RouterFactory::createRouter
+	- App\Components\Article\IArticleControlFactory
+	- App\Components\UblabooTable\Model\DoctrineGridGenerator
+	- App\Components\FormRenderer\IFormRendererFactory
+	- App\Components\ACLHtml\IACLHtmlControlFactory
+	- App\Components\Modals\IEditConfNodeModalControlFactory
+	- App\Components\Forms\InquiryForm\IInquiryFormControlFactory
+	- App\Components\Reservation\IReservationControlFactory
+	- App\Model\Database\Utils\AnnotationParser
+	- App\Model\DoctrineFormGenerator
+	- App\Model\ACLMapper
+	- App\Model\Database\Utils\EntityData
+	- App\Model\Facade\Article
+	- App\Model\Facade\Banner
+	- App\Model\Facade\BannerPartner
+	- App\Model\Facade\BaseFront
+	- App\Model\Facade\BaseIntra
+	- App\Model\Facade\ChangeManager
+	- App\Model\Facade\Configurator
+	- App\Model\Facade\Cron
+	- App\Model\Facade\Currency
+	- App\Model\Facade\Customer
+	- App\Model\Facade\ManagedRisc
+	- App\Model\Facade\Menu
+	- App\Model\Facade\Offer
+	- App\Model\Facade\Process
+	- App\Model\Facade\Product
+	- App\Model\Facade\Reservation
+	- App\Model\Facade\ShiftPlan
+	- App\Model\Facade\Task
+	- App\Model\Facade\Translation
+	- App\Model\Facade\Visit
+	- App\Model\Facade\WebSetting
+	- App\Components\PDFPrinter\IPDFPrinterFactory
+	- App\Components\PDFPrinter\PDFPrinterControl
+	- App\Components\MailSender\IMailSenderFactory
+	- App\Model\Database\Utils\SQLHelper
+	- App\Model\DoctrineDetailGenerator
+	- App\Model\Utils\GoogleMaps
+	- App\Model\Utils\TimeHelper
+
+	-
+	    factory: App\Model\CustomerAuthenticator
+	    autowired: self
+
+	MailSender:
+	    class: App\Components\MailSender\MailSender
+	    setup:
+	        - setDir(%wwwDir%)
+	        - setBaseUri(%baseUri%)
+	        - setProduction(%debugMode%)
+
+	application.presenterFactory:
+	    factory: App\PresenterFactory(Nette\Bridges\ApplicationDI\PresenterFactoryCallback(
+	            invalidLinkMode: Nette\Application\UI\Presenter::INVALID_LINK_WARNING
+	        ))
+	    alteration: true
+extensions:
+    imageStorage: Ublaboo\ImageStorage\DI\ImageStorageExtension
+
+    # Common
+    nettrine.annotations: Nettrine\Annotations\DI\AnnotationsExtension
+    nettrine.cache: Nettrine\Cache\DI\CacheExtension
+    nettrine.migrations: Nettrine\Migrations\DI\MigrationsExtension
+    nettrine.fixtures: Nettrine\Fixtures\DI\FixturesExtension
+    translation: Contributte\Translation\DI\TranslationExtension
+
+    # DBAL
+    nettrine.dbal: Nettrine\DBAL\DI\DbalExtension
+    nettrine.dbal.console: Nettrine\DBAL\DI\DbalConsoleExtension
+
+    # ORM
+    nettrine.orm: Nettrine\ORM\DI\OrmExtension
+    nettrine.orm.cache: Nettrine\ORM\DI\OrmCacheExtension
+    nettrine.orm.console: Nettrine\ORM\DI\OrmConsoleExtension
+    nettrine.orm.annotations: Nettrine\ORM\DI\OrmAnnotationsExtension
+    nettrine.extensions.beberlei: Nettrine\Extensions\Beberlei\DI\BeberleiBehaviorExtension
+
+    contributte.console: Contributte\Console\DI\ConsoleExtension(%consoleMode%)
+    contributte.console.extra: Contributte\Console\Extra\DI\ConsoleBridgesExtension
+    #contributte.events: Contributte\EventDispatcher\DI\EventDispatcherExtension
+    #contributte.events2nette: Contributte\Events\Extra\DI\EventBridgesExtension
+    contributte.monolog: Contributte\Monolog\DI\MonologExtension
+
+    recaptcha: Contributte\ReCaptcha\DI\ReCaptchaExtension
+
+recaptcha:
+    secretKey: 6Le-mOInAAAAAEwFkbOyKXeso_sbPz3wDNlX_bAB
+    siteKey: 6Le-mOInAAAAAC2SC95ENSbONC6Z3OmfebM3V20f
+
+nettrine.dbal:
+	debug:
+		panel: %debugMode%
+	#configuration:
+	#	sqlLogger: Nettrine\DBAL\Logger\PsrLogger(@Monolog\Logger)
+	connection:
+		driver: %database.driver%
+		host: %database.host%
+		user: %database.user%
+		password: %database.password%
+		dbname: %database.dbname%
+		port: %database.port%
+		charset: utf8mb4
+
+nettrine.orm:
+	entityManagerDecoratorClass: App\Model\Database\EntityManager
+	configuration:
+		autoGenerateProxyClasses: true
+
+nettrine.orm.annotations:
+	mapping:
+		App\Model\Database\Entity: %appDir%/Model/Database/Entity
+
+nettrine.orm.cache:
+
+nettrine.cache:
+#	driver: Doctrine\Common\Cache\ApcuCache
+
+nettrine.migrations:
+	table: doctrine_migrations
+	column: version
+	directory: %rootDir%/db/Migrations
+	namespace: Database\Migrations
+	versionsOrganization: null
+
+nettrine.fixtures:
+	paths:
+		- %rootDir%/db/Fixtures
+
+nettrine.annotations:
+	debug: %debugMode%
+	ignore: [author]
+	cache: Doctrine\Common\Cache\PhpFileCache(%tempDir%/cache/doctrine)
+
+nettrine.extensions.beberlei:
+    driver: mysql
+
+contributte.console:
+	url: http://localhost
+	lazy: true
+
+contributte.monolog:
+	holder:
+		enabled: false
+	channel:
+		default:
+			handlers:
+				- Monolog\Handler\RotatingFileHandler(%appDir%/../log/syslog.log, 30, Monolog\Logger::WARNING)
+			processors:
+				- Monolog\Processor\WebProcessor()
+				- Monolog\Processor\IntrospectionProcessor()
+				- Monolog\Processor\MemoryPeakUsageProcessor()
+				- Monolog\Processor\ProcessIdProcessor()
+
+translation:
+	locales:
+		whitelist: [cs]
+		default: cs
+		fallback: [cs]
+	dirs:
+		- %rootDir%/lang
+	loaders:
+		doctrine: Contributte\Translation\Loaders\Doctrine
+	localeResolvers:
+		- Contributte\Translation\LocalesResolvers\Router
+
+tracy:
+    email: david@webrex.eu
+    fromEmail: webmailer@webrex.eu
+
+imageStorage:
+	data_path          : %wwwDir% # Filesystem location
+	data_dir           : www                    # Relative path
+	algorithm_file     : sha1_file               # Algorithm to take image prefix directory from
+	algorithm_content  : sha1                    # ...
+	quality            : 80                      # Default quality when cropping
+	default_transform  : shrink_only                     # Default crop transformation
+	noimage_identifier : assets/images/no-photo.png # No-image image
+	friendly_url       : FALSE                   # Create friendly URLs?

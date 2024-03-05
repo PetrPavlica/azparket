@@ -1,0 +1,402 @@
+{block title}{_'Plánování směn'}{/block}
+{*block description}{_'Přehled směn pro linku'} {$aaType}{/block}
+{block header-icon}<i class="fa fa-box icon-gradient bg-mean-fruit"></i>{/block*}
+{block header-actions-top}
+
+    <div class="top-week">
+        <a n:href="ShiftPlan: type => $aaType, week => $previousWeek, year => $previousYear">
+            <i class="fa fa-chevron-left"></i>
+        </a>
+        <div class="week-number date-btn">
+            <span>{$week}. Týden, {$year}</span>
+            <input type="text" id="date" value="{$dateInput}" autocomplete="off" />
+        </div>
+        <a n:href="ShiftPlan: type => $aaType, week => $nextWeek, year => $nextYear">
+            <i class="fa fa-chevron-right"></i>
+        </a>
+    </div>
+
+
+{/block}
+{block content}
+    <style>
+        #hide-before-print {
+            visibility: hidden;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #section-to-print, #section-to-print * {
+                visibility: visible;
+            }
+            #section-to-print {
+                position: absolute;
+                left: 0;
+                top: 0;
+            }
+        }
+    </style>
+
+    <div class="col-md-12">
+        <div class="row" style="">
+            <input type="text" name="search-plan" id="search-plan" class="form-control input-md" style="margin-top: -15px; width: 75%;" placeholder="Vyhledávání: zadejte jméno">
+
+            <div class="pull-right" style="width: 25%;">
+
+                    {if $agency}
+                        <a n:href="ShiftPlan: type => $aaType, week => $week, year => $year" class="btn btn-success" style="margin-top: -12px;margin-bottom: 2px;float: right;">
+                            {_'Zobrazit všechny zaměstance'}
+                        </a>
+                    {else}
+                        <a n:href="ShiftPlan: type => $aaType, week => $week, year => $year, agency => 1" class="btn btn-primary" style="margin-top: -12px;margin-bottom: 2px;float: right;">
+                            {_'Zobrazit pouze agenturní'}
+                        </a>
+                    {/if}
+
+            </div>
+        </div>
+    </div>
+
+    <div id="section-to-print">
+        <div class="col-md-12 tpp1" style="margin-bottom: 0;">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="row cols-cus-22">
+                        {foreach $cusDays as $dayName}
+                            {if $dayName != ''}
+                                <div class="col-md-1 cus22-md-3 {if $iterator->counter >= 7}tpp2-end{else}tpp2{/if} d-flex align-items-center justify-content-center">
+                                    <div style="font-size: medium; font-weight: 500;">
+                                        {$dayName}
+                                    </div>
+                                </div>
+                            {else}
+                                <div class="col-md-1 cus22-md-1 tpp2 d-flex align-items-center justify-content-center">
+                                    <div style="font-size: small; font-weight: 500;">
+                                        {_'Zaplněno'}
+                                    </div>
+                                </div>
+                            {/if}
+                        {/foreach}
+                    </div>
+                    {foreach $floorsA as $floor}
+                        <div class="row cols-cus-22">
+                            {foreach $columnsA as $ymd => $column}
+                                {if $floor >= 0}
+                                    {if $column >= 0}
+                                        <div class="col-md-1 cus22-md-3 tpp2-shift-in checkSpot" data-toggle="modal" data-target="#planModal" data-id="{$ymd.'_'.$floor.'_'.$aaType}">
+                                            {foreach $placesA as $place}
+                                                <div class="row">
+                                                    {ifset $spotsA[$ymd.'_'.$floor]}
+                                                        {var $iii = 0}
+                                                        {foreach $spotsA[$ymd.'_'.$floor]['workers'] as $spotA}
+                                                            {var $iii += 1}
+                                                            <div data-id="{$ymd.'_'.$floor.'_'.$aaType}"
+                                                                 class="col-md-12 tppDrag tpp3 spt-base"
+                                                                 style="font-size: small;{$spotA['style']|noescape}"
+                                                                 data-toggle="tooltip" data-placement="bottom" title="{$spotA['desc']}"
+                                                                 data-animation="false">
+                                                                {$spotA['name']}
+                                                                <span style="float: right; position: absolute; right: 0; padding-right: 2px;{$spotA['style']|noescape}">{$spotA['position']}</span>
+                                                            </div>
+                                                        {/foreach}
+                                                        {if $iii < $baseNumSpots}
+                                                            {for $ix = $iii; $ix < $baseNumSpots; $ix++}
+                                                                <div class="col-md-12 tppDrag tpp3 spt-empty" style="font-size: small;">
+                                                                    &nbsp;
+                                                                </div>
+                                                            {/for}
+                                                        {/if}
+                                                    {else}
+                                                        &nbsp;
+                                                    {/ifset}
+                                                </div>
+                                            {/foreach}
+                                        </div>
+                                    {else}
+                                        <div class="col-md-1 cus22-md-1 tpp2 d-flex align-items-center justify-content-center">
+                                            <div style="font-size: small; font-weight: 500;">
+                                                {$cusFloors[$floor]}
+                                            </div>
+                                        </div>
+                                    {/if}
+                                {else}
+                                    {if $column >= 0}
+                                        {if $floor == -3}
+                                            <div class="col-md-1 cus22-md-3 {if $iterator->counter >= 7}tpp2-end{else}tpp2{/if} d-flex align-items-center justify-content-center">
+                                                <div style="font-size: medium; font-weight: 500;">
+                                                    {$column}
+                                                </div>
+                                            </div>
+                                        {else}
+                                            <div class="col-md-1 cus22-md-3 {if $iterator->counter >= 7}tpp2-end{else}tpp2{/if} d-flex align-items-center justify-content-center checkSpot"
+                                                data-toggle="modal" data-target="#planModal" data-id="{$ymd.'_'.($floor*-1).'_'.$aaType}">
+                                                <div style="font-size: medium; font-weight: 500;">
+                                                    {if isset($spotsA[$ymd.'_'.($floor*-1)])}
+                                                        {$spotsA[$ymd.'_'.($floor*-1)]['shift']}
+                                                    {else}
+                                                        &nbsp;
+                                                    {/if}
+                                                </div>
+                                            </div>
+                                        {/if}
+                                    {else}
+                                        {if $floor == -3}
+                                            <div class="col-md-1 cus22-md-1 tpp2 d-flex align-items-center justify-content-center">
+                                                <div style="font-size: medium; font-weight: 500;">
+                                                    {$fillWorkersPercent}
+                                                </div>
+                                            </div>
+                                        {else}
+                                            <div class="col-md-1 cus22-md-1 tpp2 d-flex align-items-center justify-content-center">
+                                                <div style="font-size: medium; font-weight: 500;">
+                                                    &nbsp;
+                                                </div>
+                                            </div>
+                                        {/if}
+                                    {/if}
+                                {/if}
+                            {/foreach}
+                        </div>
+                    {/foreach}
+                </div>
+            </div>
+        </div>
+
+        <div id="hide-before-print" style="font-size: 16px;">
+            {$timeNow|date:'j.n.Y H:i'}
+        </div>
+    </div>
+
+    <div class="col-md-12">
+        <div class="row" style="padding-top: 0; padding-bottom: 10px;">
+            <div>
+                <ul class="legend">
+                    <li><span class="legend-green"></span> {_'Kmenový'} </li>
+                    <li><span class="legend-blue"></span> {_'Agenturní'} </li>
+                    <li><span class="legend-green-light"></span> {_'Kmenový (ručně zadaní)'} </li>
+                    <li><span class="legend-blue-light"></span> {_'Agenturní (ručně zadaní)'} </li>
+                    <li><span class="legend-yellow"></span> {_'Přidán z deníku (Kmenový)'} </li>
+                    <li><span class="legend-orange"></span> {_'Přidán z deníku (Agenturní)'} </li>
+                    <li><span class="legend-gray"></span> {_'Nepřišel'} </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+        <div class="col-md-12">
+            <div class="row" style="display: block">
+                <a n:href="planFromThisWeek! type => 0" class="btn btn-primary">
+                    {_'Přeplánovat od tohoto týdne do konce roku'}
+                </a>
+
+                <div class="pull-right">
+                    <a n:href="planFromThisWeek! type => 1" class="btn btn-success">
+                        {_'Přeplánovat od tohoto týdne (ponechat ruční zadání)'}
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+{/block}
+
+{block scriptsBot}
+    <div class="modal fade" id="planModal" tabindex="-1" role="dialog" aria-labelledby="planModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+            <div class="modal-content" n:snippet="planModal">
+                {form planModalForm}
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="planModalLabel">Zaměstnanci v plánu</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+
+                            <input n:ifset="$modalSpot" type="hidden" name="spot" data-autosubmit="" id="frm-spot" value="{$modalSpot->id}">
+                            {ifset $workerSelect}
+                                <div class="col-md-12 mb-4">
+                                    <div class="row">
+                                        <div class="col-md-7">
+                                            <select name="worker" class="form-control selectpicker" data-live-search="true" id="frm-worker">
+                                                <option value="">-- vyberte</option>
+                                                {foreach $workerSelect as $kkey => $worker}
+                                                    <option {if strpos($worker, '<b></b>') !== false}style="color: blue;"{/if} value="{$kkey}">{$worker|noescape}</option>
+                                                {/foreach}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <select name="workerPosition" class="form-control selectpicker" data-live-search="true" id="frm-workerPosition">
+                                                <option value="">-- neprovádět změnu</option>
+                                                {foreach $workerPositionSelect as $poss}
+                                                    <option value="{$poss->id}">{$poss->name}</option>
+                                                {/foreach}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button type="submit" class="btn btn-primary">Přidat</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            {/ifset}
+
+
+                        <table class="table table-bordered table-sm" id="sortable-table">
+                            <thead>
+                            <tr>
+                                <th style="width: 5%;">#</th>
+                                <th style="width: 25%;">Příjmení a jméno</th>
+                                <th style="width: 25%;">Pozice</th>
+                                <th style="width: 7%;">Hodiny</th>
+                                <th style="width: 7%; text-align: center;">Hlavní</th>
+                                <th style="width: 7%; text-align: center;">Kmen</th>
+                                <th style="width: 7%; text-align: center;">Přišel</th>
+                                <th style="width: 7%; text-align: center;">Navíc</th>
+                                <th style="width: 20%; text-align: center;">Fond</th>
+                                <th style="width: 20%; text-align: center;">Dovolená</th>
+                                <th style="width: 10%;">Akce</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {if isset($modalSpot) && $modalSpotWorkers && count($modalSpotWorkers)}
+                                {var $i = 1}
+                                {foreach $modalSpotWorkers as $conn}
+                                    <tr>
+                                        <td>
+                                            <span>{$i}.</span>
+                                        </td>
+                                        <td>
+                                            {$conn->worker->surname} {$conn->worker->name}
+                                        </td>
+                                        <td>
+                                            {if $conn->workerPosition}{$conn->workerPosition->name}{else}-{/if}
+                                        </td>
+                                        <td>
+                                            {$conn->hours}
+                                        </td>
+                                        <td style="text-align: center;">
+                                            {if $conn->worker->shift == $modalSpot->shift}<i class="fa fa-check text-success"></i>{else}<i class="fa fa-times text-info"></i>{/if}
+                                        </td>
+                                        <td style="text-align: center;">
+                                            {if !$conn->worker->agency}<i class="fa fa-check text-success"></i>{else}<i class="fa fa-times text-info"></i>{/if}
+                                        </td>
+                                        <td style="text-align: center;">
+                                            {if !$conn->minusLog}<i class="fa fa-check text-success"></i>{else}<i class="fa fa-times text-info"></i>{/if}
+                                        </td>
+                                        <td style="text-align: center;">
+                                            {if $conn->plusLog}<i class="fa fa-check text-success"></i>{else}<i class="fa fa-times text-info"></i>{/if}
+                                        </td>
+                                        <td style="text-align: center;">
+                                            {ifset $modalSpotHours[$conn->worker->id]}{$modalSpotHours[$conn->worker->id]}{else}0{/ifset}
+                                            /
+                                            {if $conn->worker->timeFund}{$conn->worker->timeFund}{elseif $conn->worker->shift && isset($fpd[$conn->worker->shift])}{$fpd[$conn->worker->shift]}{else}-{/if}
+                                        </td>
+                                        <td style="text-align: center;">
+                                            {if $conn->worker->hoursVacation}{$conn->worker->hoursVacation}{else}-{/if}
+                                        </td>
+                                        <td style="text-align: center;">
+
+                                                <span style="cursor: pointer" class="removeWorkerSpot" data-id="{$conn->id}"><i class="fa fa-trash text-danger"></i></span>
+
+                                        </td>
+                                    </tr>
+                                    {var $i += 1}
+                                {/foreach}
+                            {else}
+                                <tr>
+                                    <td colspan="11">
+                                        {_'Žádný zaměstanec není zadán'}
+                                    </td>
+                                </tr>
+                            {/if}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Zavřít</button>
+                    </div>
+                {/form}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $("#search-plan").on('keyup change', function () {
+            let term = $(this).val().toLowerCase();
+            if(term) {
+                $('.tpp3').each(function() {
+                    let inText = $(this).text().trim().toLowerCase();
+                    if(inText && inText.includes(term)) {
+                        $(this).removeClass('plan-not-found');
+                    } else {
+                        $(this).removeClass('plan-not-found');
+                        $(this).addClass('plan-not-found');
+                    }
+                });
+            } else {
+                $('.tpp3').each(function() {
+                    $(this).removeClass('plan-not-found');
+                });
+            }
+        });
+
+
+            $( function() {
+                $(document).on('click', '.checkSpot', function (e) {
+                    $.nette.ajax({
+                        url: {link checkSpotPlan!},
+                        type: 'POST',
+                        data: {
+                            spot : $(this).attr('data-id')
+                        },
+                        off: {
+                            snippets: true
+                        }
+                    });
+                });
+            });
+
+            $( function() {
+                $(document).on('click', '.removeWorkerSpot', function (e) {
+                    $.nette.ajax({
+                        url: {link removeWorkerSpot!},
+                        type: 'POST',
+                        data: {
+                            plan : $(this).attr('data-id')
+                        },
+                        off: {
+                            snippets: true
+                        }
+                    });
+                });
+            });
+
+
+        $("#date").datepicker({
+            format: "yyyy-mm-dd",
+            language: 'cs'
+        }).on('changeDate', function(e) {
+            let eDate = new Date(e.date.getTime());
+            let nDay = (eDate.getDay() + 6) % 7;
+            eDate.setDate(eDate.getDate() - nDay + 3);
+            let n1stThursday = eDate.valueOf();
+            eDate.setMonth(0, 1);
+            if (eDate.getDay() !== 4) {
+                eDate.setMonth(0, 1 + ((4 - eDate.getDay()) + 7) % 7);
+            }
+            let weekNumber = (1 + Math.ceil((n1stThursday - eDate) / 604800000)) + '';
+            weekNumber = (weekNumber.length === 1 ? '0'+weekNumber : weekNumber);
+            let dateString = weekNumber + ". Týden, " + e.date.getFullYear();
+            let yearUrl = e.date.getFullYear();
+
+            $(".week-number").find("span").text(dateString);
+            let fullLink = {link ShiftPlan: test=>0};
+            fullLink = fullLink.split('?')[0];
+            let typeUrl = {$aaType};
+            location.href = fullLink + "?week=" + weekNumber + '&year=' + yearUrl + '&type=' + typeUrl;
+        });
+    </script>
+{/block}

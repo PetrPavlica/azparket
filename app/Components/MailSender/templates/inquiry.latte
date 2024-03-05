@@ -1,0 +1,40 @@
+{$webSettings['default_inquiry_email']|noescape}
+
+<br>
+<br>
+
+<b>Obsah poptávky:</b><br>
+{if $customer->company}
+    {_'Firma'}: {$customer->company}<br>
+{/if}
+{_'Jméno'}: {$customer->name} {$customer->surname}<br>
+{_'Telefon'}: {$customer->phone}<br>
+E-mail: {$customer->email}<br>
+{_'Adresa instalace'}: {$inquiry->installCity}, {$inquiry->installZip}<br>
+{if $inquiry->configurator}
+    {_'Konfigurace'}: {$inquiry->configurator->name}<br>
+{/if}
+{if $inquiry->values}
+    <ul>
+    {foreach $inquiry->values as $v}
+        <li>
+            {$v->name}: {$v->value}
+        </li>
+    {/foreach}
+    </ul>
+{/if}
+{if $products}
+    {_'Produkty'}:
+    {foreach $products as $ip}
+        {$ip->count}x 
+        {$ip->product->nazev_polozky}
+        {if !$iterator->isLast()}, {/if}
+    {/foreach}
+    <br>
+{/if}
+{_'Zpráva'}:<br>{$inquiry->message}
+
+<br>
+<br>
+
+{$webSettings['default_email_footer']|noescape}

@@ -1,0 +1,77 @@
+{block title}Dashboard{/block}
+{block description}{/block}
+{block header-icon}
+    <i class="pe-7s-paint-bucket icon-gradient bg-grow-early"></i>
+{/block}
+{block content}
+
+
+{*}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-parent">
+            <div class="card-header">
+                {_'Poptávka vyžadující reakci obchodníka'}
+            </div>
+            <div class="card-body">
+                {control inquiryTable}
+            </div>
+        </div>
+    </div>
+</div>
+{*}
+
+{*<div n:snippet="CardsSnipp" class="row dashboard-styles cards-container">
+
+
+    <div n:if="isset($cardFutureWorkerTender)" class="col-md-4 col-sm-6 col-xs-12 card-container" id="card" style="">
+        <div class="card">
+            <div class="card-header">
+                <a n:href="WorkerTender:default" class="card-title">Nadcházejí školení</a> <span class="badge">{count($cardFutureWorkerTender)}</span>
+                <div class="card-actions">
+                </div>
+            </div>
+            <div class="card-body" style="">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Název</th>
+                        <th>Datum</th>
+                        <th>Od</th>
+                        <th>Do</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {foreach $cardFutureWorkerTender as $wt}
+                        <tr class="row-href" data-href="{if in_array($usrGrp, [1])}{link WorkerTender:edit 'id' => $wt->id}{else}#{/if}">
+                            <td>
+                                {$wt->name}
+                            </td>
+                            <td>
+                                {$wt->tenderDate|date:'j. n. Y'}
+                            </td>
+                            <td>
+                                {$wt->timeStart}
+                            </td>
+                            <td>
+                                {$wt->timeEnd}
+                            </td>
+                        </tr>
+                    {/foreach}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>*}
+
+{/block}
+{block scriptsBot}
+<script>
+    $( document ).ready(function() {
+        $('.row-href').click(function() {
+            window.location = $(this).data('href');
+        });
+    });
+</script>
+{/block}

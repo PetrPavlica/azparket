@@ -1,0 +1,137 @@
+table{
+  font-size: 11px;
+}
+.container table{
+    border: 1px solid black;
+}
+.container_body{
+    margin-top: 10px;
+}
+.container_body td{
+    text-align: center;
+}
+td{
+    padding: 1px 3px;
+}
+table {
+    width: 100%;
+  }
+
+.container_body table{
+border: 3px solid black;
+    border-collapse: collapse;
+}
+ .technicke{
+    border-right: 3px solid #000;
+    border-left: 3px solid #000;
+   }
+   .left_right{
+    border-right: 2px solid #000;
+    border-left: 3px solid #000;
+   }
+   .left_right_bottom{
+    border-right: 2px solid #000;
+    border-bottom: 2px solid #000;
+    border-left: 3px solid #000;
+   }
+   .left_right_bottom_{
+    border-right: 2px solid #000;
+    border-bottom: 3px solid #000;
+    border-left: 3px solid #000;
+   }
+   .right_left_bott{
+    border-right: 3px solid #000;
+    border-bottom: 3px solid #000;
+    border-left: 3px solid #000;
+   }
+   .technicke_zaves{
+    border-left: 3px solid #000;
+    border-bottom: 3px solid #000;
+   }
+   .technicke_bottom{
+    border-bottom: 3px solid #000;
+    border-left: 3px solid #000;
+   }
+   .bottom{
+    border-bottom: 3px solid #000;
+   }
+   .left{
+    border-left: 3px solid #000;
+   }
+   .left_dotted{
+    border-left: 3px dotted #000;
+   }
+.right_2 {
+    border-right: 2px solid #000;
+}
+.right_3 {
+    border-right: 3px solid #000;
+}
+.left_2 {
+    border-left: 2px solid #000;
+}
+.left_3 {
+    border-left: 3px solid #000;
+}
+.bottom_2 {
+    border-bottom: 2px solid #000;
+}
+.bottom_3 {
+    border-bottom: 3px solid #000;
+}
+.left_dotted_bottom{
+    border-left: 3px dotted #000;
+    border-bottom: 3px solid #000;
+}
+.right_left_bott_celkova{
+    border-right: 3px solid #000;
+    border-bottom: 2px solid #000;
+    border-left: 3px solid #000;
+}
+.border{
+    border-right: 3px solid #000;
+    border-bottom: 2px solid #000;
+    border-left: 3px solid #000;
+}
+.border_bottom{
+    border-bottom: 2px solid #000;
+}
+.border_bottom_dott{
+    border-bottom: 2px solid #000;
+    border-left: 3px dotted #000;
+}
+.border_bottom_tech{
+    border-bottom: 2px solid #000;
+    border-right: 3px solid #000;
+    border-left: 3px solid #000;
+}
+.bottom_right{
+    border-bottom: 2px solid #000;
+    border-right: 2px solid #000;
+}
+.bottom_right_left{
+    border-bottom: 2px solid #000;
+    border-right: 2px solid #000;
+    border-left: 3px solid #000;
+
+}
+.bottom_right_left_{
+    border-bottom: 3px solid #000;
+    border-right: 2px solid #000;
+    border-left: 3px solid #000;
+}
+p{
+    -webkit-transform: rotate(-90deg);
+    transform: rotate(-90deg);
+   }
+
+.table_text{
+    margin-top: 15px;
+    margin-bottom: 10px;
+    font-size: 9px;
+}
+   .table_nabidku{
+    border: 4px double black;
+    width: 100%;
+   }
+  

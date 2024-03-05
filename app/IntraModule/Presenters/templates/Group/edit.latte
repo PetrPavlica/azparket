@@ -1,0 +1,31 @@
+{block title}
+    {ifset $entity}
+        {_'Editace role'}
+    {else}
+        {_'Přidání role'}
+    {/ifset}
+{/block}
+{block description}
+    {ifset $entity}
+        {_'Editace stávající role'}
+    {else}
+        {_'Přidání nové role'}
+    {/ifset}
+{/block}
+{block header-icon}<i class="fa fa-cogs icon-gradient bg-malibu-beach"></i>{/block}
+{block header-actions}
+    <a n:href="Group:default" class="btn btn-outline-primary">
+        {_'Zpět'}
+    </a>
+{/block}
+{block content}
+    <div>
+        {form form}
+            <div class="card mb-2">
+                <div class="card-body">
+                    {include bootstrap-form 'form'}
+                </div>
+            </div>
+        {/form}
+    </div>
+{/block}

@@ -1,0 +1,550 @@
+{block title}
+    {ifset $entity}
+        {_'Editace konfigurátoru'}
+    {else}
+        {_'Přidání konfigurátoru'}
+    {/ifset}
+{/block}
+{block header-icon}<i class="fa fa-sitemap icon-gradient bg-happy-itmeo"></i>{/block}
+{block description}
+{/block}
+{block content}
+    <div class="card mb-2">
+        <div class="card-body">
+            {form form}
+                <div class="form-row">
+                    {include bootstrap-input $form, 'name', 6}
+                    {include bootstrap-input $form, 'orderConfigurator', 6}
+                    {include bootstrap-input $form, 'active', 6}
+                    
+
+                </div>
+                
+                <button type="submit" name="sendSave" class="d-none" id="main-form-submit"></button>
+            {/form}
+        </div>
+
+        <div class="card-footer">
+            <a n:href="Configurator:default" class="btn btn-outline-primary m-1"><i class="fa fa-arrow-left"></i> Zpět</a>
+            <button type="button" class="send btn btn-primary m-1" onclick="document.getElementById('main-form-submit').click()">Uložit</button>
+        </div>
+    </div>
+
+
+    <div id="accordion1">
+        <div class="card mb-2">
+            <div class="card-header">
+                <a class="card-link" data-toggle="collapse" href="#collapse1">
+                    <i class="fa fa-plus"></i> {_'Vstupní pole konfigurátoru'}
+                </a>
+            </div>
+            <div id="collapse1" class="collapse" data-parent="#accordion1">
+                <div class="card-body p-3">
+                    {ifset $inputs}
+                        <div class="form-row" n:snippet="conf-inputs">
+                            {foreach $inputs as $input}
+                                <div class="col-md-4 p-2">
+                                <div class="card">
+                                <div class="card-body p-3">
+                                <div class="conf-input" data-input-id="{$input->id}">
+                                    <div class="form-group" >
+                                    
+                                        <div class="form-row">
+                                            <div class="col-md-2">
+                                                <label>{_'Řada'}</label>
+                                                <input type="number" step="1" min="0" name="inputOrder" value="{$input->orderInput}" class="form-control form-control-sm"/>
+                                            </div>
+
+                                            <div class="col-md-10">
+                                                <div class="d-flex">
+                                                    <label>{_'Název'}</label>
+                                                    <span class="ml-auto">
+                                                        <a class="btn btn-sm btn-outline-danger p-1  ajax" n:href="removeInput! inputId => $input->id">
+                                                            <i class="fa fa-trash"></i>
+                                                        </a>
+                                                    </span>
+                                                </div>
+                                                <input type="text" name="inputName" value="{$input->name}" class="form-control form-control-sm"/>
+                                            </div>
+                                        </div>
+
+                                        
+                                    </div>
+                                    <div class="form-group m-0">
+                                        <label>{_'Popis'}</label>
+                                        <textarea name="inputDescription" class="form-control form-control-sm">{$input->description}</textarea>
+                                    </div>
+                                </div>
+                                </div>
+                                </div>
+                                </div>
+                            {/foreach}
+                            <div class="col-md-12 mt-3">
+                                <a n:href="addInput!" class="btn btn-sm btn-outline-primary ajax">
+                                    <i class="fa fa-plus"></i> {_'Přidat vstupní pole'}
+                                </a>
+                            </div>
+                        </div>
+                    {else}
+                        {_'Vstupní pole se zobrazí až po prvním uložení.'}
+                    {/ifset}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="accordion2">
+        <div class="card mb-2">
+            <div class="card-header">
+                <a class="card-link" data-toggle="collapse" href="#collapse2">
+                    <i class="fa fa-plus"></i> {_'Strom konfigurátoru'}
+                </a>
+
+                <button n:ifset="$entity" type="button" class="btn btn-primary ml-auto" onclick="openEditConfNodeModal()">Přidat uzel</button>
+            </div>
+            <div id="collapse2" class="collapse {ifset $entity}show{/ifset}" data-parent="#accordion2">
+                {ifset $entity}
+                    <div class="card-body p-0 position-relative" id="conf-tree" style="background:#fff">
+                        <div class="row position-absolute" style="right:8px">
+                            <div class="col-12">
+                                <button class="zoomSvgOut btn btn-link" style="font-size:1.5rem">
+                                    <i class="fa fa-search-minus pr-2" aria-hidden="true"></i>
+                                </button>
+                                <button class="zoomSvgIn btn btn-link" style="font-size:1.5rem">
+                                    <i class="fa fa-search-plus pr-2" aria-hidden="true"></i>
+                                </button>
+                                <button id="imgId" class="downloadSvg btn btn-link" style="font-size:1.5rem">
+                                    <i class="fa fa-download pr-2" aria-hidden="true"></i>
+                                </button>
+                                <button id="fullscreenTree" class="btn btn-link" style="font-size:1.5rem">
+                                    <i class="fa fa-expand pr-2" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        {snippet graphMermaidSnipp}
+                            <div class="mermaid-wrap overflow-hidden">
+                                <div id="diagram" class="mermaid">
+                                    graph TD
+                                    subgraph caption0["&nbsp;&nbsp;{$entity->name}"]
+                                        caption1[ ]
+                                        caption2[ ]
+                                        caption1-->caption2
+                                        style caption0 fill:#FFF,opacity:0,stroke:#FFF;
+                                        style caption1 fill:#FFF,opacity:0,stroke:#FFF;
+                                        style caption2 fill:#FFF,opacity:0,stroke:#FFF;
+                                        linkStyle 0 stroke:#FFF,opacity:0,stroke-width:0;
+                                    end
+                                    {foreach $nodes as $node}
+                                        {if $node->products && count($node->products)}
+                                            {$node->id}["
+                                                {$node->nodeNo}. {if $node->name}{$node->name}{/if}{if $node->input} ({$node->input->name}){/if}
+                                                {if $node->value}<br> H: <b>{$node->value}</b>{/if}
+                                                {foreach $node->products as $np}<br>P{$iterator}:  <b>{$np->count}x {$np->product->klic_polozky} - {$np->product->nazev_polozky}</b>{/foreach}
+                                                {if $node->forSalesman}<br>Vyžaduje obchodníka{/if}
+                                            "]
+                                        {elseif $node->input}
+                                            {$node->id}{"
+                                                {$node->nodeNo}. {if $node->name}{$node->name}{/if}<br>
+                                                VP: <b>{$node->input->name}</b>
+                                                {if $node->forSalesman}<br>Vyžaduje obchodníka{/if}
+                                            "}
+                                        {else}
+                                            {$node->id}("
+                                                {$node->nodeNo}. {if $node->name}{$node->name}{/if}
+                                                {if $node->input}<br> VP: <b>{$node->input->name}</b><br>{/if}
+                                                {if $node->value}<br> H: <b>{$node->value}</b><br>{/if}
+                                                {if $node->products && count($node->products)} {foreach $node->products as $np}<br>P{$iterator}: <b>{$np->count}x {$np->product->klic_polozky} - {$np->product->nazev_polozky}</b>{if !$iterator->isLast()}<br>{/if}{/foreach}{/if}
+                                                {if $node->forSalesman}Vyžaduje obchodníka{/if}
+                                            ")
+                                        {/if}
+                                        
+                                        click {$node->id} "#" " "{*color: #e20023;fill:#cfcfcf,#80ff80,#ffa8b5,#a3dfff,#ffff89*}
+                                        style {$node->id} color:#000, stroke:#333, fill:{if $node->input}#dae8fc{elseif $node->value}#fff2cc{elseif $node->products && count($node->products)}#d5e8d4{else}#cfcfcf{/if}
+                                    {/foreach}
+                                    {foreach $nodes as $node}
+                                        {if $node->parents}
+                                            {foreach $node->parents as $parent}
+                                                
+                                                {$parent->parent->id}
+                                                {*if $node->value}
+                                                    -- "{$node->value}" -->
+                                                {else*}
+                                                    -->
+                                                {*/if*}
+                                                {$node->id}
+                                            {/foreach}
+                                        {/if}
+                                    {/foreach}
+                                    ;
+                                </div>
+                            </div>
+
+                            <script type="text/javascript">
+                                if(typeof mermaid !== 'undefined') {
+                                    mermaid.init();
+                                }
+                            </script>
+                        {/snippet}
+                        </div>
+                    {else}
+                        <div class="card-body">
+                            {_'Strom se zobrazí až po prvním uložení.'}
+                        </div>
+                    {/ifset}
+                <div class="card-footer">
+                    <div class="row" style="padding-top: 20px;">
+                        <div class="col-md-12">
+                            <ul class="legend">
+                                <li><span style="background:#dae8fc"></span>{_'Vstupní pole'}</li>
+                                <li><span style="background:#fff2cc"></span>{_'Výběr hodnoty'}</li>
+                                <li><span style="background:#d5e8d4"></span>{_'Přidání produktů'}</li>
+                                <li><span style="background:#cfcfcf"></span>{_'Spojovací či prostý uzel'}</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-12 mt-3">
+                            V potstatě lze nyní konfigurátor naklikat, jak se člověku zachce, ovšem jeho výsledek tak jednoduše přestane fungovat,
+                            pokud se nedodrží aktuálně programově neošetřená pravidla.<br><br>
+                            Pravidla:<br>
+                            <ul class="">
+                                <li>Uzly by se měly rozdělit do 3 skupin:
+                                    <ul class="">
+                                        <li>Se vstupem (modrý kosočtverec)</li>
+                                        <li>S hodnotou (žlutý zaoblený obdelník)</li>
+                                        <li>S přiřazením produktů (zelený hranatý obdelník)</li>
+                                    </ul>
+                                </li>
+                                <li><b>Nekombinovat vlastnosti vstupu a hodnoty</b> u jednoho uzlu.</li>
+                                <li><b>Na uzel se vstupním polem</b>, by se měly <b>vázat pouze uzly s hodnotou</b>.</li>
+                                <li>Pokud mají fungovat všechna vstupní pole, <b>je v dané cestě stromu nutné projít všechny uzly s danými vstupními poli</b>.</li>
+                                <li>Uzly, které nejsou napojené, ať už přímo nebo nepřímo, na kořen, budou ignorovány.</li>
+                                <li>Uzel, který nemá následovníka, označí strom jako dokončený, což zobrazí se ostatní vstupní pole poptávky.</li>
+                            </ul>
+                            Proces průchodu formuláře / stromu:<br>
+                            <ol class="">
+                                <li>Vykresli vstupy</li>
+                                <li>Jdi na kořenový uzel, pokud má přiřazené produkty, tak je přidej</li>
+                                <li>Opakuj, dokud si nenarazil na koncový uzel:
+                                    <ol class=""> 
+                                        <li>Opakuj, dokud se nejedná o uzel se vstupmním polem
+                                            <ol class=""> 
+                                                <li>Přidej produkty uzlu a pokračuj na 1. uzel z potomků aktuálního uzlu</li>
+                                            </ol>
+                                        </li>
+                                        <li>Povol ve formuláři vstupní pole nalezeného uzlu a naplň ho hodnotami potomků</li>
+                                        <li>Čekej na změnu pole uživatelem</li>
+                                        <li>Dle výběru, kterou uživatel učinil, registruj vybranou hodnotu a její uzel</li>
+                                        <li>Pokud se jedná o pole, které bylo již vyplněno, vrať se k uzlu dané hodnoty</li>
+                                    </ol> 
+                                </li>
+                            </ol>
+                            Dále v této chvíli chybí možnost přesměrovat na obchodníka, ale neměl by to být problém jednoduše doimplementovat
+                            jako vlastnost uzlu. Nyní je obchodník volán, pouze pokud zákazník sám klikne na tlačítko kontaktovat obchodníka.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{/block}
+
+{block scriptsBot}
+
+    
+    {control editConfNodeModal}
+    
+    {* after snippets *}
+    <script type="text/javascript">
+        $.nette.ext('snippets').after(function ($el) {
+            crDragScroll();
+        });
+    </script>
+
+    {* on change *}
+    <script n:ifset="$entity">
+        $(document).on('change', '.conf-input textarea, .conf-input input', (event) => {
+            console.log(event.target);
+            let el = $(event.target);
+            let data = {
+                inputId: el.parents('.conf-input').data('inputId')
+            }
+            if (el.attr('name') == 'inputName') {
+                data.name = el.val();
+            } else if (el.attr('name') == 'inputDescription') {
+                data.description = el.val();
+            } else if (el.attr('name') == 'inputOrder') {
+                data.order = el.val();
+            }
+            console.log(data);
+
+            
+            $.nette.ajax({
+                url: {link updateInput!},
+                type: 'POST',
+                data: data,
+                success: (data) => {
+                    console.log(data);
+                },
+            }).done(function (payload) {
+                
+            });
+        });
+    </script>
+
+    {* mermaid graph *}
+    <script type="text/javascript" src="{$basePath}/packages/mermaid/mermaid.min.js?v={php echo filemtime('packages/mermaid/mermaid.min.js')}"></script>
+    <script type="text/javascript">
+        let config = {
+            startOnLoad:true,
+            flowchart:{'curve': 'bump', 'useMaxWidth': false}
+        };
+
+        mermaid.initialize(config);
+        mermaid.init();
+    </script>
+
+    <script>
+        $(document).on('click', ".node", function (e) {
+            e.preventDefault();
+
+            /*let id = e.target.closest('.node').id;
+            let url = {link Task:edit};
+            let win = window.open(url + '/' + id, '_blank');
+            win.focus();*/
+        });
+        
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+
+            {*ifset $nodeScroll}
+                let elm = document.getElementById('#diagram .node{$nodeScroll->id}');
+                scrollToJustAbove(elm);
+            {/ifset*}
+
+            crDragScroll();
+
+            {*if $usrGrp != 1 && $usrGrp != 7 && $usrGrp != 12}
+                let deadlineDate = $('#frm-deadlineDate');
+                deadlineDate.prop('readonly', true);
+                deadlineDate.removeAttr('data-provide data-date-orientation data-date-format data-date-today-highlight data-date-autoclose autocomplete');
+            {/if}
+
+            {if $usrGrp == 5}
+                $('#frm-name').prop('readonly', true);
+                $('#frm-sponsor').prop('readonly', true);
+                $('#frm-description').prop('readonly', true);
+            {/if*}
+        });
+
+        function scrollToJustAbove(element, margin=80) {
+            let dims = element.getBoundingClientRect();
+            window.scrollTo(window.scrollX, dims.top - margin);
+        }
+
+        window.addEventListener('wheel', function(e) {
+            if (e.ctrlKey) {
+                e.preventDefault();
+                if(e.wheelDelta) {
+                    if (e.wheelDelta < 0) {
+                        svgZoomOut();
+                    } else {
+                        svgZoomIn();
+                    }
+                } else {
+                    if (e.deltaY < 0) {
+                        svgZoomIn();
+                    } else {
+                        svgZoomOut();
+                    }
+                }
+            }
+        }, { passive: false });
+
+        function crDragScroll() {
+            let x, y, top, left, down;
+            let $scrollArea = $('.mermaid-wrap');
+
+            // Disable text selection in IE8
+            $($scrollArea).attr("onselectstart", "return false;");
+
+            $($scrollArea).mousedown(function (e) {
+                e.preventDefault();
+                down = true;
+                x = e.pageX;
+                y = e.pageY;
+                top = $(this).scrollTop();
+                left = $(this).scrollLeft();
+            });
+            $($scrollArea).mouseleave(function (e) {
+                down = false;
+            });
+            $("body").mousemove(function (e) {
+                if (down) {
+                    let newX = e.pageX;
+                    let newY = e.pageY;
+                    $($scrollArea).scrollTop(top - newY + y);
+                    $($scrollArea).scrollLeft(left - newX + x);
+                }
+            });
+            $("body").mouseup(function (e) { down = false; });
+        }
+
+        function svgZoomOut() {
+            let svg = $('#diagram').find('svg')[0];
+            let $scrollArea = $('.mermaid-wrap');
+            let top = $($scrollArea).scrollTop();
+            let left = $($scrollArea).scrollLeft();
+
+            let baseWidth = svg.getAttribute('width');
+            let baseHeight = svg.getAttribute('height');
+            let newWidth = (baseWidth / 1.2).toString();
+            let newHeight = (baseHeight / 1.2).toString();
+            svg.removeAttribute('width');
+            svg.removeAttribute('height');
+            svg.setAttribute("width", newWidth);
+            svg.setAttribute("height", newHeight);
+
+            $($scrollArea).scrollTop(top / 1.25);
+            $($scrollArea).scrollLeft(left / 1.3);
+        }
+
+        function svgZoomIn() {
+            let svg = $('#diagram').find('svg')[0];
+            let $scrollArea = $('.mermaid-wrap');
+            let top = $($scrollArea).scrollTop();
+            let left = $($scrollArea).scrollLeft();
+
+            let baseWidth = svg.getAttribute('width');
+            let baseHeight = svg.getAttribute('height');
+            let newWidth = (baseWidth * 1.2).toString();
+            let newHeight = (baseHeight * 1.2).toString();
+            svg.removeAttribute('width');
+            svg.removeAttribute('height');
+            svg.setAttribute("width", newWidth);
+            svg.setAttribute("height", newHeight);
+
+            $($scrollArea).scrollTop(top * 1.25);
+            $($scrollArea).scrollLeft(left * 1.3);
+        }
+
+        $(document).on('click', ".zoomSvgOut", function (e) {
+            e.preventDefault();
+            svgZoomOut();
+        });
+
+        $(document).on('click', ".zoomSvgIn", function (e) {
+            e.preventDefault();
+            svgZoomIn()
+        });
+
+        $(document).on('click', ".downloadSvg", function (e) {
+            e.preventDefault();
+            let svg = $('#diagram').find('svg')[0];
+            let dName = '{ifset $entity}{$entity->name}{else}Diagram{/ifset}.png';
+            downloadSvg(svg, dName);
+        });
+        
+        $(document).on('click', "#fullscreenTree", function (e) {
+            
+            if (isFulscreenTree) {
+                closeFullscreen();
+                isFulscreenTree = false;
+            } else {
+                openFullscreen();
+                isFulscreenTree = true;
+            }
+        });
+
+        function copyStylesInline(destinationNode, sourceNode) {
+            var containerElements = ["svg", "g", "a"];
+            for (var cd = 0; cd < destinationNode.childNodes.length; cd++) {
+                var child = destinationNode.childNodes[cd];
+                if (containerElements.indexOf(child.tagName) != -1) {
+                    copyStylesInline(child, sourceNode.childNodes[cd]);
+                    continue;
+                }
+                var style = sourceNode.childNodes[cd].currentStyle || window.getComputedStyle(sourceNode.childNodes[cd]);
+                if (style == "undefined" || style == null) continue;
+                for (var st = 0; st < style.length; st++){
+                    child.style.setProperty(style[st], style.getPropertyValue(style[st]));
+                }
+            }
+        }
+
+        function triggerDownload (imgURI, fileName) {
+            var evt = new MouseEvent("click", {
+                view: window,
+                bubbles: false,
+                cancelable: true
+            });
+            var a = document.createElement("a");
+            a.setAttribute("download", fileName);
+            a.setAttribute("href", imgURI);
+            a.setAttribute("target", '_blank');
+            a.dispatchEvent(evt);
+        }
+
+        function downloadSvg(svg, fileName) {
+            var copy = svg.cloneNode(true);
+            copyStylesInline(copy, svg);
+            var canvas = document.createElement("canvas");
+            let baseWidth = svg.getAttribute('width');
+            let baseHeight = svg.getAttribute('height');
+            canvas.width = baseWidth + 30;
+            canvas.height = baseHeight + 30;
+            var ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, baseWidth, baseHeight);
+
+
+            var data = (new XMLSerializer()).serializeToString(copy);
+            var svgBlob = new Blob([data], { type: "image/svg+xml;charset=utf-8" });
+
+            blobToDataURL(svgBlob, ctx, canvas, fileName, finalDataUrlDownload);
+        }
+
+        function finalDataUrlDownload(url, ctx, canvas, fileName) {
+            var img = new Image();
+            img.crossOrigin = 'anonymous';
+
+            img.onload = function () {
+                ctx.drawImage(img, 0, 0);
+                var imgURI = canvas
+                    .toDataURL("image/png")
+                    .replace("image/png", "image/octet-stream");
+                triggerDownload(imgURI, fileName);
+                canvas.remove()
+            };
+            img.src = url;
+        }
+
+        function blobToDataURL(blob, ctx, canvas, fileName, callback) {
+            var a = new FileReader();
+            a.onload = function(e){ callback(e.target.result, ctx, canvas, fileName); };
+            a.readAsDataURL(blob);
+        }
+
+        var isFulscreenTree = 0;
+        function openFullscreen() {
+            var elem = document.body;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) { /* Safari */
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) { /* IE11 */
+                elem.msRequestFullscreen();
+            }
+        }
+        function closeFullscreen() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) { /* Safari */
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) { /* IE11 */
+                document.msExitFullscreen();
+            }
+        }
+
+    </script>
+
+{/block}

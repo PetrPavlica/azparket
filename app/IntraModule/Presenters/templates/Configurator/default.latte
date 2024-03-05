@@ -1,0 +1,17 @@
+{block title}{_'Konfigurátor'}{/block}
+{block description}{_'Přehled konfigurátorů'}{/block}
+{block header-icon}<i class="fa fa-sitemap icon-gradient bg-happy-itmeo"></i>{/block}
+{block header-actions}
+    <a n:href="Configurator:edit" class="btn btn-primary">
+        {_'Nový konfigurátor'}
+    </a>
+{/block}
+{block content}
+
+    <div class="card card-parent">
+    <div class="card-body">
+        {control table}
+    </div>
+    </div>
+
+{/block}

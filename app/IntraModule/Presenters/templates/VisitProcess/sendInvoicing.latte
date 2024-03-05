@@ -1,0 +1,35 @@
+{block title}
+    {_'Odeslání dokumentů'}
+{/block}
+{block description}
+    {_'Odeslání dokumentů emailem k fakturaci'}
+{/block}
+{block header-icon}<i class="fa fa-book icon-gradient bg-happy-itmeo"></i>{/block}
+{block header-actions}
+    <a n:href="VisitProcess:edit id => $visitProcess->id" class="btn btn-outline-primary">
+        {_'Zpět'}
+    </a>
+{/block}
+{block content}
+    <div class="card">
+        <div class="card-body">
+            {form sendInvoicingForm}
+                {input docIds}
+                {input id}
+                <div class="col-xs-12 col-sm-12 col-md-4 offset-md-4">
+                    <div class="form-row">
+                        {include bootstrap-input $form, 'note', 12}
+                    </div>
+                    <span style="">
+                        <a n:href="VisitProcess:edit id => $visitProcess->id" class="btn btn-outline-primary">
+                            {_'Zpět'}
+                        </a>
+                    </span>
+                    <span class="pull-right">
+                        <button name="send" type="submit" class="btn btn-primary">{_'Odeslat na fakturaci'}</button>
+                    </span>
+                </div>
+            {/form}
+        </div>
+    </div>
+{/block}

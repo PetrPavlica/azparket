@@ -1,0 +1,60 @@
+{block title}
+    {ifset $entity}
+        {_'Editace materiálu'}
+    {else}
+        {_'Přidání materiálu'}
+    {/ifset}
+{/block}
+{block description}
+    {ifset $entity}
+        {_'Editace stávacího materiálu'}
+    {else}
+        {_'Přidání nového materiálu'}
+    {/ifset}
+{/block}
+{block header-icon}<i class="fa fa-cubes icon-gradient bg-happy-itmeo"></i>{/block}
+{block header-actions}
+    <a n:href="Material:default" class="btn btn-outline-primary">
+        {_'Zpět'}
+    </a>
+{/block}
+{block content}
+    {form form}
+        {input id}
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div style="" class="col-xs-12 col-sm-12 col-md-6">
+                        {include bootstrap-input $form, 'number', 12}
+                        {include bootstrap-input $form, 'name', 12}
+                        {include bootstrap-input $form, 'origName', 12}
+                        {include bootstrap-input $form, 'unit', 12}
+                        {include bootstrap-input $form, 'stock', 12}
+                        {include bootstrap-input $form, 'group', 12}
+                    </div>
+                    <div style="" class="col-xs-12 col-sm-12 col-md-6">
+                        {include bootstrap-input $form, 'active', 12}
+                        {include bootstrap-input $form, 'priceSale', 12}
+                        {include bootstrap-input $form, 'gwp', 12}
+                        {include bootstrap-input $form, 'link', 12}
+                        {include bootstrap-input $form, 'description', 12}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <a n:href="Material:default" class="btn btn-outline-primary">
+                    <span class="fa fa-arrow-left" aria-hidden="true"></span>
+                    Zpět
+                </a>
+                <span class="pull-right">
+                    <button name="sendBack" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a zpět</button>
+                    <button name="sendSave" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a pokračovat</button>
+                    <button name="sendNew" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a nový</button>
+                </span>
+            </div>
+        </div>
+    {/form}
+{/block}

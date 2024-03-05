@@ -1,0 +1,142 @@
+{block title}{_'Nástěnka'}{/block}
+{block description}{_'Seznam úkolů'}{/block}
+{block header-icon}<i class="fa fa-server icon-gradient bg-mean-fruit"></i>{/block}
+{block header-actions}
+    <a n:href="Task:edit" class="btn btn-primary">
+        {_'Přidat úkol'}
+    </a>
+{/block}
+{block head}
+    <style>
+        body {
+            background-image: url('{php echo $baseUrl}/assets/img/task-dashboard-bg.jpg?v={filemtime('assets/img/task-dashboard-bg.jpg')}');
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+        }
+        .app-container {
+            background: transparent !important;
+        }
+        #task-cards-wrap {
+            min-width: 100%;
+            width: max-content !important;
+        }
+        .cards-wrap .cards-column {
+            width: calc(100% / {count($taskStates)}) !important;
+        }
+    </style>
+{/block}
+{block content}
+{snippet dcards}
+    <div id="task-cards-wrap">
+        <div id="task-cards">
+            {var $nowDate = Nette\Utils\DateTime::from('now')}
+            <div class="cards-wrap cards-body" id="containment-wrapper">
+                {foreach $taskStates as $i => $state}
+                    <ul class="ui-widget-header sortable connectWith cards-column" id="droppable containment move-to-wrapper" data-state="{$state['state']->id}">
+                        <h5 class="cards-head">{$state['state']->name}</h5>
+                        {if is_array($state['tasks']) && count($state['tasks'])}
+                            {foreach $state['tasks'] as $task}
+                                <li class="li-item draggable ui-widget-content" id="draggable" data-task="{$task->id}">
+                                    <div class="dcard {if $task->priority}dc-priority{/if}" id="">
+                                        <div class="dcard-head">
+                                            <div class="">
+                                                <div class="flexElem flex-wrap">
+                                                    <div title="Datum vytvoření">{$task->foundedDate|date:'j. n. Y'}&nbsp;|&nbsp;</div>
+                                                    <div title="Datum uzavření">{$task->closeToDate|date:'j. n. Y'}&nbsp;|&nbsp;</div>
+                                                </div>
+                                                {if $task->inStateDate}
+                                                    {var $diffDate = $nowDate->diff($task->inStateDate)}
+                                                {else}
+                                                    {var $diffDate = $nowDate->diff($nowDate)}
+                                                {/if}
+                                                <div title="Dní ve stavu" class="day-state">{$diffDate->d}&nbsp;dní</div>
+                                            </div>
+                                            <div>
+                                                <div class="flexElem justify-content-end">
+                                                    <a n:href="Task:view id=>$task->id" title="Náhled">
+                                                        <i class="fa fa-eye" style="color: #0073ff;"></i>
+                                                        &nbsp;
+                                                    </a>
+                                                    <a n:if="in_array($usrGrp, [1]) || $user->id == $task->originator->id" n:href="Task:edit id=>$task->id" title="Upravit">
+                                                        &nbsp;<i class="fa fa-edit" style="font-weight: bold;"></i>
+                                                    </a>
+                                                </div>
+                                                <div class="flexElem justify-content-end">
+                                                    <div n:if="$task->documents" class="supplement" title="Přílohy">
+                                                        <a n:href="Task:view id=>$task->id, openTab => '#docs'">
+                                                            <i class="fa fa-paperclip" aria-hidden="true"></i>
+                                                            {count($task->documents)}
+                                                            &nbsp;&nbsp;
+                                                        </a>
+                                                    </div>
+                                                    <div n:if="$task->comments" class="supplement" title="Komentáře">
+                                                        <a n:href="Task:view id=>$task->id, openTab => '#comm'">
+                                                            <i class="fa fa-comments" aria-hidden="true"></i>
+                                                            {count($task->comments)}
+                                                            {*&nbsp;&nbsp;*}
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="dcard-body">
+                                            <div class="dcard-taskName">
+                                                <a n:href="Task:view id=>$task->id" title="Úkol">
+                                                    {$task->name}
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="dcard-foot">
+                                            <div class="originatorName" title="Přiřazeno / řeší">
+                                                {$task->assigned->name}
+                                            </div>
+                                            <div class="flexElem">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            {/foreach}
+                        {/if}
+                    </ul>
+                {/foreach}
+            </div>
+        </div>
+    </div>
+{/snippet}
+{/block}
+{block scriptsBot}
+    <script>
+        function initDraggable() {
+            $(".sortable").sortable({
+                containment: "#containment-wrapper",
+                connectWith: ".sortable",
+                items: ".li-item",
+                stop: function (event, ui) {
+                    $.nette.ajax({
+                        url: {link changeTaskStateDraggable!},
+                        type: 'POST',
+                        data: {
+                            id: $(ui.item[0]).attr('data-task'),
+                            state: $(ui.item[0].parentNode).attr('data-state')
+                        }
+                    });
+                }
+            });
+            $('.sortable li').disableSelection();
+        }
+
+        $(document).ajaxComplete(function() {
+            initDraggable();
+        });
+
+        $(function() {
+            initDraggable();
+        });
+        $(window).on('scroll', function(e) {
+            var left = $(this).scrollLeft();
+            $('.app-page-title').css('left', left);
+            $('.app-wrapper-footer').css({'left': left, 'position': 'relative'});
+        });
+    </script>
+{/block}

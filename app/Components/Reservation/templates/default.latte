@@ -1,0 +1,149 @@
+
+{import '../../templates/form.latte'}
+<div class="reservation-item position-relative" id="ri-{$ri->id}" data-riid="{$ri->id}">
+    <div class="spinner-wrap" style="display: none;"><div class="spinner-dual-ring"></div></div>
+
+    <div class="position-relative">
+        {if !$adminMode}<h2 style="width:40%"><b>{$ri->name}</b></h2>{/if}
+
+        <div class="weekpicker d-flex justify-content-center my-4">
+            <div style="max-width:500px;" class="d-flex align-items-center justify-content-between">
+                <a n:href="previousWeek!" class="mx-3 p-2 ajax spinner-on"><i class="fa fa-chevron-left text-special"></i></a>
+                <input
+                    class="form-control text-center w-auto"
+                    name="weekpicker"
+                    value="{$dateStr}"
+                    data-provide="datepicker"
+                    data-date-orientation="bottom"
+                    data-date-format="d. m. yyyy"
+                    data-date-today-highlight="true"
+                    data-date-autoclose="true"
+                    data-date-language="cs"
+                    autocomplete="off"
+                    readonly
+                >
+                <a n:href="nextWeek!" class="mx-3 p-2 ajax spinner-on "><i class="fa fa-chevron-right text-special"></i></a>
+            </div>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="r-grid {if $adminMode}col-xl-11{else}{if $rColumns < 14}col-xl-8{else}col-xl-12{/if}{/if} {if !$adminMode}my-4{/if}">
+            <div class="table-responsive mb-2">
+                {var $timeRanges = []}
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            
+                            {for $rTime = $timeFromMin; $rTime < $timeToMax; $rTime += $ri->reservablePeriod}
+                                {var $timeRanges[($rTime - $timeFromMin) / $ri->reservablePeriod] = [$timeHelper->minutesToTimeStr($rTime), $timeHelper->minutesToTimeStr($rTime + $ri->reservablePeriod)]}
+                                <th>
+                                    <div>{end($timeRanges)[0]}</div>
+                                    <div class="hypen">-</div>
+                                    <div>{end($timeRanges)[1]}</div>
+                                </th>
+                            {/for}
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {for $day = $dayFrom; $day <= $dayTo; $day++}
+                        {var $auxDate = (clone $dateFrom)->modify('+' . $day . ' days')}
+                        <tr data-date="{$auxDate|date:'Y-m-d'}">
+                            <th class="r-dayname">
+                                {$auxDate|date:'j. n. Y'}<br>
+                                {$days[$day]}
+                            </th>
+                            {for $rTime = $timeFromMin; $rTime < $timeToMax; $rTime += $ri->reservablePeriod}
+                                {var $reservedReservation = null}
+                                <td class="
+                                        {if $rTime < $riDayRanges[$day][0] || $rTime >= $riDayRanges[$day][1]}
+                                            r-unreservable
+                                        {else}
+                                            {var $classSet = false}
+                                            {foreach $rsArr[$day] as $r}
+                                                {if
+                                                    $rTime >= $r['minutesFrom']
+                                                    && $rTime + $ri->reservablePeriod <= $r['minutesTo']
+                                                }
+                                                    r-reserved
+
+                                                    {var $reservedReservation = $r['reservation']}
+                                                    {var $classSet = true}
+                                                    {breakIf true}
+                                                {/if}
+                                            {/foreach}
+                                            
+                                            {if $now > (clone $auxDate)->modify('+' . $rTime . ' minutes')}
+                                                r-past
+                                                {var $classSet = true}
+                                            {/if}
+
+                                            {if !$classSet}
+                                                r-free
+                                            {/if}
+                                        {/if}
+                                    "
+                                    data-toggle="tooltip"
+                                    data-html="true"
+                                    title="
+                                        {var $timeRange = $timeRanges[($rTime - $timeFromMin) / $ri->reservablePeriod]}
+                                        {$timeRange[0]} - {$timeRange[1]}<br>
+                                        {$auxDate|date:'j. n. Y'}<br>
+                                        {$days[$day]}
+                                        {if $adminMode && $reservedReservation}
+                                            <br>
+                                            {$reservedReservation->customer ? $reservedReservation->customer->name . ' ' . $reservedReservation->customer->surname}
+                                        {/if}
+                                    "
+                                    data-minute-from="{$rTime}"
+                                    data-minute-to="{$rTime + $ri->reservablePeriod}"
+                                    {if $adminMode && $reservedReservation}
+                                        data-reservation-id="{$reservedReservation->id}"
+                                    {/if}
+                                >
+                                    
+                                </td>
+                            {/for}
+                        </tr>
+                    {/for}
+                    </tbody>
+                </table>
+            </div>
+            <div class="r-legend text-center">
+                <span class="mx-1"><span class="legend-item r-free"></span> Volné</span>
+                <span class="mx-1"><span class="legend-item r-reserved"></span> Obsazené</span>
+                <span class="mx-1"><span class="legend-item r-free r-selected"></span> Vybrané</span>
+                <span class="mx-1">
+                    <span class="legend-item">
+                        <div class="legend-item-half r-past"></div>
+                        <div class="legend-item-half r-past r-reserved"></div>
+                    </span> Uplynulé
+                </span>
+                <span class="mx-1"><span class="legend-item border"></span> Mimo termín</span>
+            </div>
+        </div>
+        {if $adminMode}
+        <div class="col-xl-1 d-flex align-items-center">
+            <button type="button" class="btn btn-primary" id="newReservationButt">Nová rezervace <i class="fa fa-plus"></i></button>
+        </div>
+        {else}
+            <div id="r-form-{$ri->id}" class="r-form d-flex align-items-center {if $rColumns < 14}col-xl-4{else}col-xl-6{/if} my-5">
+                {form form}
+                    <div class="form-row">
+                        {include bootstrap-input $form, 'date', 6}
+                        <div class="col-md-6"></div>
+                        {include bootstrap-input $form, 'timeFrom', 6}
+                        {include bootstrap-input $form, 'timeTo', 6}
+                        {include bootstrap-input $form, 'name', 6}
+                        {include bootstrap-input $form, 'surname', 6}
+                        {include bootstrap-input $form, 'email', 6}
+                        {include bootstrap-input $form, 'phone', 6}
+                        {include bootstrap-input $form, 'gdpr', 12}
+                    </div>
+                    <button type="submit" class="btn btn-special">Odeslat</button>
+                {/form}
+            </div>
+        {/if}
+    </div>
+</div>

@@ -1,0 +1,6 @@
+{**
+ * @param $item    Ublaboo\DataGrid\Row
+*}
+{if $item && $item->$column && file_exists($item->$column)}
+    <img src="{$basePath}/{$item->$column}" alt="{basename($item->$column)}">
+{/if}

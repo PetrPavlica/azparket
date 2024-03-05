@@ -1,0 +1,113 @@
+
+{import '../../templates/form.latte'}
+{ifset $currConfData}
+{*<input type="hidden" name="id" value="{$confId}" />*}
+    <h2>{$conf->name}</h2>
+    <p><b>Vybírejte položky postupně</b>.
+    Po vyplnění se Vám zobrazí sada produktů vyhovující Vašim požadavkům, pokud&nbsp;ne,
+    tak Vás poprosíme o vyplnění zprávy poptávky a společně s volbami budou po odeslání předány obchodníkovi
+    pro nalezení dalších řešení.</p>
+    <div class="form-row position-relative">
+        <div class="spinner-wrap spinner-wrap-light" id="spin-conf-inputs" style="display: none;"><div class="spinner-dual-ring"></div></div>
+        {foreach $conf->inputs as $ciKey => $ci}
+            <div class="form-group col-md-7">
+                <label class="w-100">{$iterator}. {$ci->name} <span data-toggle="tooltip" title="{$ci->description}" class="pull-right fa fa-question"></span></label>
+                <select name="{$ci->webName}" class="form-control selectpicker" data-ciid="{$ci->id}" {if !isset($currConfData['inputs'][$ci->id]) || !$currConfData['inputs'][$ci->id]['active']}disabled{/if}>
+                    {ifset $currConfData['inputs'][$ci->id]}
+                        <option value="" {if $currConfData['inputs'][$ci->id]['value'] === ''}selected diasbled{/if}>Vyberte</option>
+                        {foreach $currConfData['inputs'][$ci->id]['items'] as $itemKey => $item}
+                            <option value="{$itemKey}" {if $currConfData['inputs'][$ci->id]['value'] === $itemKey}selected{/if}>{$item}</option>
+                        {/foreach}
+                    {/ifset}
+                </select>
+            </div>
+            <div class="col-md-5" style="font-size:.95rem">
+                <div>{$ci->description}</div>
+            </div>
+        {/foreach}
+    </div>
+    {if isset($confProducts[$confId]) && $confProducts[$confId]}
+        <div class="products mb-3">
+            <h3>Produkty</h3>
+            {foreach $confProducts[$confId] as  $p}
+                {$p['count']}x {$p['product']->klic_polozky}: {$p['product']->nazev_polozky} (interní ID {$p['product']->id}){if !$iterator->isLast()}<br>{/if}
+            {/foreach}
+        </div>
+    {/if}
+{/ifset}
+
+{form form}
+
+    <div class="{if isset($currConfData) && !$currConfData['salesman'] && !$currConfData['filled']}d-none{/if}">
+        <h3>Údaje poptávky</h3>
+        <div class="form-group">
+            <div class="form-row">
+                {include bootstrap-input $form, 'message', 12}
+                {include bootstrap-input $form, 'company', 6}
+                {include bootstrap-input $form, 'ico', 6}
+                {include bootstrap-input $form, 'name', 6}
+                {include bootstrap-input $form, 'surname', 6}
+                {include bootstrap-input $form, 'email', 6}
+                {include bootstrap-input $form, 'phone', 6}
+                {include bootstrap-input $form, 'installCity', 6}
+                {include bootstrap-input $form, 'installZip', 6}
+                <div class="col-md-12">
+                    <div class="form-row mt-n4">
+                    {include bootstrap-input $form, 'familyHouse', 6}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <div {ifset $hideButtons}class="d-none"{/ifset}>
+            {ifset $currConfData}
+                {if !$currConfData['salesman'] && !$currConfData['filled']}
+                    <a n:href="configuratorForceSalesman! confId => $confId" class="btn btn-primary ajax">Raději napsat obchodníkovi</a>
+                {/if}
+            {/ifset}
+            <button type="submit" name="send-inq" class="btn {if isset($currConfData) && !$currConfData['filled'] && !$currConfData['salesman']}disabled btn-secondary{else}btn-primary{/if}">Odeslat</button>
+            
+            {ifset $currConfData}
+                <a n:href="configuratorReset! confId => $confId" class="btn btn-outline-danger btn-sm ajax pull-right">Resetovat</a>
+            {/ifset}
+        </div>
+{/form}
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        $(document).on('change', '#product-configurator select', (event) => {
+            $el = $(event.target);
+            let data = {};
+            data.inputId = $el.data('ciid');
+            data.nextNodeId = $el.val();
+            data.confId = $el.parents('.conf-data').data('cid');
+
+            $('.spinner-wrap').show();
+
+            $.nette.ajax({
+                url: {link configuratorUpdate!},
+                type: 'POST',
+                data: data,
+                /*off: {
+                    snippets: true
+                }*/
+            }).done(function (payload) {
+
+            });
+        });
+
+        {*$(function() {
+            var confEl = $('#product-configurator');
+            var confItemsEl = $('#product-configurator .conf-items');
+            /*for(var key in confItems) {
+                confItemsEl.append('');
+            }*/
+            $(document).on('click', '#product-configurator .conf-items button', function(e) {
+                confEl.find('.conf-selected').html('<span class="btn btm-primary-outline my-1">' + confItems[$(this).data('index')] + '</span>');
+            });
+        });*}
+
+    });
+</script>

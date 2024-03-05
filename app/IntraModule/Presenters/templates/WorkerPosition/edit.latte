@@ -1,0 +1,122 @@
+{block title}
+    {ifset $entity}
+        {_'Editace pracovní pozice'}
+    {else}
+        {_'Přidání pracovní pozice'}
+    {/ifset}
+{/block}
+{block description}
+    {ifset $entity}
+        {_'Editace stávající pracovní pozice zaměstnance'}
+    {else}
+        {_'Přidání nové pracovní pozice zaměstnance'}
+    {/ifset}
+{/block}
+{block header-icon}<i class="fa fa-briefcase icon-gradient bg-mean-fruit"></i>{/block}
+{block content}
+
+    <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
+        <li class="nav-item"><a class="nav-link {if empty($openTab) || $openTab == '#home'}active show{/if}" data-toggle="tab" id="tab-1" href="#home" role="tab"><span>Základní informace</span></a></li>
+        <li class="nav-item" {if !isset($entity)}title="{_'Je nutné uložit formulář'}" style="cursor:not-allowed"{/if}>
+            <a class="nav-link {if !isset($entity)}disabled{/if} {if $openTab == '#workers'}active show{/if}" data-toggle="tab" id="tab-2" href="#workers" role="tab">
+                <span>Zaměstnanci</span>
+            </a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+
+        <div id="home" class="tab-pane tabs-animation fade {if empty($openTab) || $openTab == '#home'}active show{/if}">
+            <div n:snippet='owf-form'>
+                {form form}
+                    <div class="card mb-2" id="card-home">
+                        <div class="card-body">
+                            <div class="form-row">
+                                {include bootstrap-input $form, 'name', 4}
+                                {include bootstrap-input $form, 'short', 4}
+                                {include bootstrap-input $form, 'workplace', 4}
+                                {include bootstrap-input $form, 'description', 12}
+                                {include bootstrap-input $form, 'superiorPositions', 6}
+                                {include bootstrap-input $form, 'subordinatePositions', 6}
+                                {include bootstrap-input $form, 'skills', 12}
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+
+                    <div class="card" id="card-buttons">
+                        <div class="card-body">
+                            <a n:href="WorkerPosition:default" class="btn btn-outline-primary">
+                                <span class="fa fa-arrow-left" aria-hidden="true"></span>
+                                Zpět
+                            </a>
+                            <span class="pull-right">
+                                <button name="sendBack" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a zpět</button>
+                                <button name="send" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit</button>
+                                <button name="sendNew" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a nový</button>
+                            </span>
+                        </div>
+                    </div>
+
+                {/form}
+            </div>
+        </div>
+
+        {if isset($entity)}
+            <div id="workers" class="t2 tab-pane tabs-animation fade accordion {if $openTab == '#workers'}show active{/if}">
+                <div class="card">
+                    <div class="card-header">
+                        {_'Zaměstnanci v pozici'}
+                        <span style="cursor: pointer" class="addWorker btn btn-primary ml-auto" data-toggle="modal" data-target="#workerModal" data-id="0">
+                            <i class="fa fa-plus"></i> {_'Přidat zaměstnance'}
+                        </span>
+                    </div>
+                    <div class="card-body p-0"></div>
+                </div>
+                {control tableWorkers}
+            </div>
+        {/if}
+
+    </div>
+{/block}
+
+{block scriptsBot}
+   <div n:ifset="$entity" class="modal fade" id="workerModal" tabindex="-1" role="dialog" aria-labelledby="workerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+            <div class="modal-content" n:snippet="workerModal">
+                {form workerModalForm}
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="workerModalLabel">Přidání zaměstnance do pozice</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="position" data-autosubmit="" id="frm-position" value="{$entity->id}">
+                        <div class="col-md-12 mb-4">
+                            <div class="row">
+                                <div class="col-md-4 pt-2">
+                                    <span>Zaměstnanec</span>
+                                </div>
+                                <div class="col-md-8">
+                                    {input worker}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Přidat</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Zavřít</button>
+                    </div>
+                {/form}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var url = document.location.toString();
+        if (url.match('#')) {
+            $('.nav-tabs a[href="#' + url.split('#')[1] + '"]').tab('show');
+        }
+    </script>
+{/block}

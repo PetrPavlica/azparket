@@ -1,0 +1,69 @@
+{block title}
+    {_'Odeslání dokumentů'}
+{/block}
+{block description}
+    {_'Odeslání dokumentů emailem'}
+{/block}
+{block header-icon}<i class="fa fa-suitcase icon-gradient bg-happy-itmeo"></i>{/block}
+{block header-actions}
+    <a n:href="Visit:edit id => $visit->id" class="btn btn-outline-primary">
+        {_'Zpět'}
+    </a>
+{/block}
+{block content}
+    <div class="card">
+        <div class="card-body">
+            {form sendDocsForm}
+                {input docIds}
+                {input id}
+                <div class="col-xs-12 col-sm-12 col-md-4 offset-md-4">
+                    <div class="form-row">
+                        {include bootstrap-input $form, 'note', 12}
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-xs-12 col-sm-12 col-md-3">
+                            Zadejte email:
+                        </div>
+                        <div class="col-xs-12 col-sm-12 col-md-9" style="text-align: right;">
+                            <div class="add-email btn btn-success btn-sm">+ Email</div>
+                            <div class="remove-email btn btn-danger btn-sm">- Email</div>
+                        </div>
+                    </div>
+                    <div id="emails_wrap" class="">
+                        <div id="email-1">
+                            <input type="email" name="email-1" placeholder="zadejte email" class="form-control" autocomplete="off" required data-nette-rules='[{"op":":filled","msg":"Toto pole je povinné."},{"op":":email","msg":"Prosím zadejte platnou emailovou adresu."}]'>
+                        </div>
+                    </div>
+                    <br><br>
+                    <span style="">
+                        <a n:href="Visit:edit id => $visit->id" class="btn btn-outline-primary">
+                            {_'Zpět'}
+                        </a>
+                    </span>
+                    <span class="pull-right">
+                        <button name="send" type="submit" class="btn btn-primary">{_'Odeslat'}</button>
+                    </span>
+                </div>
+            {/form}
+        </div>
+    </div>
+{/block}
+{block scriptsBot}
+    <script>
+        let countEmail = 1;
+        $(document).on('click', '.add-email', function (e) {
+            oldCount = countEmail;
+            countEmail += 1;
+            $('#email-'+oldCount).after('<div id="email-'+countEmail+'" style="margin-top: 16px;"><input type="email" name="email-'+countEmail+'" placeholder="zadejte email" class="form-control" autocomplete="off" required data-nette-rules=\'[{"op":":filled","msg":"Toto pole je povinné."},{"op":":email","msg":"Prosím zadejte platnou emailovou adresu."}]\'></div>');
+        });
+        $(document).on('click', '.remove-email', function (e) {
+            if (countEmail > 1) {
+                oldCount = countEmail;
+                countEmail -= 1;
+                $('#email-' + oldCount).remove();
+            } else {
+                alert('Musí zůstat alespoň jeden příjemce!');
+            }
+        });
+    </script>
+{/block}

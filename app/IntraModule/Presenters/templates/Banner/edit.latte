@@ -1,0 +1,112 @@
+{block title}
+    {ifset $banner}
+        Úprava banneru
+    {else}
+        Přidání nového banneru
+    {/ifset}
+{/block}
+{block description}
+    {ifset $banner}
+        Editace banneru na přední stránce webu
+    {else}
+        Přidání banneru na přední stránce webu
+    {/ifset}
+{/block}
+{block header-icon}<i class="fa fa-images icon-gradient bg-mean-fruit"></i>{/block}
+{block header-actions}{/block}
+{block content}
+    {form bannerForm, class => "form-horizontal"}
+        {input id}
+        <div class="card mb-2">
+            <div class="card-header">{_'Obecné'}</div>
+            <div class="card-body">
+                <div class="row">
+
+                    <div class="col-md-6">
+                        <div class="row">
+                            {include bootstrap-input $form, 'orderBanner', 12}
+                            {include bootstrap-input $form, 'type', 12}
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    {label image /}<br>
+                                    {input image}
+                                    {snippet img}
+                                        {if isset($banner) && $banner->image}
+                                            <div n:if="$banner->image" class="form-row">
+                                                <div class="col-10 my-2">
+                                                    <a href="{$basePath}/{$banner->image}" class="fancybox">
+                                                        <img src="{$basePath}/{$banner->image}?time={php echo time()}" style="max-height: 100px; width: auto; max-width: 100%">
+                                                    </a>
+                                                </div>
+                                                <div class="col-2 my-2">
+                                                {*delete ajax*}
+                                                    <a n:href="deleteImg! bannerId => $banner->id" class="btn btn-xs btn-danger ">
+                                                        <span class="fa fa-trash"></span>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        {/if}
+                                    {/snippet}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-2">
+            <div class="card-header">
+                {_'Jazyková nastavení'}
+                <ul class="w-auto ml-auto py-1 body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
+                    {foreach $langs as $l}
+                        <li class="nav-item"><a class="nav-link {if $locale == $l->code}show active{/if}" data-toggle="tab" href="#{$l->code}" role="tab"><span>{$l->name}</span></a></li>
+                    {/foreach}
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content">
+                    {foreach $langs as $l}
+                        <div id="{$l->code}" class="tab-pane tabs-animation fade {if $locale == $l->code}show active{/if}">
+                            <input type="hidden" name="langId[{$l->code}]" value="{ifset $dataLang[$l->code]['id']}{$dataLang[$l->code]['id']}{/ifset}">
+                            <div class="row">
+                                <div class="col-sm-12 col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Název</label>
+                                        <input type="text" name="name[{$l->code}]" placeholder="Název" class="form-control" value="{ifset $dataLang[$l->code]['name']}{$dataLang[$l->code]['name']}{/ifset}">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Odkaz</label>
+                                        <input type="text" name="link[{$l->code}]" placeholder="Odkaz" class="form-control" value="{ifset $dataLang[$l->code]['link']}{$dataLang[$l->code]['link']}{/ifset}">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-6">
+                                    <label class="control-label"></label>
+                                    <div class="form-group">
+                                        <label for="active[{$l->code}]"><input type="checkbox" id="active[{$l->code}]" name="active[{$l->code}]" {if (isset($dataLang[$l->code]['active']) && $dataLang[$l->code]['active']) || !isset($dataLang)}checked{/if}> Zobrazit</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="text[{$l->code}]">Text</label>
+                                        <textarea id="text[{$l->code}]" name="text[{$l->code}]" class="ckeditor">{ifset $dataLang[$l->code]['text']}{$dataLang[$l->code]['text']}{/ifset}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {/foreach}
+                </div>
+            </div>
+        </div>
+        {control renderer $form, 'btns'}
+    {/form}
+{/block}

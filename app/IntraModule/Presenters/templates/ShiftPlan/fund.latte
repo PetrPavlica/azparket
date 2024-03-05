@@ -1,0 +1,340 @@
+{block title}{_'Plánování fondů'}{/block}
+{*block description}{_'Přehled směn pro linku'} {$aaType}{/block}
+{block header-icon}<i class="fa fa-box icon-gradient bg-mean-fruit"></i>{/block*}
+{block header-actions-top}
+
+    <div class="top-week">
+        <a n:href="ShiftPlan:fund yeara => $previousYear">
+            <i class="fa fa-chevron-left"></i>
+        </a>
+        <div class="week-number date-btn">
+            <span>{$yeara}</span>
+            <input type="text" id="date" value="{$dateInput}" autocomplete="off" />
+        </div>
+        <a n:href="ShiftPlan:fund yeara => $nextYear">
+            <i class="fa fa-chevron-right"></i>
+        </a>
+    </div>
+
+
+{/block}
+{block content}
+    <div style="padding-bottom: 10px;">
+        <a n:href="exportFunds! year => $yeara" class="btn btn-info btn-sm" target="_blank" style="float: right; z-index: 20;">
+            <i class="fa fa-file-excel"></i> &nbsp;XLS
+        </a>
+    </div>
+
+
+    <div n:snippet="snippFundA" class="col-md-12" style="margin-bottom: 10px;">
+        <h5>Směna A</h5>
+        {var $fpdTotalA = 0}
+        {foreach $cusMonths as $monthName}
+            <div class="row cols-cus-35">
+                {foreach $cusDays as $dayName}
+                    {if $monthName == ''}
+                        <div class="col-md-1 {if $dayName == 'F.P.D.'}cus35-md-3{else}cus35-md-1{/if} ssp-border d-flex align-items-center justify-content-center">
+                            <div style="font-size: medium; font-weight: 500;">
+                                {$dayName}
+                            </div>
+                        </div>
+                    {else}
+                        {if is_numeric($dayName)}
+                            {ifset $spotsA[$monthName.'-'.$dayName]}
+                                <div class="switchShiftSpot col-md-1 cus35-md-1 {if $spotsA[$monthName.'-'.$dayName]->active}ssp-active{else}ssp-disabled{/if} ssp-border d-flex align-items-center justify-content-center"
+                                     data-id="{$spotsA[$monthName.'-'.$dayName]->id}" style="cursor: pointer">
+                                    <div style="font-size: medium; font-weight: 500;">
+                                        {if $spotsA[$monthName.'-'.$dayName]->name == 1}R{else}N{/if}
+                                    </div>
+                                </div>
+                            {elseifset $spotsCheck[$monthName.'-'.$dayName]}
+                                <div class="col-md-1 cus35-md-1 ssp-disabled ssp-border d-flex align-items-center justify-content-center">
+                                    <div style="font-size: medium; font-weight: 500;">
+                                        v
+                                    </div>
+                                </div>
+                            {else}
+                                <div class="col-md-1 cus35-md-1 ssp-empty ssp-border d-flex align-items-center justify-content-center">
+                                    <div style="font-size: medium; font-weight: 500;">
+                                        &nbsp;
+                                    </div>
+                                </div>
+                            {/ifset}
+                        {else}
+                            {if $dayName == 'M'}
+                                <div class="col-md-1 cus35-md-1 ssp-border d-flex align-items-center justify-content-center">
+                                    <div style="font-size: medium; font-weight: 500;">
+                                        {$monthName}
+                                    </div>
+                                </div>
+                            {else}
+                                <div class="col-md-1 cus35-md-3 ssp-border d-flex align-items-center justify-content-center">
+                                    <div style="font-size: medium; font-weight: 500;">
+                                        {ifset $fpdA[$monthName]}{$fpdA[$monthName]}{var $fpdTotalA += $fpdA[$monthName]}{else}&nbsp;{/ifset}
+                                    </div>
+                                </div>
+                            {/if}
+                        {/if}
+                    {/if}
+                {/foreach}
+            </div>
+        {/foreach}
+        <div class="row cols-cus-35">
+            <div class="col-md-1 cus35-md-32 d-flex align-items-center justify-content-center">
+                <div style="font-size: medium; font-weight: 500;">
+                    &nbsp;
+                </div>
+            </div>
+            <div class="col-md-1 cus35-md-3 d-flex align-items-center justify-content-center">
+                <div style="font-size: medium; font-weight: 500;">
+                    {$fpdTotalA}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div n:snippet="snippFundB" class="col-md-12" style="margin-bottom: 10px;">
+        <h5>Směna B</h5>
+        {var $fpdTotalB = 0}
+        {foreach $cusMonths as $monthName}
+            <div class="row cols-cus-35">
+                {foreach $cusDays as $dayName}
+                    {if $monthName == ''}
+                        <div class="col-md-1 {if $dayName == 'F.P.D.'}cus35-md-3{else}cus35-md-1{/if} ssp-border d-flex align-items-center justify-content-center">
+                            <div style="font-size: medium; font-weight: 500;">
+                                {$dayName}
+                            </div>
+                        </div>
+                    {else}
+                        {if is_numeric($dayName)}
+                            {ifset $spotsB[$monthName.'-'.$dayName]}
+                                <div class="switchShiftSpot col-md-1 cus35-md-1 {if $spotsB[$monthName.'-'.$dayName]->active}ssp-active{else}ssp-disabled{/if} ssp-border d-flex align-items-center justify-content-center"
+                                     data-id="{$spotsB[$monthName.'-'.$dayName]->id}" style="cursor: pointer">
+                                    <div style="font-size: medium; font-weight: 500;">
+                                        {if $spotsB[$monthName.'-'.$dayName]->name == 1}R{else}N{/if}
+                                    </div>
+                                </div>
+                            {elseifset $spotsCheck[$monthName.'-'.$dayName]}
+                                <div class="col-md-1 cus35-md-1 ssp-disabled ssp-border d-flex align-items-center justify-content-center">
+                                    <div style="font-size: medium; font-weight: 500;">
+                                        v
+                                    </div>
+                                </div>
+                            {else}
+                                <div class="col-md-1 cus35-md-1 ssp-empty ssp-border d-flex align-items-center justify-content-center">
+                                    <div style="font-size: medium; font-weight: 500;">
+                                        &nbsp;
+                                    </div>
+                                </div>
+                            {/ifset}
+                        {else}
+                            {if $dayName == 'M'}
+                                <div class="col-md-1 cus35-md-1 ssp-border d-flex align-items-center justify-content-center">
+                                    <div style="font-size: medium; font-weight: 500;">
+                                        {$monthName}
+                                    </div>
+                                </div>
+                            {else}
+                                <div class="col-md-1 cus35-md-3 ssp-border d-flex align-items-center justify-content-center">
+                                    <div style="font-size: medium; font-weight: 500;">
+                                        {ifset $fpdB[$monthName]}{$fpdB[$monthName]}{var $fpdTotalB += $fpdB[$monthName]}{else}&nbsp;{/ifset}
+                                    </div>
+                                </div>
+                            {/if}
+                        {/if}
+                    {/if}
+                {/foreach}
+            </div>
+        {/foreach}
+        <div class="row cols-cus-35">
+            <div class="col-md-1 cus35-md-32 d-flex align-items-center justify-content-center">
+                <div style="font-size: medium; font-weight: 500;">
+                    &nbsp;
+                </div>
+            </div>
+            <div class="col-md-1 cus35-md-3 d-flex align-items-center justify-content-center">
+                <div style="font-size: medium; font-weight: 500;">
+                    {$fpdTotalB}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div n:snippet="snippFundC" class="col-md-12" style="margin-bottom: 10px;">
+        <h5>Směna C</h5>
+        {var $fpdTotalC = 0}
+        {foreach $cusMonths as $monthName}
+            <div class="row cols-cus-35">
+                {foreach $cusDays as $dayName}
+                    {if $monthName == ''}
+                        <div class="col-md-1 {if $dayName == 'F.P.D.'}cus35-md-3{else}cus35-md-1{/if} ssp-border d-flex align-items-center justify-content-center">
+                            <div style="font-size: medium; font-weight: 500;">
+                                {$dayName}
+                            </div>
+                        </div>
+                    {else}
+                        {if is_numeric($dayName)}
+                            {ifset $spotsC[$monthName.'-'.$dayName]}
+                                <div class="switchShiftSpot col-md-1 cus35-md-1 {if $spotsC[$monthName.'-'.$dayName]->active}ssp-active{else}ssp-disabled{/if} ssp-border d-flex align-items-center justify-content-center"
+                                     data-id="{$spotsC[$monthName.'-'.$dayName]->id}" style="cursor: pointer">
+                                    <div style="font-size: medium; font-weight: 500;">
+                                        {if $spotsC[$monthName.'-'.$dayName]->name == 1}R{else}N{/if}
+                                    </div>
+                                </div>
+                            {elseifset $spotsCheck[$monthName.'-'.$dayName]}
+                                <div class="col-md-1 cus35-md-1 ssp-disabled ssp-border d-flex align-items-center justify-content-center">
+                                    <div style="font-size: medium; font-weight: 500;">
+                                        v
+                                    </div>
+                                </div>
+                            {else}
+                                <div class="col-md-1 cus35-md-1 ssp-empty ssp-border d-flex align-items-center justify-content-center">
+                                    <div style="font-size: medium; font-weight: 500;">
+                                        &nbsp;
+                                    </div>
+                                </div>
+                            {/ifset}
+                        {else}
+                            {if $dayName == 'M'}
+                                <div class="col-md-1 cus35-md-1 ssp-border d-flex align-items-center justify-content-center">
+                                    <div style="font-size: medium; font-weight: 500;">
+                                        {$monthName}
+                                    </div>
+                                </div>
+                            {else}
+                                <div class="col-md-1 cus35-md-3 ssp-border d-flex align-items-center justify-content-center">
+                                    <div style="font-size: medium; font-weight: 500;">
+                                        {ifset $fpdC[$monthName]}{$fpdC[$monthName]}{var $fpdTotalC += $fpdC[$monthName]}{else}&nbsp;{/ifset}
+                                    </div>
+                                </div>
+                            {/if}
+                        {/if}
+                    {/if}
+                {/foreach}
+            </div>
+        {/foreach}
+        <div class="row cols-cus-35">
+            <div class="col-md-1 cus35-md-32 d-flex align-items-center justify-content-center">
+                <div style="font-size: medium; font-weight: 500;">
+                    &nbsp;
+                </div>
+            </div>
+            <div class="col-md-1 cus35-md-3 d-flex align-items-center justify-content-center">
+                <div style="font-size: medium; font-weight: 500;">
+                    {$fpdTotalC}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div n:snippet="snippFundD" class="col-md-12" style="margin-bottom: 10px;">
+        <h5>Směna D</h5>
+        {var $fpdTotalD = 0}
+        {foreach $cusMonths as $monthName}
+            <div class="row cols-cus-35">
+                {foreach $cusDays as $dayName}
+                    {if $monthName == ''}
+                        <div class="col-md-1 {if $dayName == 'F.P.D.'}cus35-md-3{else}cus35-md-1{/if} ssp-border d-flex align-items-center justify-content-center">
+                            <div style="font-size: medium; font-weight: 500;">
+                                {$dayName}
+                            </div>
+                        </div>
+                    {else}
+                        {if is_numeric($dayName)}
+                            {ifset $spotsD[$monthName.'-'.$dayName]}
+                                <div class="switchShiftSpot col-md-1 cus35-md-1 {if $spotsD[$monthName.'-'.$dayName]->active}ssp-active{else}ssp-disabled{/if} ssp-border d-flex align-items-center justify-content-center"
+                                     data-id="{$spotsD[$monthName.'-'.$dayName]->id}" style="cursor: pointer">
+                                    <div style="font-size: medium; font-weight: 500;">
+                                        {if $spotsD[$monthName.'-'.$dayName]->name == 1}R{else}N{/if}
+                                    </div>
+                                </div>
+                            {elseifset $spotsCheck[$monthName.'-'.$dayName]}
+                                <div class="col-md-1 cus35-md-1 ssp-disabled ssp-border d-flex align-items-center justify-content-center">
+                                    <div style="font-size: medium; font-weight: 500;">
+                                        v
+                                    </div>
+                                </div>
+                            {else}
+                                <div class="col-md-1 cus35-md-1 ssp-empty ssp-border d-flex align-items-center justify-content-center">
+                                    <div style="font-size: medium; font-weight: 500;">
+                                        &nbsp;
+                                    </div>
+                                </div>
+                            {/ifset}
+                        {else}
+                            {if $dayName == 'M'}
+                                <div class="col-md-1 cus35-md-1 ssp-border d-flex align-items-center justify-content-center">
+                                    <div style="font-size: medium; font-weight: 500;">
+                                        {$monthName}
+                                    </div>
+                                </div>
+                            {else}
+                                <div class="col-md-1 cus35-md-3 ssp-border d-flex align-items-center justify-content-center">
+                                    <div style="font-size: medium; font-weight: 500;">
+                                        {ifset $fpdD[$monthName]}{$fpdD[$monthName]}{var $fpdTotalD += $fpdD[$monthName]}{else}&nbsp;{/ifset}
+                                    </div>
+                                </div>
+                            {/if}
+                        {/if}
+                    {/if}
+                {/foreach}
+            </div>
+        {/foreach}
+        <div class="row cols-cus-35">
+            <div class="col-md-1 cus35-md-32 d-flex align-items-center justify-content-center">
+                <div style="font-size: medium; font-weight: 500;">
+                    &nbsp;
+                </div>
+            </div>
+            <div class="col-md-1 cus35-md-3 d-flex align-items-center justify-content-center">
+                <div style="font-size: medium; font-weight: 500;">
+                    {$fpdTotalD}
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}
+
+{block scriptsBot}
+    <script>
+
+            $( function() {
+                $(document).on('click', '.switchShiftSpot', function (e) {
+                    $.nette.ajax({
+                        url: {link switchShiftSpot!},
+                        type: 'POST',
+                        data: {
+                            plan : $(this).attr('data-id')
+                        },
+                        off: {
+                            snippets: true
+                        }
+                    });
+                });
+            });
+
+
+        $("#date").datepicker({
+            format: "yyyy",
+            language: 'cs',
+            startView: 2,
+            minViewMode: 2
+        }).on('changeDate', function(e) {
+            let eDate = new Date(e.date.getTime());
+            let nDay = (eDate.getDay() + 6) % 7;
+            eDate.setDate(eDate.getDate() - nDay + 3);
+            let n1stThursday = eDate.valueOf();
+            eDate.setMonth(0, 1);
+            if (eDate.getDay() !== 4) {
+                eDate.setMonth(0, 1 + ((4 - eDate.getDay()) + 7) % 7);
+            }
+            let dateString = e.date.getFullYear();
+            let yearUrl = e.date.getFullYear();
+
+            $(".week-number").find("span").text(dateString);
+            let fullLink = {link ShiftPlan:fund test=>0};
+            fullLink = fullLink.split('?')[0];
+            location.href = fullLink + '?yeara=' + yearUrl;
+        });
+    </script>
+{/block}

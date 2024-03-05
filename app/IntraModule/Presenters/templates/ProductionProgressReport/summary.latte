@@ -1,0 +1,154 @@
+{block title}{_'Průběh výroby - Sestava KTL - souhrn'}{/block}
+{*block description}{_'Provozní deník'}{/block}
+{block header-icon}<i class="fa fa-check icon-gradient bg-mean-fruit"></i>{/block*}
+{block header-actions-top}
+    <div class="top-week">
+        <input type="text" id="date-range" value="{$dateInput}" data-toggle="datetimerangepicker" autocomplete="off" style="width: 28rem;" />
+    </div>
+{/block}
+{block content}
+    <div class="d-flex align-items-center justify-content-between">
+        <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
+            <li class="nav-item"><a class="nav-link" n:href="ProductionProgressReport: type => $aaType, week => null, year => null, dateRange => null"><span>Týdenní</span></a></li>
+            <li class="nav-item"><a class="nav-link show active" n:href="ProductionProgressReport:summary type => $aaType, dateRange => $dateInput"><span>Souhrnný dle výběru</span></a></li>
+            <li class="nav-item"><a class="nav-link" n:href="ProductionProgressReport:shiftSummary type => $aaType, dateRange => $dateInput"><span>Souhrnný dle směn</span></a></li>
+        </ul>
+
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#normSetting">
+            Změnit normy
+        </button>
+    </div>
+
+    <div class="table-responsive" style="padding-left: 1.25rem;">
+        <table class="table table-bordered table-hover statistics-table">
+            <thead>
+            <tr>
+                <th width="35px"></th>
+                {foreach $columnsA as $column}
+                    <th class="text-center font-weight-bold">{if is_string($column)}{$column}{else}&nbsp;{/if}</th>
+                {/foreach}
+            </tr>
+            </thead>
+            {foreach $groups as $groupId => $group}
+                <tbody class="parent-tbody {if !isset($tbodyVisible[$groupId]) || $tbodyVisible[$groupId]}d-none{/if}" data-group="{$groupId}">
+                <tr>
+                    <td colspan="{count($columnsA)}" style="background-color: {$groupColor[$groupId]|noescape};">
+                        {$group}
+                        <span class="btn-absolute">
+                                <i class="fa fa-plus-square"></i>
+                            </span>
+                    </td>
+                </tr>
+                </tbody>
+                <tbody class="child-tbody {if isset($tbodyVisible[$groupId]) && !$tbodyVisible[$groupId]}d-none{/if}" data-group="{$groupId}">
+                {var $firstLoop = true}
+                {foreach $floorsA[$groupId] as $indexFloor => $floor}
+                    <tr>
+                        <td n:if="$firstLoop" rowspan="{count($floorsA[$groupId])}" class="col-vertical" style="background-color: {$groupColor[$groupId]|noescape};" data-toggle="tooltip" title="{$group}">
+                            <span class="vertical-value">{$group}</span>
+                            <span class="btn-absolute">
+                                <i class="fa fa-minus-square"></i>
+                            </span>
+                        </td>
+                        {var $firstLoop = false}
+                        {foreach $columnsA as $ymd => $column}
+                            {if $floor >= 0}
+                                {if is_string($column)}
+                                    <td class="col-value">
+                                        {foreach $placesA as $place}
+                                            {ifset $spotsA[$ymd.'_'.$groupId.'_'.$floor]}
+                                                {$spotsA[$ymd.'_'.$groupId.'_'.$floor]['name']}
+                                            {else}
+                                                &nbsp;
+                                            {/ifset}
+                                        {/foreach}
+                                    </td>
+                                {else}
+                                    <td>
+                                        {$cusFloors[$floor]|noescape}
+                                    </td>
+                                {/if}
+                            {else}
+                                <td class="font-weight-bold text-center">
+                                    {if isset($plansA[$ymd.'_'.($floor*-1)])}
+                                        {$plansA[$ymd.'_'.($floor*-1)]['shift']}
+                                    {else}
+                                        &nbsp;
+                                    {/if}
+                                </td>
+                            {/if}
+                        {/foreach}
+                    </tr>
+                {/foreach}
+                </tbody>
+            {/foreach}
+        </table>
+    </div>
+{/block}
+
+{block scriptsBot}
+    <script>
+        $(document).on('change', '#date-range', function() {
+            let val = $(this).val();
+            let fullLink = {link ProductionProgressReport:summary test=>0};
+            fullLink = fullLink.split('?')[0];
+            let typeUrl = {$aaType};
+            location.href = fullLink + "?dateRange=" + val + '&type=' + typeUrl;
+        });
+        $(document).on('click', '.parent-tbody', function() {
+            let groupId = $(this).data('group');
+            $.nette.ajax({
+                url: {link toggleTbody!},
+                data: {
+                    groupId: groupId,
+                    visible: true
+                }
+            });
+            $(this).addClass('d-none');
+            $(document).find('.child-tbody[data-group="' + groupId + '"]').removeClass('d-none');
+        });
+
+        $(document).on('click', '.child-tbody td.col-vertical', function() {
+            let tbody = $(this).closest('tbody');
+            let groupId = tbody.data('group');
+            $.nette.ajax({
+                url: {link toggleTbody!},
+                data: {
+                    groupId: groupId,
+                    visible: false
+                }
+            });
+            tbody.addClass('d-none');
+            $(document).find('.parent-tbody[data-group="' + groupId + '"]').removeClass('d-none');
+        });
+    </script>
+{/block}
+
+{block modal-content}
+    <div class="modal fade" id="normSetting">
+        <div class="modal-dialog">
+            {form normSettingForm}
+                {input id}
+                {input line}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Změna norem</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="form-row">
+                        {include bootstrap-input $form, 'numberPeoplePerShift'}
+                        {include bootstrap-input $form, 'monthlyLaborCosts'}
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button n:name="send" class="btn btn-primary">Uložit</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Zavřít</button>
+                </div>
+            </div>
+            {/form}
+        </div>
+    </div>
+{/block}

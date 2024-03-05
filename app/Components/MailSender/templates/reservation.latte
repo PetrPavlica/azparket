@@ -1,0 +1,17 @@
+{$webSettings['default_reservation_email']|noescape}
+
+<br>
+<br>
+
+<b>Zde najdete obsah rezervace:</b><br>
+{if $customer->company}
+    {_'Firma'}: {$customer->company}<br>
+{/if}
+{_'Jméno'}: {$customer->name} {$customer->surname}<br>
+{_'Telefon'}: {$customer->phone}<br>
+E-mail: {$customer->email}<br>
+{_'Rezervovaná položka'}: {$reservation->reservationItem->name}<br>
+
+<br>
+
+{$webSettings['default_email_footer']|noescape}

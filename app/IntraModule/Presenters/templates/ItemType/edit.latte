@@ -1,0 +1,16 @@
+{block title}
+    {ifset $entity}
+        {_'Editace typu položky OP'}
+    {else}
+        {_'Přidání typu položky OP'}
+    {/ifset}
+{/block}
+{block description}{_'Editace typu položky obchodního případu'}{/block}
+{block header-icon}<i class="fa fa-clone icon-gradient bg-mean-fruit"></i>{/block}
+{block content}
+    <div class="card">
+        <div class="card-body">
+            {include bootstrap-form 'form'}
+        </div>
+    </div>
+{/block}

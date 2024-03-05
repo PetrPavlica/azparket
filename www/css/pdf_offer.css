@@ -1,0 +1,89 @@
+body {
+    line-height: 1.4;
+}
+
+body, div.mpdf_toc {
+    font-family: "Segoe UI";
+}
+
+h2 {
+    font-size: 20px;
+    text-transform: uppercase;
+    margin: 20px 0 0;
+}
+
+h3 {
+    font-size: 18px;
+    margin: 10px 0 0;
+}
+
+p {
+    margin: 0px 0 13px;
+}
+
+table {
+    margin-top: 10px;
+}
+
+.uppercase, table.uppercase td, table.uppercase th {
+    text-transform: uppercase;
+}
+
+.text-bigger {
+    font-size: 18px;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-center, table.text-center td, table.text-center th {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.w-100 {
+    width: 100%;
+}
+
+@page :first {
+    background: url(../assets/images/offer-bcg.png) no-repeat center 32%;
+}
+
+#uvod-table td {
+    padding-bottom: 10px;
+}
+
+div.mpdf_toc {
+    font-size: 18px;
+    text-transform: uppercase;
+}
+
+ul {
+    list-style-type: disc;
+    margin: 0;
+}
+
+.m-a {
+    margin: auto;
+}
+
+.price-table {
+    margin-top: 10px;
+    border-collapse: collapse;
+}
+
+.price-table td, .price-table th {
+    padding: 8px 60px 8px 0;
+}
+
+tr.border td, tr.border th{
+    border-bottom: 1px solid #ddd
+}

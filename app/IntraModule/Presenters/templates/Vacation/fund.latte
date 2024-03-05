@@ -1,0 +1,149 @@
+{block title}{_'Přehled dovolené'}{/block}
+{*block description}{_'Přehled dovolené'} {$aaType}{/block}
+{block header-icon}<i class="fa fa-box icon-gradient bg-mean-fruit"></i>{/block*}
+{block header-actions-top}
+
+    <div class="top-week">
+        <a n:href="Vacation:fund yeara => $previousYear">
+            <i class="fa fa-chevron-left"></i>
+        </a>
+        <div class="week-number date-btn">
+            <span>{$yeara}</span>
+            <input type="text" id="date" value="{$dateInput}" autocomplete="off" />
+        </div>
+        <a n:href="Vacation:fund yeara => $nextYear">
+            <i class="fa fa-chevron-right"></i>
+        </a>
+    </div>
+
+
+{/block}
+{block content}
+    <div n:snippet="snippFund" class="col-md-12" style="margin-bottom: 10px; background-color: #ffffff;">
+        <div class="row">
+            <div class="col-md-4 ssp-border d-flex">
+                <div style="font-size: medium; font-weight: 500;">
+                    {_'Zaměstnanec'}
+                </div>
+            </div>
+            <div class="col-md-2 ssp-border d-flex align-items-center justify-content-center">
+                <div style="font-size: medium; font-weight: 500;">
+                    {_'Základ dovolené (hod)'}
+                </div>
+            </div>
+            <div class="col-md-2 ssp-border d-flex align-items-center justify-content-center">
+                <div style="font-size: medium; font-weight: 500;">
+                    {_'Zásluhové volno (hod)'}
+                </div>
+            </div>
+            <div class="col-md-2 ssp-border d-flex align-items-center justify-content-center">
+                <div style="font-size: medium; font-weight: 500;">
+                    {_'Krácení za 30dní (hod)'}
+                </div>
+            </div>
+            <div class="col-md-2 ssp-border d-flex align-items-center justify-content-center">
+                <div style="font-size: medium; font-weight: 500;">
+                    {_'Zbývá dovolené (hod)'}
+                </div>
+            </div>
+        </div>
+        {foreach $workerArr as $wrkArr}
+            <div class="row">
+                <div class="col-md-4 ssp-border d-flex align-items-center">
+                    <div style="font-size: medium; font-weight: 400;">
+                        {$wrkArr['name']}
+                    </div>
+                </div>
+                <div class="col-md-2 ssp-border d-flex align-items-center justify-content-center">
+                    <input type="text" name="hoursBase-{$wrkArr['id']}" class="hoursBaseChange form-control" id="hoursBase-{$wrkArr['id']}" value="{$wrkArr['hoursBase']}"  data-id="{$wrkArr['id']}" autocomplete="off">
+                </div>
+                <div class="col-md-2 ssp-border d-flex align-items-center justify-content-center">
+                    <input type="text" name="hoursPlus-{$wrkArr['id']}" class="hoursPlusChange form-control" id="hoursPlus-{$wrkArr['id']}" value="{$wrkArr['hoursPlus']}"  data-id="{$wrkArr['id']}" autocomplete="off">
+                </div>
+                <div class="col-md-2 ssp-border d-flex align-items-center justify-content-center">
+                    <input type="text" name="hoursMinus-{$wrkArr['id']}" class="hoursMinusChange form-control" id="hoursMinus-{$wrkArr['id']}" value="{$wrkArr['hoursMinus']}"  data-id="{$wrkArr['id']}" autocomplete="off">
+                </div>
+                <div class="col-md-2 ssp-border d-flex align-items-center justify-content-center">
+                    <div style="font-size: medium; font-weight: 400;">
+                        {$wrkArr['hoursLeft']}
+                    </div>
+                </div>
+            </div>
+        {/foreach}
+    </div>
+{/block}
+
+{block scriptsBot}
+    <script>
+        $( function() {
+            $(document).on('change', '.hoursBaseChange', function (e) {
+                $.nette.ajax({
+                    url: {link hoursBaseChange!},
+                    type: 'POST',
+                    data: {
+                        item : $(this).attr('data-id'),
+                        val: $(this).val()
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        $( function() {
+            $(document).on('change', '.hoursPlusChange', function (e) {
+                $.nette.ajax({
+                    url: {link hoursPlusChange!},
+                    type: 'POST',
+                    data: {
+                        item : $(this).attr('data-id'),
+                        val: $(this).val()
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        $( function() {
+            $(document).on('change', '.hoursMinusChange', function (e) {
+                $.nette.ajax({
+                    url: {link hoursMinusChange!},
+                    type: 'POST',
+                    data: {
+                        item : $(this).attr('data-id'),
+                        val: $(this).val()
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        $("#date").datepicker({
+            format: "yyyy",
+            language: 'cs',
+            startView: 2,
+            minViewMode: 2
+        }).on('changeDate', function(e) {
+            let eDate = new Date(e.date.getTime());
+            let nDay = (eDate.getDay() + 6) % 7;
+            eDate.setDate(eDate.getDate() - nDay + 3);
+            let n1stThursday = eDate.valueOf();
+            eDate.setMonth(0, 1);
+            if (eDate.getDay() !== 4) {
+                eDate.setMonth(0, 1 + ((4 - eDate.getDay()) + 7) % 7);
+            }
+            let dateString = e.date.getFullYear();
+            let yearUrl = e.date.getFullYear();
+
+            $(".week-number").find("span").text(dateString);
+            let fullLink = {link Vacation:fund test=>0};
+            fullLink = fullLink.split('?')[0];
+            location.href = fullLink + '?yeara=' + yearUrl;
+        });
+    </script>
+{/block}

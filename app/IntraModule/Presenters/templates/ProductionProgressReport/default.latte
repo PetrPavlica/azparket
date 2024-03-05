@@ -1,0 +1,164 @@
+{block title}{_'Průběh výroby - Sestava KTL'}{/block}
+{*block description}{_'Provozní deník'}{/block}
+{block header-icon}<i class="fa fa-check icon-gradient bg-mean-fruit"></i>{/block*}
+{block header-actions-top}
+
+    <div class="top-week">
+        <a n:href="ProductionProgressReport: type => $aaType, week => $previousWeek, year => $previousYear">
+            <i class="fa fa-chevron-left"></i>
+        </a>
+        <div class="week-number date-btn">
+            <span>{$week}. Týden, {$year}</span>
+            <input type="text" id="date" value="{$dateInput}" autocomplete="off" />
+        </div>
+        <a n:href="ProductionProgressReport: type => $aaType, week => $nextWeek, year => $nextYear">
+            <i class="fa fa-chevron-right"></i>
+        </a>
+    </div>
+
+{/block}
+{block content}
+    <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
+        <li class="nav-item"><a class="nav-link show active" n:href="ProductionProgressReport: type => $aaType"><span>Týdenní</span></a></li>
+        <li class="nav-item"><a class="nav-link" n:href="ProductionProgressReport:summary type => $aaType, week => null, year => null"><span>Souhrnný dle výběru</span></a></li>
+        <li class="nav-item"><a class="nav-link" n:href="ProductionProgressReport:shiftSummary type => $aaType, week => null, year => null"><span>Souhrnný dle směn</span></a></li>
+    </ul>
+        <div class="table-responsive" style="padding-left: 1.25rem;">
+            <table class="table table-bordered table-hover statistics-table">
+                <thead>
+                <tr>
+                    <td rowspan="2" width="35px"></td>
+                {foreach $cusDays as $dayName}
+                    <th class="text-center font-weight-bold {if $iterator->counter >= 7}col-weekend{/if}" {if $iterator->counter == 1}width="200px"{/if}>{$dayName}</th>
+                {/foreach}
+                </tr>
+                <tr>
+                    {foreach $columnsA as $column}
+                        <th class="text-center font-weight-bold {if $iterator->counter >= 7}col-weekend{/if}">{if $column > 0}{$column}{else}&nbsp;{/if}</th>
+                    {/foreach}
+                </tr>
+                </thead>
+                {foreach $groups as $groupId => $group}
+                    <tbody class="parent-tbody {if !isset($tbodyVisible[$groupId]) || $tbodyVisible[$groupId]}d-none{/if}" data-group="{$groupId}">
+                    <tr>
+                        <td colspan="{count($columnsA) + 1}" style="background-color: {$groupColor[$groupId]|noescape};">
+                            {$group}
+                            <span class="btn-absolute">
+                                <i class="fa fa-plus-square"></i>
+                            </span>
+                        </td>
+                    </tr>
+                    </tbody>
+                <tbody class="child-tbody {if isset($tbodyVisible[$groupId]) && !$tbodyVisible[$groupId]}d-none{/if}" data-group="{$groupId}">
+                {var $firstLoop = true}
+                {foreach $floorsA[$groupId] as $indexFloor => $floor}
+                    <tr>
+                        <td n:if="$firstLoop" rowspan="{count($floorsA[$groupId])}" class="col-vertical" style="background-color: {$groupColor[$groupId]|noescape};" data-toggle="tooltip" title="{$group}">
+                            <span class="vertical-value">{$group}</span>
+                            <span class="btn-absolute">
+                                <i class="fa fa-minus-square"></i>
+                            </span>
+                        </td>
+                        {var $firstLoop = false}
+                        {foreach $columnsA as $ymd => $column}
+                            {if $floor >= 0}
+                                {if $column >= 0}
+                                    <td class="col-value">
+                                        {foreach $placesA as $place}
+                                            {ifset $spotsA[$ymd.'_'.$groupId.'_'.$indexFloor]}
+                                                {$spotsA[$ymd.'_'.$groupId.'_'.$indexFloor]['name']}
+                                            {else}
+                                                &nbsp;
+                                            {/ifset}
+                                        {/foreach}
+                                    </td>
+                                {else}
+                                    <td>
+                                        {$cusFloors[$floor]|noescape}
+                                    </td>
+                                {/if}
+                            {else}
+                                {*Směna ranní/noční - A,B,C,D*}
+                                {if $column >= 0}
+                                        <td class="font-weight-bold text-center {if $iterator->counter >= 7}col-weekend{/if}">
+                                                {if isset($plansA[$ymd.'_'.($floor*-1)])}
+                                                    {$plansA[$ymd.'_'.($floor*-1)]['shift']}
+                                                {else}
+                                                    &nbsp;
+                                                {/if}
+                                        </td>
+                                {else}
+                                    <td class="font-weight-bold text-center">
+                                            {if $floor == -1}
+                                                {_'ranní'}
+                                            {elseif $floor == -2}
+                                                {_'noční'}
+                                            {else}
+                                                &nbsp;
+                                            {/if}
+                                    </td>
+                                {/if}
+                            {/if}
+                        {/foreach}
+                    </tr>
+                {/foreach}
+                </tbody>
+                {/foreach}
+            </table>
+        </div>
+{/block}
+
+{block scriptsBot}
+    <script>
+        $("#date").datepicker({
+            format: "yyyy-mm-dd",
+            language: 'cs'
+        }).on('changeDate', function(e) {
+            let eDate = new Date(e.date.getTime());
+            let nDay = (eDate.getDay() + 6) % 7;
+            eDate.setDate(eDate.getDate() - nDay + 3);
+            let n1stThursday = eDate.valueOf();
+            eDate.setMonth(0, 1);
+            if (eDate.getDay() !== 4) {
+                eDate.setMonth(0, 1 + ((4 - eDate.getDay()) + 7) % 7);
+            }
+            let weekNumber = (1 + Math.ceil((n1stThursday - eDate) / 604800000)) + '';
+            weekNumber = (weekNumber.length === 1 ? '0'+weekNumber : weekNumber);
+            let dateString = weekNumber + ". Týden, " + e.date.getFullYear();
+            let yearUrl = e.date.getFullYear();
+
+            $(".week-number").find("span").text(dateString);
+            let fullLink = {link ProductionProgressReport: test=>0};
+            fullLink = fullLink.split('?')[0];
+            let typeUrl = {$aaType};
+            location.href = fullLink + "?week=" + weekNumber + '&year=' + yearUrl + '&type=' + typeUrl;
+        });
+
+        $(document).on('click', '.parent-tbody', function() {
+            let groupId = $(this).data('group');
+            $.nette.ajax({
+                url: {link toggleTbody!},
+                data: {
+                    groupId: groupId,
+                    visible: true
+                }
+            });
+            $(this).addClass('d-none');
+            $(document).find('.child-tbody[data-group="' + groupId + '"]').removeClass('d-none');
+        });
+
+        $(document).on('click', '.child-tbody td.col-vertical', function() {
+            let tbody = $(this).closest('tbody');
+            let groupId = tbody.data('group');
+            $.nette.ajax({
+                url: {link toggleTbody!},
+                data: {
+                    groupId: groupId,
+                    visible: false
+                }
+            });
+            tbody.addClass('d-none');
+            $(document).find('.parent-tbody[data-group="' + groupId + '"]').removeClass('d-none');
+        });
+    </script>
+{/block}

@@ -1,0 +1,149 @@
+{block title}{_'Provozní deník'}{/block}
+{*block description}{_'Provozní deník'}{/block}
+{block header-icon}<i class="fa fa-check icon-gradient bg-mean-fruit"></i>{/block*}
+{block header-actions-top}
+
+    <div class="top-week">
+        <a n:href="OperationLog: type => $aaType, week => $previousWeek, year => $previousYear">
+            <i class="fa fa-chevron-left"></i>
+        </a>
+        <div class="week-number date-btn">
+            <span>{$week}. Týden, {$year}</span>
+            <input type="text" id="date" value="{$dateInput}" autocomplete="off" />
+        </div>
+        <a n:href="OperationLog: type => $aaType, week => $nextWeek, year => $nextYear">
+            <i class="fa fa-chevron-right"></i>
+        </a>
+    </div>
+
+{/block}
+{block content}
+    <div class="col-md-12 tpp1" style="margin-bottom: 0;">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row cols-cus-22">
+                    {foreach $cusDays as $dayName}
+                        {if $dayName != ''}
+                            <div class="col-md-1 cus22-md-3 {if $iterator->counter >= 7}tpp2-end{else}tpp2{/if} d-flex align-items-center justify-content-center">
+                                <div style="font-size: medium; font-weight: 500;">
+                                    {$dayName}
+                                </div>
+                            </div>
+                        {else}
+                            <div class="col-md-1 cus22-md-1 tpp2 d-flex align-items-center justify-content-center">
+                                <div style="font-size: medium; font-weight: 500;">
+                                    &nbsp;
+                                </div>
+                            </div>
+                        {/if}
+                    {/foreach}
+                </div>
+                {foreach $floorsA as $floor}
+                    <div class="row cols-cus-22">
+                        {foreach $columnsA as $ymd => $column}
+                            {if $floor >= 0}
+                                {if $column >= 0}
+                                    <div class="col-md-1 cus22-md-3 tpp2-shift-in checkSpot" data-id="{$ymd.'_'.$floor.'_'.$aaType}">
+                                        {foreach $placesA as $place}
+                                            <div class="row">
+                                                {ifset $spotsA[$ymd.'_'.$floor]}
+                                                    {if $usrGrp == 1 || !$spotsA[$ymd.'_'.$floor]['log']->giveItemsCheck}
+                                                        <a n:href="OperationLog:edit id => $spotsA[$ymd.'_'.$floor]['id']"
+                                                                class="col-md-12 tppDrag tpp3 spt-base"
+                                                                style="font-size: small;{$spotsA[$ymd.'_'.$floor]['style']|noescape}"
+                                                                data-toggle="tooltip" data-placement="bottom" title="{$spotsA[$ymd.'_'.$floor]['desc']}"
+                                                                data-animation="false">
+                                                            {$spotsA[$ymd.'_'.$floor]['name']}
+                                                        </a>
+                                                    {else}
+                                                        <div class="col-md-12 tppDrag tpp3 spt-base"
+                                                             style="font-size: small;{$spotsA[$ymd.'_'.$floor]['style']|noescape}"
+                                                             data-toggle="tooltip" data-placement="bottom" title="{$spotsA[$ymd.'_'.$floor]['desc']}"
+                                                             data-animation="false">
+                                                            {$spotsA[$ymd.'_'.$floor]['name']}
+                                                        </div>
+                                                    {/if}
+                                                {else}
+                                                    {if isset($plansA[$ymd.'_'.$floor])}
+                                                        <a n:href="OperationLog:edit planId => $plansA[$ymd.'_'.$floor]['id']" class="col-md-12 tppDrag tpp3 spt-empty" style="font-size: small;">
+                                                            &nbsp;
+                                                        </a>
+                                                    {else}
+                                                        <div class="col-md-12 tppDrag tpp3 spt-empty" style="font-size: small;">
+                                                            &nbsp;
+                                                        </div>
+                                                    {/if}
+                                                {/ifset}
+                                            </div>
+                                        {/foreach}
+                                    </div>
+                                {else}
+                                    <div class="col-md-1 cus22-md-1 tpp2 d-flex align-items-center justify-content-center">
+                                        <div style="font-size: small; font-weight: 500;">
+                                            {$cusFloors[$floor]}
+                                        </div>
+                                    </div>
+                                {/if}
+                            {else}
+                                {if $column >= 0}
+                                    {if $floor == -3}
+                                        <div class="col-md-1 cus22-md-3 {if $iterator->counter >= 7}tpp2-end{else}tpp2{/if} d-flex align-items-center justify-content-center">
+                                            <div style="font-size: medium; font-weight: 500;">
+                                                {$column}
+                                            </div>
+                                        </div>
+                                    {else}
+                                        <div class="col-md-1 cus22-md-3 {if $iterator->counter >= 7}tpp2-end{else}tpp2{/if} d-flex align-items-center justify-content-center checkSpot"
+                                              data-id="{$ymd.'_'.($floor*-1).'_'.$aaType}">
+                                            <div style="font-size: medium; font-weight: 500;">
+                                                {if isset($plansA[$ymd.'_'.($floor*-1)])}
+                                                    {$plansA[$ymd.'_'.($floor*-1)]['shift']}
+                                                {else}
+                                                    &nbsp;
+                                                {/if}
+                                            </div>
+                                        </div>
+                                    {/if}
+                                {else}
+                                    <div class="col-md-1 cus22-md-1 tpp2 d-flex align-items-center justify-content-center">
+                                        <div style="font-size: medium; font-weight: 500;">
+                                            &nbsp;
+                                        </div>
+                                    </div>
+                                {/if}
+                            {/if}
+                        {/foreach}
+                    </div>
+                {/foreach}
+            </div>
+        </div>
+    </div>
+{/block}
+
+{block scriptsBot}
+    <script>
+        $("#date").datepicker({
+            format: "yyyy-mm-dd",
+            language: 'cs'
+        }).on('changeDate', function(e) {
+            let eDate = new Date(e.date.getTime());
+            let nDay = (eDate.getDay() + 6) % 7;
+            eDate.setDate(eDate.getDate() - nDay + 3);
+            let n1stThursday = eDate.valueOf();
+            eDate.setMonth(0, 1);
+            if (eDate.getDay() !== 4) {
+                eDate.setMonth(0, 1 + ((4 - eDate.getDay()) + 7) % 7);
+            }
+            let weekNumber = (1 + Math.ceil((n1stThursday - eDate) / 604800000)) + '';
+            weekNumber = (weekNumber.length === 1 ? '0'+weekNumber : weekNumber);
+            let dateString = weekNumber + ". Týden, " + e.date.getFullYear();
+            let yearUrl = e.date.getFullYear();
+
+            $(".week-number").find("span").text(dateString);
+            let fullLink = {link OperationLog: test=>0};
+            fullLink = fullLink.split('?')[0];
+            let typeUrl = {$aaType};
+            location.href = fullLink + "?week=" + weekNumber + '&year=' + yearUrl + '&type=' + typeUrl;
+        });
+    </script>
+{/block}

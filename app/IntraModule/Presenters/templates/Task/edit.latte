@@ -1,0 +1,65 @@
+{block title}
+    {ifset $entity}
+        {_'Editace úkolu'}
+    {else}
+        {_'Přidání úkolu'}
+    {/ifset}
+{/block}
+{block description}
+    {ifset $entity}
+        {_'Editace stávajícího úkolu'}
+    {else}
+        {_'Přidání nového úkolu'}
+    {/ifset}
+{/block}
+{block header-icon}<i class="fa fa-pencil-ruler icon-gradient bg-mean-fruit"></i>{/block}
+{block header-actions}
+    <a n:if="isset($entity) && $entity" n:href="Task:view id => $entity->id" class="btn btn-primary">
+        {_'Náhled úkolu'}
+    </a>
+{/block}
+{block content}
+    <div>
+        {form form}
+            {input id}
+            <div class="card mb-2">
+                <div class="card-body">
+                    <div class="form-row">
+                            <div class="col-xs-12 col-sm-12 col-md-6">
+                                {include bootstrap-input $form, 'name', 12}
+                                {include bootstrap-input $form, 'description', 12}
+                            </div>
+                            <div class="col-xs-12 col-sm-12 col-md-6">
+                                {include bootstrap-input $form, 'assigned', 12}
+                                {include bootstrap-input $form, 'taskState', 12}
+                                {*include bootstrap-input $form, 'foundedDate', 12*}
+                                {include bootstrap-input $form, 'closeToDate', 12}
+                                {include bootstrap-input $form, 'priority', 12}
+                                {include bootstrap-input $form, 'originator', 12}
+                            </div>
+
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <a n:href="Task:default" class="btn btn-outline-primary">
+                        <span class="fa fa-arrow-left" aria-hidden="true"></span>
+                        Nástěnka
+                    </a>
+                    <a n:href="Task:table" class="btn btn-outline-primary">
+                        <span class="fa fa-arrow-left" aria-hidden="true"></span>
+                        Přehled
+                    </a>
+                    <span class="pull-right">
+                    {*<button name="sendBack" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a zpět</button>*}
+                    <button name="sendSave" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a pokračovat</button>
+                    <button name="sendNew" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a nový</button>
+                </span>
+                </div>
+            </div>
+        {/form}
+    </div>
+{/block}

@@ -1,0 +1,13 @@
+{**
+ * @param $item    Ublaboo\DataGrid\Row
+*}
+{if $item && $item->$column && file_exists($item->$column)}
+    {var $ext = pathinfo($item->$column, PATHINFO_EXTENSION)}
+    {if !$ext}
+        {var $ext = '_blank'}
+    {/if}
+    <a n:href="downloadFile! file => $item->$column" target="_blank">
+        <img src="{$basePath}/assets/img/file-icons/{$ext}.png" alt="{$ext}">
+        {basename($item->$column)}
+    </a>
+{/if}

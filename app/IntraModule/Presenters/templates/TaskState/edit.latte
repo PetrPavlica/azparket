@@ -1,0 +1,47 @@
+{block title}
+    {ifset $entity}
+        {_'Editace stavu'}
+    {else}
+        {_'Přidání stavu'}
+    {/ifset}
+{/block}
+{block description}
+    {ifset $entity}
+        {_'Editace stávajícího stavu úkolu'}
+    {else}
+        {_'Přidání nového stavu úkolu'}
+    {/ifset}
+{/block}
+{block header-icon}<i class="fa fa-stream icon-gradient bg-mean-fruit"></i>{/block}
+{block content}
+    <div>
+        {form form}
+            {input id}
+            <div class="card mb-2">
+                <div class="card-body">
+                    <div class="form-row">
+                        {include bootstrap-input $form, 'name', 6}
+                        {include bootstrap-input $form, 'orderType', 6}
+                        {include bootstrap-input $form, 'forDashboard', 6}
+                        {include bootstrap-input $form, 'active', 6}
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <a n:href="TaskState:default" class="btn btn-outline-primary">
+                        <span class="fa fa-arrow-left" aria-hidden="true"></span>
+                        Zpět
+                    </a>
+                    <span class="pull-right">
+                    <button name="sendBack" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a zpět</button>
+                    <button name="sendSave" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a pokračovat</button>
+                    <button name="sendNew" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a nový</button>
+                </span>
+                </div>
+            </div>
+        {/form}
+    </div>
+{/block}

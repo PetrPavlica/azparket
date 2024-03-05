@@ -1,0 +1,309 @@
+{block title}
+    {ifset $product}
+        Úprava produktu
+    {else}
+        Přidání nového produktu
+    {/ifset}
+{/block}
+{block description}{/block}
+{block header-icon}<i class="fa fa-boxes icon-gradient bg-mean-fruit"></i>{/block}
+{block content}
+
+    <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
+        <li class="nav-item"><a data-toggle="tab" href="#main" role="tab" class="nav-link show active"><span>Základní informace</span></a></li>
+        <li class="nav-item"><a data-toggle="tab" href="#photogallery" role="tab" class="nav-link"><span>Fotogalerie</span></a></li>
+        <li class="nav-item"><a data-toggle="tab" href="#files" role="tab" class="nav-link"><span>Soubory</span></a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div id="main" class="tab-pane tabs-animation fade show active">
+        {form form, class => "form-horizontal"}
+            <div class="card mb-2">
+                <div class="card-header">{_'Obecné'}</div>
+                <div class="card-body">
+                    <div class="form-row">
+                        {include bootstrap-input $form, 'menu', 6}
+                        {include bootstrap-input $form, 'orderProduct', 6}
+                        <div class="col-md-12"><hr class="mt-1"></div>
+                    </div>
+                    <h5>Atributy z TPV</h5>
+                    <div class="form-row">
+                        {include bootstrap-input $form, 'klic_polozky', 4}
+                        {include bootstrap-input $form, 'nazev_polozky', 4}
+                        {include bootstrap-input $form, 'alter_nazev', 4}
+                        {include bootstrap-input $form, 'atribut2', 4}
+                        {include bootstrap-input $form, 'evid_cena_pol', 4}
+                        {include bootstrap-input $form, 'priceInstall', 4}
+                        {include bootstrap-input $form, 'sklad_mnozstvi', 4}
+                        {include bootstrap-input $form, 'zkratka_mj', 4}
+                        <div class="col-md-4"></div>
+                        {include bootstrap-input $form, 'hmotnost_mj', 4}
+                        {include bootstrap-input $form, 'objem', 4}
+                        <div class="col-md-4"></div>
+                        {include bootstrap-input $form, 'atr_rozmer_1', 4}
+                        {include bootstrap-input $form, 'atr_rozmer_2', 4}
+                        {include bootstrap-input $form, 'atr_rozmer_3', 4}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mb-2">
+                <div class="card-header">
+                    {_'Jazyková nastavení'}
+                        <ul class="w-auto ml-auto py-1 body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
+                        {foreach $langs as $l}
+                            <li class="nav-item"><a class="nav-link {if $locale == $l->code}show active{/if}" data-toggle="tab" href="#{$l->code}" role="tab"><span>{$l->name}</span></a></li>
+                        {/foreach}
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content">
+                    {foreach $langs as $l}
+                        <div id="{$l->code}" class="tab-pane tabs-animation fade {if $locale == $l->code}show active{/if}">
+                            <input type="hidden" name="langId[{$l->code}]" value="{ifset $dataLang[$l->code]['id']}{$dataLang[$l->code]['id']}{/ifset}">
+                            <div class="form-row">
+                                <div class="col-sm-12 col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Název</label>
+                                        <div class="">
+                                            <input type="text" name="name[{$l->code}]" placeholder="Název" class="form-control" value="{ifset $dataLang[$l->code]['name']}{$dataLang[$l->code]['name']}{/ifset}">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-3">
+                                    <label class="control-label">&nbsp;</label>
+                                    <div class="form-group">
+                                        <label for="active[{$l->code}]" class="pr-2"><input type="checkbox" id="active[{$l->code}]" name="active[{$l->code}]" {if (isset($dataLang[$l->code]['active']) && $dataLang[$l->code]['active']) || !isset($dataLang)}checked{/if}> Zobrazit</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-3">
+                                    <a 
+                                        n:ifset="$product"
+                                        n:href=":Product:default id => $product->id, locale => $l->code"
+                                        class="btn btn-primary pull-right"    
+                                    >Ukázat na webu</a>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col-sm-12 col-md-12">
+                                    <div><label for="shortDescription[{$l->code}]">Krátký popis</label></div>
+                                    <div><textarea id="shortDescription[{$l->code}]" name="shortDescription[{$l->code}]" class="ckeditor">{ifset $dataLang[$l->code]['shortDescription']}{$dataLang[$l->code]['shortDescription']}{/ifset}</textarea></div>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="form-row">
+                                <div class="col-sm-12 col-md-12">
+                                    <div><label for="description[{$l->code}]">Popis</label></div>
+                                    <div><textarea id="description[{$l->code}]" name="description[{$l->code}]" class="ckeditor">{ifset $dataLang[$l->code]['description']}{$dataLang[$l->code]['description']}{/ifset}</textarea></div>
+                                </div>
+                            </div>
+                        </div>
+                    {/foreach}
+                    </div>
+                </div>
+            </div>
+
+            {control renderer $form, 'btns'}
+        {/form}
+        </div>
+        <div id="photogallery" class="tab-pane tabs-animation fade">
+            <div class="card mb-2">
+                <div class="card-body">
+                    {ifset $product}
+                    
+                        {form photogalleryForm id => 'photogallery-dropzone', class => 'ajax dropzone'}
+                            {input id value => $product->id}
+                        {/form}
+                        {snippet product-images}
+                        <br>
+                        {if $product->images}
+                            {form galleryForm}
+                                {input id value => $product->id}
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-stripped">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-left">
+                                                #
+                                            </th>
+                                            <th class="text-left" width="40%">
+                                                {_'Fotografie'}
+                                            </th>
+                                            <th></th>
+                                            <th class="text-center" width="25%">
+                                                {_'Text fotografie (alt)'}
+                                            </th>
+                                            <th class="text-center" width="10%">
+                                                {_'Pořadí'}
+                                            </th>
+                                            <th class="text-left" style="max-width: 50px">
+                                            </th>
+                                    </thead>
+                                    <tbody>
+                                        {foreach $product->images as $img}
+                                            {var $i = $iterator->getCounter()}
+                                            <tr>
+                                                <td>
+                                                    {$i}
+                                                    <input type="hidden" name="imgId[{$i}]" value="{$img->id}">
+                                                </td>
+                                                <td>
+                                                    <a href="{$basePath}/{$img->path}" class="fancybox">
+                                                        <img style="max-height: 150px; max-width: 400px;" src="{$basePath}/{$img->path}" alt="{$img->alt}">
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <label for="isMain[{$i}]">
+                                                        <input type="radio" name="isMain" value="{$i}" id="isMain[{$i}]" {if $img->isMain}checked{/if}>
+                                                        {_'Hlavní obrázek'}
+                                                    </label>
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control" name="imgAlt[{$i}]" value="{$img->alt}">
+                                                </td>
+                                                <td>
+                                                    <input type="number" class="form-control" name="imgOrder[{$i}]" value="{$img->orderImg}">
+                                                </td>
+                                                <td style="max-width: 50px">
+                                                    <a n:href="deleteImg! imgId=>$img->id" class="fa fa-trash btn btn-danger danger-alert" data-ajax="on"></a>
+                                                </td>
+                                            </tr>
+                                        {/foreach}
+                                    </tbody>
+                                </table>
+                            </div>
+                                <div class="text-right">
+                                    {input send class => 'btn btn-primary ajax'}
+                                </div>
+                            {/form}
+                        {/if}
+                        {/snippet}
+                    {else}
+                        <div class="alert alert-info">Fotogalerii lze doplnit až bude produkt poprvé uložen.</div>
+                    {/ifset}
+                </div>
+            </div>
+        </div>
+        <div id="files" class="tab-pane tabs-animation fade">
+            <div class="card">
+                <div class="card-body">
+                    {ifset $product}
+                        {form uploadFilesForm id => 'files-dropzone', class => 'ajax dropzone'}
+                            {input id value => $product->id}
+                        {/form}
+                        <br>
+                        {snippet product-files}
+                            {if $product->files}
+                                {form filesForm}
+                                    {input id value => $product->id}
+                                        <table class="table table-bordered table-stripped">
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-left">
+                                                        #
+                                                    </th>
+                                                    <th class="text-left">
+                                                        {_'Soubor'}
+                                                    </th>
+                                                    <th class="text-left">
+                                                        {_'Zařazení'}
+                                                    </th>
+                                                    <th class="text-left">
+                                                        {_'Jazykové zařazení'}
+                                                    </th>
+                                                    <th class="text-center">
+                                                        {_'Popis souboru'}
+                                                    </th>
+                                                    <th class="text-center">
+                                                        {_'Pořadí'}
+                                                    </th>
+                                                    <th class="text-left">
+                                                    </th>
+                                            </thead>
+                                            <tbody>
+                                                {foreach $product->files as $file}
+                                                    {var $fileLangs = []}
+                                                    {if $file->langs}
+                                                        {foreach $file->langs as $f}
+                                                            {var $fileLangs[] = $f->lang->id}
+                                                        {/foreach}
+                                                    {/if}
+                                                    {var $i = $iterator->getCounter()}
+                                                    <tr>
+                                                        <td>
+                                                            {$i}
+                                                            <input type="hidden" name="fileId[{$i}]" value="{$file->id}">
+                                                        </td>
+                                                        <td>
+                                                            <a href="{$basePath}/{$file->path}" target="_blank">
+                                                                {basename($file->path)}
+                                                            </a>
+                                                        </td>
+                                                        <td>
+                                                            <select name="fileSection[{$i}]" class="selectpicker">
+                                                                <option value="">-- vyberte</option>
+                                                                <option value="1" {if $file->section == 1}selected{/if}>Výkres</option>
+                                                                <option value="2" {if $file->section == 2}selected{/if}>3D model</option>
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <select name="fileLangs[{$i}][]" class="selectpicker" multiple>
+                                                                {foreach $langs as $l}
+                                                                    <option value="{$l->id}" {if in_array($l->id, $fileLangs)}selected{/if}>{strtoupper($l->code)}</option>
+                                                                {/foreach}
+                                                            </select>
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" class="form-control" name="fileAlt[{$i}]" value="{$file->alt}">
+                                                        </td>
+                                                        <td>
+                                                            <input type="number" class="form-control" name="fileOrder[{$i}]" value="{$file->orderFile}">
+                                                        </td>
+                                                        <td>
+                                                            <a n:href="deleteFile! fileId => $file->id" class="fa fa-trash btn btn-danger danger-alert" data-ajax="on"></a>
+                                                        </td>
+                                                    </tr>
+                                                {/foreach}
+                                            </tbody>
+                                        </table>
+                                    <div class="text-right">
+                                        {input send class => 'btn btn-primary ajax'}
+                                    </div>
+                                {/form}
+                            {/if}
+                        {/snippet}
+                    {else}
+                        <div class="alert alert-info">Soubory lze doplnit až bude produkt poprvé uložen.</div>
+                    {/ifset}
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}
+
+{block scriptsBot}
+    {include parent}
+    <script type="text/javascript">
+        var photogalleryDropZone = new Dropzone('#photogallery-dropzone', {
+            acceptedFiles: 'image/*',
+            dictDefaultMessage: 'Pro nahrání obrázků je přetáhněte sem nebo klikněte zde a vyberte.'
+        });
+        photogalleryDropZone.on("queuecomplete", function(file) {
+            $.nette.ajax({
+                'url': {link updatePhotogallery!}
+            });
+            //photogalleryDropZone.removeAllFiles();
+        });
+
+        var filesDropZone = new Dropzone('#files-dropzone', {
+            acceptedFiles: '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx',
+            dictDefaultMessage: 'Pro nahrání souborů je přetáhněte sem nebo klikněte zde a vyberte.'
+        });
+        filesDropZone.on("queuecomplete", function(file) {
+            $.nette.ajax({
+                'url': {link updateFiles!}
+            });
+            //photogalleryDropZone.removeAllFiles();
+        });
+    </script>
+{/block}

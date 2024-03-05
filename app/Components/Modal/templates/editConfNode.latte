@@ -1,0 +1,162 @@
+<script>
+    $(document).on('click', ".node", function (e) {
+        e.preventDefault();
+
+        let id = e.target.closest('.node').id;
+        openEditConfNodeModal(id);
+    });
+
+    function openEditConfNodeModal(id = null) {
+        let data = {};
+        if (typeof id !== 'undefined') {
+            data.id = id;
+        }
+        let modal = '#editConfNodeModal';
+        $.nette.ajax({
+            url: {link editConfNode!},
+            type: 'POST',
+            data: data,
+            off: {
+                snippets: true
+            }
+        }).done(function (payload) {
+            let win = $(document).find(modal);
+            win.modal('show');
+            win.addClass('open');
+            win.find(".confNodeInputs").find('input, textarea, select').each(function () {
+                $(this).trigger("change");
+            });
+            //graphInitEvents();
+        });
+    }
+
+    $(document).on('click', 'button[name="addProductSend"]', function() {
+        $.nette.ajax({
+            method: 'POST',
+            url: {link addProduct!},
+            data: {
+                nodeId: $('#editConfNodeModal input[name="id"]').val(),
+                productId: $('input[name="addProduct"]').val(),
+                count: $('input[name="addProductCount"]').val()
+            }
+        });
+    });
+
+    
+    {* after snippets *}
+    $.nette.ext('snippets').after(function ($el) {
+        $('#textaddProducts[data-toggle="completer"]').completer();
+    })
+    
+</script>
+
+<!-- Modal -->
+<div class="modal fade" id="editConfNodeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-fluid modal-30" role="document">
+        <!--Content-->
+        <div class="modal-content">
+            {snippetArea editConfNodeSnipp}
+                {import '../../templates/form.latte'}
+                {form confNodeForm}
+                    <!--Header-->
+                    <div class="modal-header" n:snippet="node-head">
+
+                        <h4 class="modal-title w-100" id="myModalLabel">
+                            {_'Úprava uzlu'} {ifset $node}{$node->name}({$node->nodeNo}) [id: {$node->id}]{/ifset}
+                        </h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <!--Body-->
+                    <div class="modal-body">
+                        <div class="form-row confNodeInputs" n:snippet="node-body-1">
+                            {include bootstrap-input $form, 'nodeNo', 3}
+                            {include bootstrap-input $form, 'name', 9}
+                            {include bootstrap-input $form, 'parents', 12}
+                            {include bootstrap-input $form, 'input', 3}
+                            {include bootstrap-input $form, 'value', 6}
+                            {include bootstrap-input $form, 'forSalesman', 3}
+                        </div>
+                        <div class="form-row" n:snippet="node-body-2">
+                            {ifset $node}
+                            
+                                <div class="col-md-12 mb-2" n:if="isset($node)" id="nodeProducts">
+                                    <label for="addProduct">Produkty</label><br>
+                                    {if $node->products}
+                                        {foreach $node->products as $np}
+                                            {$np->count}x {$np->product->klic_polozky}: {$np->product->nazev_polozky} <a n:href="removeProduct nodeProductId=>$np->id, nodeId =>$node->id" class="ajax fa fa-times text-danger"></a>
+                                            {if !$iterator->isLast()}, {/if}
+                                        {/foreach}
+                                    {/if}
+                                </div>
+                                <div class="col-md-7">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <input
+                                            data-source="{link getProducts!}"
+                                            data-to-send=""
+                                            data-output=".addProduct-autocomplete"
+                                            data-preload="false"
+                                            data-suggest="true"
+                                            data-minlen="1"
+                                            data-toggle="completer"
+                                            autocomplete="off"
+                                            placeholder="Hledejte dle klíče nebo názvu..."
+                                            type="text" name="textaddProduct"
+                                            id="textaddProducts"
+                                            class="form-control autocomplete-input">
+                                            <input name="addProduct" id="addProduct" {*data-success="handleProductAutocmplt"*} class="addProduct-autocomplete" type="hidden">
+                                            <span class="input-group-append">
+                                                <span class="input-group-text remove-autocomplete-value"><i class="fa fa-times"></i></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <input type="number" step="1" min="1" name="addProductCount" value="1" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <button type="button" class="ajax btn btn-primary" name="addProductSend"><i class="fa fa-plus"></i> Přidat</button>
+                                    </div>
+                                </div>
+                            {else}
+                                <div class="col-md-12">
+                                    <label>{_'Produkty'}</label><br>
+                                    <button type="submit" class="btn btn-primary ajax">{_'Přidat produkty'}</button>
+                                </div>
+                            {/ifset}
+                        </div>
+                    </div>
+                    <!--Footer-->
+                    <div class="modal-footer" n:snippet="node-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">{_'Zavřít'}</button>
+                        <button type="submit" class="btn btn-primary ajax">{ifset $node}{_'Upravit'}{else}{_'Přidat'}{/ifset}</button>
+                        {ifset $node}
+                            <div class="dropdown">
+                                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownCopyButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    {_'Duplikovat'}
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="dropdownCopyButton">
+                                    <button type="button" onclick="document.getElementsByName('nodeCopy')[0].click()" class="btn btn-link dropdown-item">{_'Duplikovat pouze uzel'}</button>
+                                    <button type="button" onclick="document.getElementsByName('nodeCopyBranch')[0].click()" class="btn btn-link dropdown-item">{_'Duplikovat uzel a vše pod ním'}</button>
+                                </div>
+                            </div>
+                            <button type="submit" name="nodeCopy" class="d-none ajax"></button>
+                            <button type="submit" name="nodeCopyBranch" class="d-none ajax"></button>
+                            <button type="submit" name="nodeRemove" data-confirm-sweetalert2="delete" class="btn btn-outline-danger ajax" title="Odstranit">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        {/ifset}
+                        {input id}
+                    </div>
+                {/form}
+            {/snippetArea}
+        </div>
+        <!--/.Content-->
+    </div>
+</div>
+<!-- Modal -->

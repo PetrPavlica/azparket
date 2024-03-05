@@ -1,0 +1,91 @@
+{block title}
+    {ifset $entity}
+        {_'Editace absence'}
+    {else}
+        {_'Přidání absence'}
+    {/ifset}
+{/block}
+{block description}
+    {ifset $entity}
+        {_'Editace stávající absence'}
+    {else}
+        {_'Přidání nové absence'}
+    {/ifset}
+{/block}
+{block header-icon}<i class="fa fa-calendar-minus icon-gradient bg-mean-fruit"></i>{/block}
+{block content}
+{form form}
+    {input id}
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                {ifset $entity}
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label for="frm-worker">Zaměstnanec</label>
+                            <div class="form-control">
+                                {$entity->worker->surname} {$entity->worker->name}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: none;">{include bootstrap-input $form, 'worker', 6}</div>
+                {else}
+                    {include bootstrap-input $form, 'worker', 6}
+                {/ifset}
+                {include bootstrap-input $form, 'vacationType', 6}
+                {include bootstrap-input $form, 'dateStart', 6}
+                {include bootstrap-input $form, 'dateEnd', 6}
+                {include bootstrap-input $form, 'hours', 3}
+                {include bootstrap-input $form, 'countHours', 3}
+                <div class="col-6">
+                    <div class="form-group">
+                        <label for="frm-worker">&nbsp;</label>
+                        <div style="font-weight: bold;">
+                            {_'Zůstatek dovolené'}: <span id="vac-left">{ifset $entity}{$entity->worker->hoursVacation}{/ifset}</span>
+                        </div>
+                    </div>
+
+                </div>
+                {include bootstrap-input $form, 'name', 6}
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-2">
+        <div class="card-body">
+            <a class="btn btn-outline-primary"
+                    {ifset $backUrl}
+               href="{$backUrl}">
+                {else}
+                href="{link Vacation:default}">
+                {/ifset}
+                <span class="fa fa-arrow-left" aria-hidden="true"></span>
+                Zpět </a>
+
+            <button name="sendBack" type="submit" class="btn btn-primary"><i class="fa fa-floppy-o"></i> Uložit</button>
+        </div>
+    </div>
+{/form}
+{/block}
+{block scriptsBot}
+    <script>
+        $( function() {
+            $(document).on('change', '#frm-worker', function (e) {
+                $.nette.ajax({
+                    url: {link checkVacationLeft!},
+                    type: 'POST',
+                    data: {
+                        worker : $(this).val()
+                    },
+                    off: {
+                        snippets: true
+                    }
+                }).done(function (payload) {
+                    $('#vac-left').text(payload['val']);
+                });
+
+            });
+        });
+    </script>
+{/block}

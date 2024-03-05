@@ -1,0 +1,15 @@
+parameters:
+    database:
+        driver: mysqli
+        host: 127.0.0.1
+        user: root
+        password:
+        dbname: lagus
+        port: 3306
+
+mail:
+    dkim:
+        domain: webrex.cz
+        selector: webrex
+        privateKey: %appDir%/cert/dkim.key
+        #passPhrase: ...

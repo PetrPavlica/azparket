@@ -1,0 +1,24 @@
+{**
+ * @param Filter                $filter
+ * @param Nette\Forms\Container $input
+ * @param string                $iconPrefix       Icon prefix (fa fa-)
+ *}
+
+{if $outer}
+	<div class="row">
+		{label $input, class => 'col-sm-3 control-label' /}
+		<div class="col-sm-4">
+			<div class="input-group">
+				{input $input}
+				<label n:name="$input" class="input-group-addon"><span class="{$iconPrefix}calendar"></span></label>
+			</div>
+		</div>
+	</div>
+{else}
+	<div class="datagrid-col-filter-date-range">
+		<div class="input-group input-group-sm">
+			{input $input}
+			<div class="input-group-append input-group-addon-first"><span class="input-group-text {$iconPrefix}calendar icon-daterangepicker"></span></div>
+		</div>
+	</div>
+{/if}

@@ -1,0 +1,810 @@
+{block title}
+    {ifset $entity}
+        {_'Editace posouzení'}
+    {else}
+        {_'Přidání posouzení'}
+    {/ifset}
+{/block}
+{block description}
+    {ifset $entity}
+        {_'Editace stávajícího posouzení nabídky'}
+    {else}
+        {_'Přidání nového posouzení nabídky'}
+    {/ifset}
+{/block}
+{block header-icon}<i class="fa fa-check icon-gradient bg-mean-fruit"></i>{/block}
+{block content}
+    <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
+        <li class="nav-item"><a class="nav-link {if empty($openTab) || $openTab == '#home'}show active{/if}" data-toggle="tab" id="tab-1" href="#home" role="tab"><span>Přehled</span></a></li>
+        <li class="nav-item" {if !isset($entity)}title="{_'Je nutné uložit formulář'}" style="cursor:not-allowed"{/if}>
+            <a class="nav-link {if !isset($entity)}disabled{/if} {if $openTab == '#docs'}show active{/if}" data-toggle="tab" id="tab-2" href="#docs" role="tab">
+                <span>Dokumenty</span>
+            </a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+    <div id="home" class="tab-pane tabs-animation fade {if empty($openTab) || $openTab == '#home'}show active{/if}">
+        <div n:snippet='owf-form'>
+            {form form}
+                {*input id*}
+
+                <div class="card mb-2">
+                    <div class="card-header">
+                        {_'Obecné'}
+                    </div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            {include bootstrap-input $form, 'name', 6}
+                            <div class="col-3">
+                                <div class="form-group">
+                                    <label for="frm-name col-12">Zákazník</label>
+                                    <select name="customerShort" class="form-control selectpicker" data-live-search="true" id="frm-customerShort">
+                                        <option value="">-- vyberte</option>
+                                        {foreach $customerSelect as $kkey => $customer}
+                                            <option value="{$customer}" {if isset($entity) && $entity->customerShort == $customer}selected{/if}>{$customer}</option>
+                                        {/foreach}
+                                    </select>
+                                </div>
+                            </div>
+                            {include bootstrap-input $form, 'approveState', 3}
+
+                            {include bootstrap-input $form, 'request', 3}
+                            <div class="col-3">
+                                <div class="form-row">
+                                    {include bootstrap-input $form, 'startDate', 6}
+                                    {include bootstrap-input $form, 'deadlineDate', 6}
+                                </div>
+                            </div>
+                            {include bootstrap-input $form, 'approveTime', 2}
+                            {include bootstrap-input $form, 'approveType', 2}
+                            {include bootstrap-input $form, 'short', 2}
+
+                            {include bootstrap-input $form, 'description', 12}
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+
+                <div id="accordion4">
+                    <div class="card mb-2">
+                        <div class="card-header">
+                            <a class="card-link" data-toggle="collapse" href="#collapse4">
+                                <i class="fa fa-plus"></i> {_'Položky'}
+                            </a>
+
+                            <span class="ml-auto">
+                                <a n:ifset="$entity" class="btn btn-primary" n:href="printApproveListXlsx! id => $entity->id">
+                                    <i class="fas fa-file-alt"></i> Tisk do XLSX
+                                </a>
+                                <a n:ifset="$entity" class="btn btn-primary" n:href="printApproveList! id => $entity->id">
+                                    <i class="fa fa-file-pdf"></i> Tisk do PDF
+                                </a>
+                                <span n:ifset="$entity" style="cursor: pointer" class="checkApprovePart btn btn-primary ml-auto" data-toggle="modal" data-target="#partModal" data-id="0">
+                                    <i class="fa fa-plus"></i> Přidat položku
+                                </span>
+                            </span>
+                        </div>
+                        <div id="collapse4" class="collapse show" data-parent="#accordion4">
+                            <div class="card-body" n:snippet="partTable">
+                                <div class="form-row">
+                                    {ifset $entity}
+                                        <table class="tg-my" style="width:100%;">
+                                            <thead>
+                                            <tr>
+                                                <th class="" colspan="5">Identifikace dílu</th>
+                                                <th class="" colspan="8">Technické požadavky zákazníka</th>
+                                                <th class="" colspan="3">Interní požadavky</th>
+                                                <th class="" title="Tryskání" data-toggle="tooltip" data-placement="right">Trys.</th>
+                                                <th class="" style="border-bottom: solid 2px black;" colspan="2" rowspan="4">Poznámky</th>
+                                                <th class="" style="border-bottom: solid 2px black;" colspan="1" rowspan="4">Akce</th>
+                                            </tr>
+                                            <tr>
+                                                <th class="" colspan="4">interní</th>
+                                                <th class="">zákazníka</th>
+                                                <th class="" colspan="4">Tl. vrstvy (&#181;m)</th>
+                                                <th class=""></th>
+                                                <th class="" rowspan="2" title="Krýt závit / otvor / plochu" data-toggle="tooltip" data-placement="right">Krýt Z/O/P</th>
+                                                <th class="" rowspan="2" title="Kontrolovat závit / rozměr" data-toggle="tooltip" data-placement="right">Kon. Z/R</th>
+                                                <th class="" rowspan="2" title="Zvláštní znak (CC,SC,D díl)" data-toggle="tooltip" data-placement="right">ZZ</th>
+                                                <th class="" style="border-bottom: solid 2px black;" rowspan="3" title="počet ks / závěs" data-toggle="tooltip" data-placement="right">ks</th>
+                                                <th class="" style="border-bottom: solid 2px black;" rowspan="3" title="kg / buben" data-toggle="tooltip" data-placement="right">kg</th>
+                                                <th class="">závěs</th>
+                                                <th class="" style="border-bottom: solid 2px black;" rowspan="3" title="kapacitní ověření (% z celkových kapacit)" data-toggle="tooltip" data-placement="right">kap.o</th>
+                                            </tr>
+                                            <tr>
+                                                <th class="" style="border-bottom: solid 2px black;" rowspan="2">poř. čís.</th>
+                                                <th class="" style="border-bottom: solid 2px black;" rowspan="2">název dílu</th>
+                                                <th class="">zatřídění</th>
+                                                <th class="">plocha(dm2)</th>
+                                                <th class="">číslo výkresu</th>
+                                                <th class="">celková</th>
+                                                <th class="">Zn/ZnNi</th>
+                                                <th class="">KTL</th>
+                                                <th class="">Prá</th>
+                                                <th class="">norma</th>
+                                                <th class="" style="border-bottom: solid 2px black;" rowspan="2" title="standartní / speciální" data-toggle="tooltip" data-placement="right">st. / sp.</th>
+                                            </tr>
+                                            <tr>
+                                                <th class="" style="border-bottom: solid 2px black;">název</th>
+                                                <th class="" style="border-bottom: solid 2px black;">Čas navěš.</th>
+                                                <th class="" style="border-bottom: solid 2px black;">hmotnost</th>
+                                                <th class="" style="border-bottom: solid 2px black;">od do</th>
+                                                <th class="" style="border-bottom: solid 2px black;">od do</th>
+                                                <th class="" style="border-bottom: solid 2px black;">od do</th>
+                                                <th class="" style="border-bottom: solid 2px black;">od do</th>
+                                                <th class="" style="border-bottom: solid 2px black;">další norma</th>
+                                                <th class="" style="border-bottom: solid 2px black;" colspan="3">Jiné požadavky</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+
+                                            {if isset($approveParts) && $approveParts}
+                                                {foreach $approveParts as $aPart}
+                                                    {var $hasDocs = 0}
+                                                    {if $aPart->documents && count($aPart->documents)}{var $hasDocs = 1}{/if}
+                                                    <tr>
+                                                        <td class="" rowspan="7">{$aPart->interNumber}</td>
+                                                        <td class="" rowspan="7">{$aPart->interMark}</td>
+                                                        <td class="">{$aPart->interClass}</td>
+                                                        <td class="">{$aPart->interArea}</td>
+                                                        <td class="">{$aPart->cusNumber}</td>
+                                                        <td class="">{$aPart->techTotalFrom}</td>
+                                                        <td class="">{if $aPart->techZnFrom}{$aPart->techZnFrom}{elseif $aPart->techZnFrom2}{$aPart->techZnFrom2}{else}{$aPart->techZnFrom3}{/if}</td>
+                                                        <td class="">{if $aPart->techKtlFrom}{$aPart->techKtlFrom}{elseif $aPart->techKtlFrom2}{$aPart->techKtlFrom2}{else}{$aPart->techKtlFrom3}{/if}</td>
+                                                        <td class="">{if $aPart->techPraFrom}{$aPart->techPraFrom}{elseif $aPart->techPraFrom2}{$aPart->techPraFrom2}{else}{$aPart->techPraFrom3}{/if}</td>
+                                                        <td class="">{if $aPart->normFile1}{$normSelect[$aPart->normFile1]}{/if}</td>
+                                                        <td class="">{if $aPart->techDemand1}A{else}N{/if} / {if $aPart->techDemand2}A{else}N{/if} / {if $aPart->techDemand3}A{else}N{/if}</td>
+                                                        <td class="">{if $aPart->techDemand4}A{else}N{/if} / {if $aPart->techDemand5}A{else}N{/if}</td>
+                                                        <td class="">{$aPart->techDemand6}</td>
+                                                        <td class="" rowspan="2">{$aPart->interDemand1}</td>
+                                                        <td class="" rowspan="2">{$aPart->interDemand2}</td>
+                                                        <td class="" rowspan="2">{$aPart->interDemand3}</td>
+                                                        <td class="">{if $aPart->blasting}A{else}N{/if}</td>
+                                                        <td class="" style="border-bottom: solid 2px black;" colspan="2" rowspan="{if $hasDocs}10{else}9{/if}">{$aPart->note}</td>
+                                                        <td class="" style="border-bottom: solid 2px black;" rowspan="{if $hasDocs}10{else}9{/if}">
+                                                            <span style="cursor: pointer; font-size: 16px;" class="checkApprovePart" data-toggle="modal" data-target="#partModal" data-id="{$aPart->id}"><i class="fa fa-pen text-info pt-3 pb-3" title="Upravit" data-toggle="tooltip" data-placement="top"></i></span>
+                                                            <br>
+                                                            <span style="cursor: pointer; font-size: 16px;" class="checkApproveDocPart" data-toggle="modal" data-target="#docPartModal" data-id="{$aPart->id}"><i class="fa fa-file-upload text-info pt-3 pb-3" title="Přidat dokument" data-toggle="tooltip" data-placement="top"></i></span>
+                                                            <br>
+                                                            <span style="cursor: pointer; font-size: 16px;" class="removeApprovePart" data-id="{$aPart->id}"><i class="fa fa-trash text-danger pt-3 pb-3" title="Smazat" data-toggle="tooltip" data-placement="top"></i></span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="">{$aPart->interName}</td>
+                                                        <td class="">{$aPart->timeNorm}</td>
+                                                        <td class="">{$aPart->cusName}</td>
+                                                        <td class="">{$aPart->techTotalTo}</td>
+                                                        <td class="">{if $aPart->techZnTo}{$aPart->techZnTo}{elseif $aPart->techZnTo2}{$aPart->techZnTo2}{else}{$aPart->techZnTo3}{/if}</td>
+                                                        <td class="">{if $aPart->techKtlTo}{$aPart->techKtlTo}{elseif $aPart->techKtlTo2}{$aPart->techKtlTo2}{else}{$aPart->techKtlTo3}{/if}</td>
+                                                        <td class="">{if $aPart->techPraTo}{$aPart->techPraTo}{elseif $aPart->techPraTo2}{$aPart->techPraTo2}{else}{$aPart->techPraTo3}{/if}</td>
+                                                        <td class="">{if $aPart->normFile2}{$aPart->normFile2}{/if}</td>
+                                                        <td class="" colspan="3">{$aPart->techDemand7}</td>
+                                                        <td class="">{$aPart->capacity}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="" colspan="1"><b>Tk</b></td>
+                                                        <td class="" colspan="3">{$aPart->approveResultTk}</td>
+                                                        <td class="" colspan="4">{if $aPart->approveUserTk}{$aPart->approveUserTk->name} {if $aPart->approveDateTk}({$aPart->approveDateTk|date:'j.n.Y'}){/if}{/if}</td>
+                                                        <td class="" colspan="7">{$aPart->approveNoteTk}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="" colspan="1"><b>Chpú</b></td>
+                                                        <td class="" colspan="3">{$aPart->approveResultChpu}</td>
+                                                        <td class="" colspan="4">{if $aPart->approveUserChpu}{$aPart->approveUserChpu->name} {if $aPart->approveDateChpu}({$aPart->approveDateChpu|date:'j.n.Y'}){/if}{/if}</td>
+                                                        <td class="" colspan="7">{$aPart->approveNoteChpu}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="" colspan="1"><b>VPÚ</b></td>
+                                                        <td class="" colspan="3">{$aPart->approveResultVpu}</td>
+                                                        <td class="" colspan="4">{if $aPart->approveUserVpu}{$aPart->approveUserVpu->name} {if $aPart->approveDateVpu}({$aPart->approveDateVpu|date:'j.n.Y'}){/if}{/if}</td>
+                                                        <td class="" colspan="7">{$aPart->approveNoteVpu}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="" colspan="1"><b>RefO</b></td>
+                                                        <td class="" colspan="3">{$aPart->approveResultRefo}</td>
+                                                        <td class="" colspan="4">{if $aPart->approveUserRefo}{$aPart->approveUserRefo->name} {if $aPart->approveDateRefo}({$aPart->approveDateRefo|date:'j.n.Y'}){/if}{/if}</td>
+                                                        <td class="" colspan="7">{$aPart->approveNoteRefo}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="" colspan="1"><b>TPV</b></td>
+                                                        <td class="" colspan="3">{$aPart->approveResultTpv}</td>
+                                                        <td class="" colspan="4">{if $aPart->approveUserTpv}{$aPart->approveUserTpv->name} {if $aPart->approveDateTpv}({$aPart->approveDateTpv|date:'j.n.Y'}){/if}{/if}</td>
+                                                        <td class="" colspan="7">{$aPart->approveNoteTpv}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="" colspan="2"><b>Stav posouzení</b></td>
+                                                        <td class="" colspan="1"><b>Kooperace</b></td>
+                                                        <td class="" colspan="3">{$aPart->approveResultKoop}</td>
+                                                        <td class="" colspan="4">{if $aPart->approveUserKoop}{$aPart->approveUserKoop->name} {if $aPart->approveDateKoop}({$aPart->approveDateKoop|date:'j.n.Y'}){/if}{/if}</td>
+                                                        <td class="" colspan="7">{$aPart->approveNoteKoop}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="" {if !$hasDocs}style="border-bottom: solid 2px black;"{/if} colspan="2">{if $aPart->approveState}{$aPart->approveState->name}{/if}</td>
+                                                        <td class="" {if !$hasDocs}style="border-bottom: solid 2px black;"{/if} colspan="1"><b>Personální</b></td>
+                                                        <td class="" {if !$hasDocs}style="border-bottom: solid 2px black;"{/if} colspan="3">{$aPart->approveResultPers}</td>
+                                                        <td class="" {if !$hasDocs}style="border-bottom: solid 2px black;"{/if} colspan="4">{if $aPart->approveUserPers}{$aPart->approveUserPers->name} {if $aPart->approveDatePers}({$aPart->approveDatePers|date:'j.n.Y'}){/if}{/if}</td>
+                                                        <td class="" {if !$hasDocs}style="border-bottom: solid 2px black;"{/if} colspan="7">{$aPart->approveNotePers}</td>
+                                                    </tr>
+                                                    {if $hasDocs}
+                                                        <tr>
+                                                            <td class="" style="border-bottom: solid 2px black;" colspan="17">
+                                                                {foreach $aPart->documents as $aDoc}
+                                                                    <a style="cursor: pointer" class="" href="{$basePath}/{$aDoc->document}" download>
+                                                                        <i class="fa fa-download text-info pl-4 pr-2">&nbsp;&nbsp;{substr($aDoc->document, strrpos($aDoc->document, '/') + 1)}</i>
+                                                                    </a>
+                                                                    <span style="cursor: pointer" class="removeApproveDocPart" data-id="{$aDoc->id}"><i class="fa fa-trash text-danger pr-4"></i></span>
+                                                                {/foreach}
+                                                            </td>
+                                                        </tr>
+                                                    {/if}
+                                                {/foreach}
+                                            {else}
+                                                <tr>
+                                                    <td class="" colspan="23">{_'Zatím nebyly přidány žádné položky'}</td>
+                                                </tr>
+                                            {/if}
+                                            </tbody>
+                                        </table>
+
+                                    {else}
+                                        {_'Pro zadávání položek nejprve uložte formulář'}
+                                    {/ifset}
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <a
+                                href="{if isset($entity)}
+                                    {link Approve:default slug => $entity->approveState->id}
+                                {else}
+                                    {link Approve:default slug => 1}
+                                {/if}"
+                                class="btn btn-outline-primary"
+                        >
+                            <span class="fa fa-arrow-left" aria-hidden="true"></span>
+                            Zpět
+                        </a>
+                        <span class="pull-right">
+                                <button name="sendBack" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a zpět</button>
+                                <button name="send" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit</button>
+                                <button name="sendNew" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a nový</button>
+                            </span>
+                    </div>
+                </div>
+                {*input ajax*}
+            {/form}
+        </div>
+    </div>
+
+    {ifset $entity}
+        <div id="docs" class="tab-pane tabs-animation fade {if $openTab == '#docs'}show active{/if}">
+            <div class="card mb-3">
+                <div class="card-header">
+                    Dokumenty
+                    <span style="cursor: pointer" class="checkApproveDoc btn btn-primary ml-auto" data-toggle="modal" data-target="#docModal" data-id="0">
+                        <i class="fa fa-plus"></i> Přidat dokument
+                    </span>
+                </div>
+                <div class="card-body" n:snippet="docsTable">
+                    <table class="table table-bordered table-sm" id="sortable-table">
+                        <thead>
+                        <tr>
+                            <th style="width: 10%;">Název</th>
+                            <th style="width: 10%;">Popis</th>
+                            <th style="width: 10%;">Přidal</th>
+                            <th style="width: 10%;">Akce</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {if isset($approveDocs) && $approveDocs}
+                            {foreach $approveDocs as $approveDoc}
+                                <tr>
+                                    <td>
+                                        {substr($approveDoc->document, strrpos($approveDoc->document, '/') + 1)}
+                                    </td>
+                                    <td>
+                                        {$approveDoc->description}
+                                    </td>
+                                    <td>
+                                        {if $approveDoc->user}{$approveDoc->user->name}{/if}
+                                    </td>
+                                    <td>
+                                        <a style="cursor: pointer" class="" href="{$basePath}/{$approveDoc->document}" download><i class="fa fa-download text-success pl-2 pr-3"></i></a>
+                                        <span style="cursor: pointer" class="removeApproveDoc" data-id="{$approveDoc->id}"><i class="fa fa-trash text-danger"></i></span>
+                                    </td>
+                                </tr>
+                            {/foreach}
+                        {else}
+                            <tr>
+                                <td colspan="6">
+                                    {_'Žádný dokument není zadán'}
+                                </td>
+                            </tr>
+                        {/if}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {/ifset}
+
+{/block}
+
+{block scriptsBot}
+    <div n:ifset="$entity" class="modal fade" id="partModal" tabindex="-1" role="dialog" aria-labelledby="partModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+            <div class="modal-content" n:snippet="partModal">
+                {form partModalForm}
+                    <input type="text" style="display: none;" name="approve" value="{$entity->id}">
+                    <input type="text" style="display: none;" name="id">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="partModalLabel">Položka</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <style type="text/css">
+
+                    </style>
+                    <div class="modal-body compact-my-modal">
+                        <div class="form-row">
+                            <legend style="">Identifikace dílu</legend>
+                            {include bootstrap-input $form, 'interNumber', 2}
+                            {include bootstrap-input $form, 'interMark', 2}
+                            {include bootstrap-input $form, 'cusNumber', 3}
+                            <div class="col-2">
+                                <div class="form-group">
+                                    <label for="frm-interClass">Zatřídění</label>
+                                    <select name="interClass" class="form-control form-control" id="frm-interClass" data-lfv-initialized="true" data-lfv-message-id="frm-interClass_message_1">
+                                        <option value="">-- vyberte</option>
+                                        {foreach $interClassSelect as $kkey => $inClass}
+                                            <option value="{$inClass}" {if isset($modalPart) && $modalPart->interClass == $inClass}selected{/if}>{$inClass}</option>
+                                        {/foreach}
+                                    </select>
+                                </div>
+                            </div>
+                            {include bootstrap-input $form, 'interName', 3}
+
+                            {include bootstrap-input $form, 'interArea', 3}
+                            {include bootstrap-input $form, 'cusName', 3}
+                            {include bootstrap-input $form, 'timeNorm', 2}
+                            {include bootstrap-input $form, 'blasting', 2}
+                            {include bootstrap-input $form, 'approveState', 2}
+
+                            {include bootstrap-input $form, 'interDemand1', 3}
+                            {include bootstrap-input $form, 'interDemand2', 3}
+                            {include bootstrap-input $form, 'interDemand3', 3}
+                            {include bootstrap-input $form, 'capacity', 3}
+
+                            {include bootstrap-input $form, 'note', 12}
+
+                            <hr>
+                            <legend style="">Tl. vrstvy (&#181;m)</legend>
+
+                            <div class="col-6">
+                                <div class="form-row">
+                                    {include bootstrap-input $form, 'techTotalFrom', 3}
+                                    {include bootstrap-input $form, 'techTotalTo', 3}
+                                    {include bootstrap-input $form, 'techZnFrom', 3}
+                                    {include bootstrap-input $form, 'techZnTo', 3}
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-row">
+                                {include bootstrap-input $form, 'techKtlFrom', 3}
+                                    {include bootstrap-input $form, 'techKtlTo', 3}
+                                    {include bootstrap-input $form, 'techPraFrom', 3}
+                                    {include bootstrap-input $form, 'techPraTo', 3}
+                                </div>
+                            </div>
+
+                            <div class="col-6">
+                                <div class="form-row">
+                                    <div class="col-6">
+                                        <div class="form-group">
+                                            <label for="frm-name col-12">&nbsp;</label>
+                                            <div style="font-size: 20px;">Duplex</div>
+                                        </div>
+                                    </div>
+                                    {include bootstrap-input $form, 'techZnFrom2', 3}
+                                    {include bootstrap-input $form, 'techZnTo2', 3}
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-row">
+                                    {include bootstrap-input $form, 'techKtlFrom2', 3}
+                                    {include bootstrap-input $form, 'techKtlTo2', 3}
+                                    {include bootstrap-input $form, 'techPraFrom2', 3}
+                                    {include bootstrap-input $form, 'techPraTo2', 3}
+                                </div>
+                            </div>
+
+                            <div class="col-6">
+                                <div class="form-row">
+                                    <div class="col-6">
+                                        <div class="form-group">
+                                            <label for="frm-name col-12">&nbsp;</label>
+                                            <div style="font-size: 20px;">Triplex</div>
+                                        </div>
+                                    </div>
+                                    {include bootstrap-input $form, 'techZnFrom3', 3}
+                                    {include bootstrap-input $form, 'techZnTo3', 3}
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-row">
+                                    {include bootstrap-input $form, 'techKtlFrom3', 3}
+                                    {include bootstrap-input $form, 'techKtlTo3', 3}
+                                    {include bootstrap-input $form, 'techPraFrom3', 3}
+                                    {include bootstrap-input $form, 'techPraTo3', 3}
+                                </div>
+                            </div>
+
+                            <hr>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="frm-name col-12">Norma</label>
+                                    <select name="normFile1" class="form-control selectpicker" data-live-search="true" id="frm-normFile1">
+                                        <option value="">-- vyberte</option>
+                                        {foreach $normSelect as $kkey => $norm}
+                                            <option value="{$kkey}" {if isset($modalPart) && $modalPart->normFile1 == $kkey}selected{/if}>{$norm}</option>
+                                        {/foreach}
+                                    </select>
+                                </div>
+                            </div>
+                            {include bootstrap-input $form, 'normFile2', 6}
+
+                            <hr>
+                            <legend style="">Technické požadavky zákazníka</legend>
+                            {include bootstrap-input $form, 'techDemand6', 6}
+                            {include bootstrap-input $form, 'techDemand7', 6}
+
+                            {include bootstrap-input $form, 'techDemand1', 2}
+                            {include bootstrap-input $form, 'techDemand2', 2}
+                            {include bootstrap-input $form, 'techDemand3', 2}
+                            {include bootstrap-input $form, 'techDemand4', 2}
+                            {include bootstrap-input $form, 'techDemand5', 2}
+
+                            <hr>
+                            <legend style="">Schválení</legend>
+                            <div class="col-2">
+                                <div class="form-group">
+                                    <label for="frm-name col-12">&nbsp;</label>
+                                    <div style="font-size: 20px;">Tk</div>
+                                </div>
+                            </div>
+                            {include bootstrap-input $form, 'approveResultTk', 2}
+                            {include bootstrap-input $form, 'approveNoteTk', 5}
+                            <div class="col-3">
+                                <div class="form-group">
+                                    {if isset($modalPart) && $modalPart->approveUserTk}
+                                        <label for="frm-name col-12">Schválil / dne</label>
+                                        <div style="padding-top: 5px;">{$modalPart->approveUserTk->name} {if $modalPart->approveDateTk}({$modalPart->approveDateTk|date:'j.n.Y'}){/if}</div>
+                                    {/if}
+                                </div>
+                            </div>
+
+                            <div class="col-2">
+                                <div class="form-group">
+                                    <label for="frm-name col-12">&nbsp;</label>
+                                    <div style="font-size: 20px;">Chpú</div>
+                                </div>
+                            </div>
+                            {include bootstrap-input $form, 'approveResultChpu', 2}
+                            {include bootstrap-input $form, 'approveNoteChpu', 5}
+                            <div class="col-3">
+                                <div class="form-group">
+                                    {if isset($modalPart) && $modalPart->approveUserChpu}
+                                        <label for="frm-name col-12">Schválil / dne</label>
+                                        <div style="padding-top: 5px;">{$modalPart->approveUserChpu->name} {if $modalPart->approveDateChpu}({$modalPart->approveDateChpu|date:'j.n.Y'}){/if}</div>
+                                    {/if}
+                                </div>
+                            </div>
+
+                            <div class="col-2">
+                                <div class="form-group">
+                                    <label for="frm-name col-12">&nbsp;</label>
+                                    <div style="font-size: 20px;">VPÚ</div>
+                                </div>
+                            </div>
+                            {include bootstrap-input $form, 'approveResultVpu', 2}
+                            {include bootstrap-input $form, 'approveNoteVpu', 5}
+                            <div class="col-3">
+                                <div class="form-group">
+                                    {if isset($modalPart) && $modalPart->approveUserVpu}
+                                        <label for="frm-name col-12">Schválil / dne</label>
+                                        <div style="padding-top: 5px;">{$modalPart->approveUserVpu->name} {if $modalPart->approveDateVpu}({$modalPart->approveDateVpu|date:'j.n.Y'}){/if}</div>
+                                    {/if}
+                                </div>
+                            </div>
+
+                            <div class="col-2">
+                                <div class="form-group">
+                                    <label for="frm-name col-12">&nbsp;</label>
+                                    <div style="font-size: 20px;">RefO</div>
+                                </div>
+                            </div>
+                            {include bootstrap-input $form, 'approveResultRefo', 2}
+                            {include bootstrap-input $form, 'approveNoteRefo', 5}
+                            <div class="col-3">
+                                <div class="form-group">
+                                    {if isset($modalPart) && $modalPart->approveUserRefo}
+                                        <label for="frm-name col-12">Schválil / dne</label>
+                                        <div style="padding-top: 5px;">{$modalPart->approveUserRefo->name} {if $modalPart->approveDateRefo}({$modalPart->approveDateRefo|date:'j.n.Y'}){/if}</div>
+                                    {/if}
+                                </div>
+                            </div>
+
+                            <div class="col-2">
+                                <div class="form-group">
+                                    <label for="frm-name col-12">&nbsp;</label>
+                                    <div style="font-size: 20px;">TPV</div>
+                                </div>
+                            </div>
+                            {include bootstrap-input $form, 'approveResultTpv', 2}
+                            {include bootstrap-input $form, 'approveNoteTpv', 5}
+                            <div class="col-3">
+                                <div class="form-group">
+                                    {if isset($modalPart) && $modalPart->approveUserTpv}
+                                        <label for="frm-name col-12">Schválil / dne</label>
+                                        <div style="padding-top: 5px;">{$modalPart->approveUserTpv->name} {if $modalPart->approveDateTpv}({$modalPart->approveDateTpv|date:'j.n.Y'}){/if}</div>
+                                    {/if}
+                                </div>
+                            </div>
+
+                            <div class="col-2">
+                                <div class="form-group">
+                                    <label for="frm-name col-12">&nbsp;</label>
+                                    <div style="font-size: 20px;">Kooperace</div>
+                                </div>
+                            </div>
+                            {include bootstrap-input $form, 'approveResultKoop', 2}
+                            {include bootstrap-input $form, 'approveNoteKoop', 5}
+                            <div class="col-3">
+                                <div class="form-group">
+                                    {if isset($modalPart) && $modalPart->approveUserKoop}
+                                        <label for="frm-name col-12">Schválil / dne</label>
+                                        <div style="padding-top: 5px;">{$modalPart->approveUserKoop->name} {if $modalPart->approveDateKoop}({$modalPart->approveDateKoop|date:'j.n.Y'}){/if}</div>
+                                    {/if}
+                                </div>
+                            </div>
+
+                            <div class="col-2">
+                                <div class="form-group">
+                                    <label for="frm-name col-12">&nbsp;</label>
+                                    <div style="font-size: 20px;">Personální</div>
+                                </div>
+                            </div>
+                            {include bootstrap-input $form, 'approveResultPers', 2}
+                            {include bootstrap-input $form, 'approveNotePers', 5}
+                            <div class="col-3">
+                                <div class="form-group">
+                                    {if isset($modalPart) && $modalPart->approveUserPers}
+                                        <label for="frm-name col-12">Schválil / dne</label>
+                                        <div style="padding-top: 5px;">{$modalPart->approveUserPers->name} {if $modalPart->approveDatePers}({$modalPart->approveDatePers|date:'j.n.Y'}){/if}</div>
+                                    {/if}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Uložit</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Zavřít</button>
+                    </div>
+                {/form}
+            </div>
+        </div>
+    </div>
+
+    <div n:ifset="$entity" class="modal fade" id="docModal" tabindex="-1" role="dialog" aria-labelledby="docModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+            <div class="modal-content" n:snippet="docModal">
+                {form docModalForm}
+                    <input type="text" style="display: none;" name="approve" value="{$entity->id}">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="docModalLabel">Dokument</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <style type="text/css">
+
+                    </style>
+                    <div class="modal-body compact-my-modal">
+                        <div class="form-row">
+                            {include bootstrap-input $form, 'description', 12}
+                            {include bootstrap-input $form, 'document', 12}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Uložit</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Zavřít</button>
+                    </div>
+                {/form}
+            </div>
+        </div>
+    </div>
+
+    <div n:ifset="$entity" class="modal fade" id="docPartModal" tabindex="-1" role="dialog" aria-labelledby="docPartModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+            <div class="modal-content" n:snippet="docPartModal">
+                {form docPartModalForm}
+                    <div style="display: none;">
+                        {include bootstrap-input $form, 'approvePart', 12}
+                    </div>
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="docPartModalLabel">Dokument</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <style type="text/css">
+
+                    </style>
+                    <div class="modal-body compact-my-modal">
+                        <div class="form-row">
+                            {include bootstrap-input $form, 'document', 12}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Uložit</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Zavřít</button>
+                    </div>
+                {/form}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let interClassName = {$interClassName};
+
+        $( function() {
+            $(document).on('change', '#frm-interClass', function (e) {
+                let newVal = '';
+                if($(this).val()) {
+                    newVal = interClassName[$(this).val()];
+                }
+                $('#frm-interName').val(newVal);
+            });
+        });
+
+        $( function() {
+            $(document).on('click', '.checkApprovePart', function (e) {
+                $.nette.ajax({
+                    url: {link checkApprovePart!},
+                    type: 'POST',
+                    data: {
+                        part : $(this).attr('data-id')
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        $( function() {
+            $(document).on('change', '.countTotalFrom', function (e) {
+                let totalFrom = 0;
+                $(".countTotalFrom").each(function() {
+                   let currVal = $(this).val();
+                   if(currVal) {
+                      totalFrom += parseInt($(this).val());
+                   }
+                });
+
+                $('#frm-partModalForm-techTotalFrom').val(totalFrom);
+            });
+        });
+
+        $( function() {
+            $(document).on('change', '.countTotalTo', function (e) {
+                let totalTo = 0;
+                $(".countTotalTo").each(function() {
+                    let currVal = $(this).val();
+                    if(currVal) {
+                        totalTo += parseInt($(this).val());
+                    }
+                });
+
+                $('#frm-partModalForm-techTotalTo').val(totalTo);
+            });
+        });
+
+        $( function() {
+            $(document).on('click', '.removeApprovePart', function (e) {
+                $.nette.ajax({
+                    url: {link removeApprovePart!},
+                    type: 'POST',
+                    data: {
+                        part : $(this).attr('data-id')
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        $( function() {
+            $(document).on('click', '.checkApproveDoc', function (e) {
+                $.nette.ajax({
+                    url: {link checkApproveDoc!},
+                    type: 'POST',
+                    data: {
+                        doc : $(this).attr('data-id')
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        $( function() {
+            $(document).on('click', '.removeApproveDoc', function (e) {
+                $.nette.ajax({
+                    url: {link removeApproveDoc!},
+                    type: 'POST',
+                    data: {
+                        doc : $(this).attr('data-id')
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        $( function() {
+            $(document).on('click', '.checkApproveDocPart', function (e) {
+                $.nette.ajax({
+                    url: {link checkApproveDocPart!},
+                    type: 'POST',
+                    data: {
+                        part : $(this).attr('data-id')
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        $( function() {
+            $(document).on('click', '.removeApproveDocPart', function (e) {
+                $.nette.ajax({
+                    url: {link removeApproveDocPart!},
+                    type: 'POST',
+                    data: {
+                        doc : $(this).attr('data-id')
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        {*}$(document).ready(function () {
+            let deadlineDate = $('#frm-deadlineDate');
+            deadlineDate.prop('readonly', true);
+            deadlineDate.removeAttr('data-provide data-date-orientation data-date-format data-date-today-highlight data-date-autoclose autocomplete');
+        });{*}
+
+        $(".autosized").each(function () {
+            this.setAttribute("style", "height:" + (this.scrollHeight) + "px;overflow-y:hidden;");
+            }).on("input", function () {
+              this.style.height = "auto";
+              this.style.height = (this.scrollHeight) + "px";
+        });
+    </script>
+
+{/block}

@@ -1,0 +1,143 @@
+{block title}{$product->name}{/block}
+
+{block content}
+    <article>
+    <div id="product">
+        <div class="content">
+            <a class="btn-link bt-back" onclick="window.history.back();">
+                <span class="fa fa-arrow-left" aria-hidden="true"></span>
+                {_'Zpět'}
+            </a>
+            <div class="product_head">
+                <div class="left">
+                    <div class="image">
+                        {if $product->path}
+                            <img src="{$basePath}/{$product->path}" alt="{$product->alt}">
+                        {else}
+                            <img src="{$basePath}/assets/img/no-photo.png" ald="{_'Obrázek nenalezen'}">
+                        {/if}
+                    </div>
+                </div>
+                <div class="right">
+                    <h2>{$product->name|noescape}</h2>
+                    <div class="text">
+                        {$product->short_description|noescape}
+                    </div>
+                    <div class="price_wrap">
+                        <div class="price">
+                            <div class="text">
+                                {_'Cena za ks'}
+                            </div>
+                            <div class="pr">
+                                XXX {_'Kč'}
+                                {*if $product->show_price}
+                                    {$product->price} {_'Kč'}
+                                {else}
+                                    <div class="fl-upper">{_'na dotaz'}</div>
+                                {/if*}
+                            </div>
+                        </div>
+                        <div class="btn_wrap">
+                            {*form addToBasketForm}
+                                {input productId value => $product->id}
+                                {input count class => 'number', min => '1', max => '99999999', value => '1'*}
+                                
+                                <button type="button" {*n:name="addToBasket"*} class="ml-0 btn btn_pop buy_btn" data-toggle="modal" data-target="#inquiryModal">
+                                    {_'Poptat'}
+                                </button>
+                            {*/form*}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="advanced_details">
+                {$product->description|noescape}
+                <br>
+                
+                <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav nav-tabs">
+                    <li class="nav-item"><span class="nav-link m-1 show active" data-toggle="tab" href="#param" role="tab"><span>{_'Parametry'}</span></span></li>
+                    {if $vykresy}<li class="nav-item"><span class="nav-link m-1" data-toggle="tab" href="#sizes" role="tab"><span>{_'Výkresy'}</span></span></li>{/if}
+                    {if $models3D}<li class="nav-item"><span class="nav-link m-1" data-toggle="tab" href="#3d_model" role="tab"><span>{_'3D náhled'}</span></span></li>{/if}
+                    {if $productFiles}<li class="nav-item"><span class="nav-link m-1" data-toggle="tab" href="#download" role="tab"><span>{_'Ke stažení'}</span></span></li>{/if}
+                    
+                </ul>
+
+                <div class="tab-content">
+                    <div id="param" class="tab-pane tabs-animation fade show active">
+                        TPV rozměry / případně definovatelné
+                    </div>
+                    <div if="$vykresy" id="sizes" class="tab-pane tabs-animation fade">
+                        {foreach $vykresy as $k => $file}
+                            <a n:href="downloadFile! filePath => $file->path, fileName => $file->alt" target="_blank">{$file->alt}</a>
+                            <iframe id="iframe_sizes" src="{$file->path}#toolbar=0" style="width: 100%; height: 820px; border: 0;"></iframe>
+                        {/foreach}
+                    </div>
+                    <div n:if="isset($modelXml) && $modelXml" id="3d_model" class="tab-pane tabs-animation fade">
+                        {foreach $vykresy as $k => $file}
+                            {$file->alt}
+                            <div style="border: 4px solid #d7d7d7; margin-bottom: 1rem; padding: 0.75rem" data-model="{$iterator}"></div>
+                        {/foreach}
+                    </div>
+                    <div n:if="$productFiles" id="download" class="tab-pane tabs-animation fade">
+                        <div id="downloadDoc">
+                            <div class="docBody">
+                                {foreach $productFiles as $k => $file}
+                                    <a n:href="downloadFile! filePath => $file->path, fileName => $file->alt" target="_blank">{$file->alt}</a>
+                                    {*{if count($block)}
+                                        <div class="docBlock">
+                                            <div class="headItem">{$docTypeName[$k]}</div>
+                                            {foreach $block as $dDoc}
+                                                {if $dDoc->description == 'Servomotory_3DModel'}
+                                                    <div class="docItem">
+                                                        <a n:href="downloadFile! filePath => $webIntra.$dDoc->path, fileName => $dDoc->name" target="_blank">{_'3D Model'}.{$dDoc->type}</a>
+                                                    </div>
+                                                {elseif $dDoc->description == 'Servomotor_vystup_tisk'}
+                                                    <div class="docItem">
+                                                        <a n:href="downloadFile! filePath => $webIntra.$dDoc->path, fileName => $dDoc->name" target="_blank">{_'List motoru'}.{$dDoc->type}</a>
+                                                    </div>
+                                                {else}
+                                                    <div class="docItem">
+                                                        <a n:href="downloadFile! filePath => $webIntra.$dDoc->path, fileName => $dDoc->name" target="_blank">{if $dDoc->description}{$dDoc->description}.{$dDoc->type}{else}{$dDoc->name}{/if}</a>
+                                                    </div>
+                                                {/if}
+                                            {/foreach}
+                                        </div>
+                                    {/if}*}
+                                {/foreach}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            <a class="btn-link bt-back" onclick="window.history.back();">
+                <span class="fa fa-arrow-left" aria-hidden="true"></span>
+                {_'Zpět'}
+            </a>
+        </div>
+    </div>
+    </article>
+{/block}
+{block scriptsBot}
+    <div class="modal fade" id="inquiryModal" tabindex="-1" role="dialog" aria-labelledby="inquiryModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+            <div class="modal-content" n:snippet="inquiryModal">
+                <div class="modal-header">
+                    {_'Poptávka produktu'} {$product->name}
+                </div>
+                <div class="modal-body">
+                    {control inquiryForm [$product]}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{_'Zavřít'}</button>
+                    <button type="button" onclick="document.getElementsByName('send-inq')[0].click()" class="btn btn-primary ajax">{_'Odeslat'}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {if isset($modelXml) && $modelXml}
+        <link href="{$basePath}/assets/packages/x3dom/x3dom.css" rel="stylesheet" id="iframecss">
+        <script src="{$basePath}/assets/packages/x3dom/x3dom.js" id="iframejs"></script>
+    {/if}
+{/block}

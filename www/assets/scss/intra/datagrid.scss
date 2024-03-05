@@ -1,0 +1,159 @@
+.datagrid {
+  padding: 0;
+
+  .btn {
+    font-size: .75rem;
+    padding: .15rem .25rem;
+  }
+
+  table {
+    table-layout: fixed;
+    width: 100%;
+
+    th, td {
+      width: 150px;
+      min-width: 150px;
+      max-width: 150px;
+
+      > span {
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+
+        img {
+          max-width: 100%;
+          max-height: calc(39px - 1.1rem);
+        }
+      }
+
+      &.col-action {
+        position: sticky;
+        z-index: 1;
+        right: 0;
+        padding: 0;
+        width: 25px;
+        min-width: 25px;
+        max-width: 25px;
+        background-color: #fff;
+        vertical-align: middle;
+        text-align: right;
+
+        $numbers: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10;
+
+        @each $n in $numbers {
+          &.col-action-#{$n} {
+            width: calc(25px * #{$n});
+            max-width: calc(25px * #{$n});
+            min-width: calc(25px * #{$n});
+          }
+        }
+      }
+    }
+
+    thead {
+      .head-group {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      th {
+        position: relative;
+
+        .head-group {
+          span {
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+          }
+        }
+      }
+
+      tr {
+        th {
+          .datagrid-column-header-additions {
+            display: flex;
+            align-items: center;
+          }
+        }
+
+        .bootstrap-select {
+          &:not([class*=col-]):not(.input-group-btn) {
+            width: 100%;
+
+            > .btn {
+              width: 100%;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .table-responsive {
+    overflow-y: hidden;
+  }
+
+  .datagrid-col-filter-date-range {
+    overflow: hidden;
+    display: block;
+
+    > .input-group {
+      width: auto;
+    }
+  }
+
+  .resizer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 5px;
+    cursor: col-resize;
+    user-select: none;
+    z-index: 1;
+
+    &:hover, &.resizing {
+      border-right: 2px solid blue;
+    }
+  }
+
+  .table-hover {
+    tbody {
+      tr {
+        &:hover {
+          background-color: #d5d5d5 !important;
+
+          td {
+            &.col-action {
+              background-color: #d5d5d5 !important;
+            }
+          }
+        }
+
+        &:nth-of-type(odd) {
+          background-color: #f3f3f3;
+
+          td {
+            &.col-action {
+              background-color: #f3f3f3;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .row-group-actions {
+    background-color: #f9f9f9;
+    border: 1px solid #dee2e6;
+    border-bottom: 0;
+    padding: 8px;
+
+    .datagrid-toolbar {
+      margin-top: 0;
+    }
+  }
+}

@@ -1,0 +1,18 @@
+<article n:if="$article" class="event">
+    {var $slug = Nette\Utils\Strings::webalize(($article->name ? $article->name : ''))}
+    <h2 n:if="$article->show_name"><a n:href="Events:default id => $article->article_id, slug => $slug">{$article->name}</a></h2>
+    <span class="date">{$article->publish|date:'j. n. Y'}</span>
+    <div class="content">
+        <div class="text">
+            {$article->perex|noescape}
+            <div class="clearfix"></div>
+        </div>
+        {if $article->path && file_exists($article->path)}
+            <div class="image">
+                <a href="{$basePath}/{$article->path}" data-fancybox="article{$article->id}">
+                    <img n:img="$article->path, '400x200'" alt="{$article->alt}">
+                </a>
+            </div>
+        {/if}
+    </div>
+</article>

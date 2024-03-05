@@ -1,0 +1,733 @@
+{block title}
+    {ifset $entity}
+        {_'Editace zaměstnance'} {$entity->name} {$entity->surname}
+    {else}
+        {_'Přidání zaměstnance'}
+    {/ifset}
+{/block}
+{block description}
+    {ifset $entity}
+        {_'Editace stávajícího zaměstnance'}
+    {else}
+        {_'Přidání nového zaměstnance'}
+    {/ifset}
+{/block}
+{block header-icon}<i class="fa fa-users-cog icon-gradient bg-happy-itmeo"></i>{/block}
+{block content}
+
+    <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
+        <li class="nav-item"><a class="nav-link {if empty($openTab) || $openTab == '#home'}show active{/if}" data-toggle="tab" id="tab-1" href="#home" role="tab"><span>Přehled</span></a></li>
+        {*<li class="nav-item" {if !isset($entity)}title="{_'Je nutné uložit formulář'}" style="cursor:not-allowed"{/if}>
+            <a class="nav-link {if !isset($entity)}disabled{/if} {if $openTab == '#shifts'}show active{/if}" data-toggle="tab" id="tab-2" href="#shifts" role="tab">
+                <span>Směny navíc</span>
+            </a>
+        </li>
+        <li class="nav-item" {if !isset($entity)}title="{_'Je nutné uložit formulář'}" style="cursor:not-allowed"{/if}>
+            <a class="nav-link {if !isset($entity)}disabled{/if} {if $openTab == '#future'}show active{/if}" data-toggle="tab" id="tab-5" href="#future" role="tab">
+                <span>Nadcházející směny</span>
+            </a>
+        </li>
+        <li class="nav-item" {if !isset($entity)}title="{_'Je nutné uložit formulář'}" style="cursor:not-allowed"{/if}>
+            <a class="nav-link {if !isset($entity)}disabled{/if} {if $openTab == '#tenders'}show active{/if}" data-toggle="tab" id="tab-3" href="#tenders" role="tab">
+                <span>Školení</span>
+            </a>
+        </li>
+        <li class="nav-item" {if !isset($entity)}title="{_'Je nutné uložit formulář'}" style="cursor:not-allowed"{/if}>
+            <a class="nav-link {if !isset($entity)}disabled{/if} {if $openTab == '#notes'}show active{/if}" data-toggle="tab" id="tab-4" href="#notes" role="tab">
+                <span>Poznámky</span>
+            </a>
+        </li>*}
+        {if isset($entity) && $entity->user}
+            <li class="nav-item" {if !isset($entity)}title="{_'Je nutné uložit formulář'}" style="cursor:not-allowed"{/if}>
+                <a class="nav-link {if !isset($entity)}disabled{/if} {if $openTab == '#user'}show active{/if}" data-toggle="tab" id="tab-6" href="#user" role="tab">
+                    <span>Přístupy</span>
+                </a>
+            </li>
+        {/if}
+    </ul>
+
+    <div class="tab-content">
+        <div id="home" class="tab-pane tabs-animation fade {if empty($openTab) || $openTab == '#home'}show active{/if}">
+            <div n:snippet='owf-form'>
+                {form form}
+                    {*input id*}
+
+                    <div class="card mb-2">
+                        <div class="card-header">
+                            {_'Obecné'}
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                {include bootstrap-input $form, 'name', 3}
+                                {include bootstrap-input $form, 'surname', 3}
+                                {include bootstrap-input $form, 'personalId', 3}
+                                {include bootstrap-input $form, 'workerStep', 3}
+
+                                {include bootstrap-input $form, 'birthDate', 3}
+
+                                {include bootstrap-input $form, 'phone', 3}
+                                {include bootstrap-input $form, 'email', 3}
+                                <div class="col-6"></div>
+
+                                {include bootstrap-input $form, 'male', 6}
+                                <div class="form-row col-3">
+                                    {*include bootstrap-input $form, 'agency', 6*}
+                                    {include bootstrap-input $form, 'active', 6}
+                                </div>
+                                <div class="col-3"></div>
+                                
+                                {*include bootstrap-input $form, 'workerSkills', 12*}
+
+                                {include bootstrap-input $form, 'insurance', 6}
+                                {include bootstrap-input $form, 'nationality', 6}
+                                {include bootstrap-input $form, 'calendarColor', 3}
+                                <div style="" class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="col-md-6 control-label" for="cal-col-picker"> </label>
+                                        <input id="cal-col-picker" title="Color" type="color" style="border:none;width:100%;height:37px;">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+
+                    <div id="accordion4">
+                        <div class="card mb-2">
+                            <div class="card-header">
+                                <a class="card-link" data-toggle="collapse" href="#collapse4">
+                                    <i class="fa fa-plus"></i> {_'Zaměstnání'}
+                                </a>
+                            </div>
+                            <div id="collapse4" class="collapse show" data-parent="#accordion4">
+                                <div class="card-body">
+                                    {*<div class="form-row">
+                                        {include bootstrap-input $form, 'workerPosition', 3}
+                                        {include bootstrap-input $form, 'productionLine', 3}
+                                        {include bootstrap-input $form, 'shift', 2}
+                                        {include bootstrap-input $form, 'timeFund', 2}
+                                    </div>
+                                    <div class="form-row">
+                                        {include bootstrap-input $form, 'notWorker', 3}
+                                        {include bootstrap-input $form, 'yesWorker', 3}
+                                        {include bootstrap-input $form, 'hoursVacationBase', 2}
+                                    </div>
+                                    <hr/>
+                                    <div class="form-row">
+                                        {include bootstrap-input $form, 'startDateChange', 3}
+                                        {include bootstrap-input $form, 'productionLineChange', 3}
+                                        {include bootstrap-input $form, 'shiftChange', 2}
+                                    </div>
+                                    <hr/>*}
+                                    <div class="form-row">
+                                        {*include bootstrap-input $form, 'workerEmployment', 6*}
+                                        {include bootstrap-input $form, 'startDate', 6}
+                                        {include bootstrap-input $form, 'endDate', 6}
+                                        {include bootstrap-input $form, 'endContractDate', 6}
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="accordion1">
+                        <div class="card mb-2">
+                            <div class="card-header">
+                                <a class="card-link" data-toggle="collapse" href="#collapse1">
+                                    <i class="fa fa-plus"></i> {_'Adresa'}
+                                </a>
+                            </div>
+                            <div id="collapse1" class="collapse" data-parent="#accordion1">
+                                <div class="card-body">
+                                    <div class="form-row">
+                                        {include bootstrap-input $form, 'street', 3}
+                                        {include bootstrap-input $form, 'city', 3}
+                                        {include bootstrap-input $form, 'zip', 3}
+                                        {include bootstrap-input $form, 'country', 3}
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <a 
+                                href="{if isset($backWPosID)}
+                                    {link WorkerPosition:edit id => $backWPosID, 'openTab' => '#workers'}
+                                {elseif isset($backWTendID)}
+                                    {link WorkerTender:edit id => $backWTendID, 'openTab' => '#workers'}
+                                {else}
+                                    {link Worker:default}
+                                {/if}"
+                                class="btn btn-outline-primary"
+                            >
+                                <span class="fa fa-arrow-left" aria-hidden="true"></span>
+                                Zpět
+                            </a>
+                            <span class="pull-right">
+                                <button name="sendBack" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a zpět</button>
+                                <button name="send" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit</button>
+                                <button name="sendNew" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a nový</button>
+                            </span>
+                            {if !isset($entityUser)}
+                                <span class="pull-right">
+                                    <div class="mt-4 form-check" style="display: table-cell; padding-right: 25px; padding-top: 5px;">
+                                        <input type="checkbox" name="createUser" id="frm-createUser" class="form-check-input" value="1">
+                                        <label for="frm-createUser" class="form-check-label">Vytvořit přístupy</label>
+                                    </div>
+                                </span>
+                            {/if}
+                        </div>
+                    </div>
+                    {*input ajax*}
+                {/form}
+            </div>
+        </div>
+
+        <div id="tenders" class="tab-pane tabs-animation fade {if $openTab == '#tenders'}show active{/if}">
+            <div class="card mb-3">
+                <div class="card-header">
+                    {_'Školení'}
+                    <a n:href="WorkerTender:" class="btn btn-link ml-auto">Přejít na školení</a>
+                </div>
+                <div class="card-body" n:snippet="tableTenders">
+                    <table class="table table-bordered table-sm" id="sortable-table" style="table-layout: fixed;">
+                        <thead>
+                        <tr>
+                            <th style="width: 5%">Id</th>
+                            <th style="width: 30%">Název</th>
+                            <th style="width: 15%">Čas</th>
+                            <th style="width: 10%">Hodnocení</th>
+                            <th style="width: 35%">Slovní hodnocení</th>
+                            <th style="width: 5%">Akce</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {if isset($tenders) && $tenders}
+                            {foreach $tenders as $t}
+                                <tr data-id="{$t->id}">
+                                    <td>
+                                        <a n:href="WorkerTender:edit $t->tender->id">{$t->tender->id}</a>
+                                    </td>
+                                    <td>
+                                        <a n:href="WorkerTender:edit $t->tender->id">{$t->tender->name}</a>
+                                    </td>
+                                    <td>
+                                        {$t->tender->tenderDate|date:'j. n. Y'} {$t->tender->timeStart} - {$t->tender->timeEnd}
+                                    </td>
+                                    {if $t->tender->tenderDate > (new DateTime('NOW'))}
+                                        <td colspan="2">Školení ještě neproběhlo</td>
+                                    {else}
+                                        <td>
+                                            <select name="result" class="form-control selectpicker">
+                                                <option value="" disabled {if empty($t->result)}selected{/if}>Nehodnoceno</option>
+                                                <option value="A" {if $t->result == 'A'}selected{/if}>A</option>
+                                                <option value="B" {if $t->result == 'B'}selected{/if}>B</option>
+                                                <option value="C" {if $t->result == 'C'}selected{/if}>C</option>
+                                                <option value="D" {if $t->result == 'D'}selected{/if}>D</option>
+                                                <option value="E" {if $t->result == 'E'}selected{/if}>E</option>
+                                                <option value="F" {if $t->result == 'F'}selected{/if}>Nesplnil/a</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <textarea name="resultDesc" rows="1" class="form-control col-12">{$t->resultDesc}</textarea>
+                                        </td>
+                                    {/if}
+                                    
+                                    <td>
+                                        <span style="cursor: pointer; {if $t->tender->tenderDate > (new DateTime('NOW'))}display:none{/if}" class="saveTender" titile="Odeslat hodnocení"><i class="fa fa-save text-info pl-2 pr-3"></i></span>
+                                        <span style="cursor: pointer" class="removeTender" ><i class="fa fa-trash text-danger"></i></span>
+                                    </td>
+                                </tr>
+                            {/foreach}
+                        {else}
+                            <tr>
+                                <td colspan="6">
+                                    {_'Žádné školení není zadáno'}
+                                </td>
+                            </tr>
+                        {/if}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+                                        
+        {ifset $entity}
+            <div id="shifts" class="tab-pane tabs-animation fade {if $openTab == '#shifts'}show active{/if}">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        Směny navíc
+                        <span style="cursor: pointer" class="checkShiftBonusGroup btn btn-primary ml-auto" data-toggle="modal" data-target="#planModalGroup" data-id="0">
+                            <i class="fa fa-cog"></i> Upravit směny dle šablony
+                        </span>
+
+                        <span style="cursor: pointer" class="checkShiftBonus btn btn-primary ml-auto" data-toggle="modal" data-target="#planModal" data-id="0">
+                            <i class="fa fa-plus"></i> Přidat směnu navíc
+                        </span>
+
+                        <span style="cursor: pointer" class="removeShiftBonusAll btn btn-danger ml-auto" data-id="{$entity->id}">
+                            <i class="fa fa-trash"></i> Odstranit směny navíc
+                        </span>
+                    </div>
+                    <div class="card-body" n:snippet="bonusTable">
+                        <table class="table table-bordered table-sm" id="sortable-table">
+                            <thead>
+                            <tr>
+                                <th style="width: 10%;">Směna</th>
+                                <th style="width: 10%;">Ranní/Noční</th>
+                                <th style="width: 15%;">Linka</th>
+                                <th style="width: 15%;">Den v týdnu</th>
+                                <th style="width: 20%;">První datum</th>
+                                <th style="width: 20%;">Poslední datum</th>
+                                <th style="width: 10%;">Akce</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {if isset($shiftBonuses) && $shiftBonuses}
+                                {foreach $shiftBonuses as $shiftBonus}
+                                    <tr>
+                                        <td>
+                                            {$shiftBonus->shift}
+                                        </td>
+                                        <td>
+                                            {$nameTrans[$shiftBonus->name]}
+                                        </td>
+                                        <td>
+                                            {$lineTrans[$shiftBonus->productionLine]}
+                                        </td>
+                                        <td>
+                                            {$dayTrans[$shiftBonus->dayOfWeek]}
+                                        </td>
+                                        <td>
+                                            {if $shiftBonus->dateStart}{$shiftBonus->dateStart->format('j. n. Y')}{else}-{/if}
+                                        </td>
+                                        <td>
+                                            {if $shiftBonus->dateEnd}{$shiftBonus->dateEnd->format('j. n. Y')}{else}-{/if}
+                                        </td>
+                                        <td>
+                                            <span style="cursor: pointer" class="checkShiftBonus" data-toggle="modal" data-target="#planModal" data-id="{$shiftBonus->id}"><i class="fa fa-pen text-info pl-2 pr-3"></i></span>
+                                            <span style="cursor: pointer" class="removeShiftBonus" data-id="{$shiftBonus->id}"><i class="fa fa-trash text-danger"></i></span>
+                                        </td>
+                                    </tr>
+                                {/foreach}
+                            {else}
+                                <tr>
+                                    <td colspan="6">
+                                        {_'Žádný směna navíc není zadána'}
+                                    </td>
+                                </tr>
+                            {/if}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {/ifset}
+
+        {ifset $entity}
+            <div id="future" class="tab-pane tabs-animation fade {if $openTab == '#future'}show active{/if}">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        Nadcházející směny
+                        <div class="col-xl-9 col-lg-10 col-md-6 col-sm-12" style="margin: auto 0 auto auto;">
+                            <div class="row">
+                                <div class="col-xl-2 col-lg-2 col-md-12 col-sm-12">
+                                    {_'Zobratit směny'}
+                                </div>
+                                <div id="workerIdForFutureShift" style="display: none;" data-id="{if $entity->id}{$entity->id}{else}0{/if}"></div>
+                                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12">
+                                    {_'od:'}&nbsp;
+                                    <input type="text" name="futureShiftDateFrom" id="futureShiftDateFrom" autocomplete="off" />
+                                </div>
+                                <div class="col-xl-4 col-lg-4 col-md-12 col-sm-12">
+                                    {_'do:'}&nbsp;
+                                    <input type="text" name="futureShiftDateTo" id="futureShiftDateTo" autocomplete="off" />
+                                </div>
+                                <div class="col-xl-2 col-lg-2 col-md-12 col-sm-12">
+                                    <div class="btn btn-light" id="resetFutureShiftDateFilter">{_'Reset'}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="btn btn-primary" id="printWorkerFutureShift" data-id="{if $entity}{$entity->id}{else}0{/if}">
+                            <i class="fas fa-download"></i> {_'Tisk'}
+                        </span>
+                    </div>
+                    <div class="card-body" n:snippet="futureTable">
+                        <table class="table table-bordered table-sm" id="sortable-table">
+                            <thead>
+                            <tr>
+                                <th style="width: 10%;">Datum</th>
+                                <th style="width: 10%;">Směna</th>
+                                <th style="width: 20%;">Linka</th>
+                                <th style="width: 20%;">Ranní/Noční</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {if isset($futureShifts) && $futureShifts}
+                                {foreach $futureShifts as $futureShift}
+                                    <tr>
+                                        <td>
+                                            {$futureShift->plan->datePlan|date:'j.n.Y'}
+                                        </td>
+                                        <td>
+                                            {$futureShift->plan->shift}
+                                        </td>
+                                        <td>
+                                            {$lineTrans[$futureShift->plan->productionLine]}
+                                        </td>
+                                        <td>
+                                            {$nameTrans[$futureShift->plan->name]}
+                                        </td>
+                                    </tr>
+                                {/foreach}
+                            {else}
+                                <tr>
+                                    <td colspan="6">
+                                        {_'Žádná nadcházející směna není zadána'}
+                                    </td>
+                                </tr>
+                            {/if}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {/ifset}
+
+        {if isset($entity)}
+            <div id="notes" class="t2 tab-pane tabs-animation fade accordion {if $openTab == '#notes'}show active{/if}">
+                <div class="card">
+                    <div class="card-header">
+                        Poznámky k zaměstnanci
+                        <a n:href="WorkerNote:edit 'backWID' => $entity->id" class="btn btn-primary ml-auto">
+                            <span class="fa fa-plus" aria-hidden="true"></span>
+                            {_'Přidat poznámku'}
+                        </a>
+                    </div>
+                    <div class="card-body p-0"></div>
+                </div>
+                {control tableNotes}
+            </div>
+        {/if}
+
+        {if isset($entity) && $entity->user}
+            <div id="user" class="t2 tab-pane tabs-animation fade accordion {if $openTab == '#user'}show active{/if}">
+                <div class="card">
+                    <div class="card-header">
+                        Přístupy
+                    </div>
+                    <div class="card-body">
+                        {include bootstrap-form 'userForm'}
+                    </div>
+                </div>
+
+            </div>
+        {/if}
+    </div>
+
+{/block}
+
+{block scriptsBot}
+    <div n:ifset="$entity" class="modal fade" id="planModal" tabindex="-1" role="dialog" aria-labelledby="planModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content" n:snippet="planModal">
+                {form planModalForm}
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="planModalLabel">Směna navíc</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input n:ifset="$modalBonus" type="hidden" name="bonus" data-autosubmit="" id="frm-bonus" value="{$modalBonus->id}">
+                        <input type="hidden" name="worker" data-autosubmit="" id="frm-worker" value="{$entity->id}">
+                        <div class="col-md-12 mb-4">
+                            <div class="row">
+                                <div class="col-md-4 pt-2">
+                                    <span>Směna</span>
+                                </div>
+                                <div class="col-md-8">
+                                    <select name="shift" class="form-control" id="frm-shift">
+                                        {foreach $shiftTrans as $kkey => $value}
+                                            <option value="{$kkey}" {if isset($modalBonus) && $modalBonus->shift == $kkey}selected{/if}>{$value}</option>
+                                        {/foreach}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-4 pt-2">
+                                    <span>Ranní/Noční</span>
+                                </div>
+                                <div class="col-md-8">
+                                    <select name="name" class="form-control" id="frm-name">
+                                        {foreach $nameTrans as $kkey => $value}
+                                            <option value="{$kkey}" {if isset($modalBonus) && $modalBonus->name == $kkey}selected{/if}>{$value}</option>
+                                        {/foreach}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-4 pt-2">
+                                    <span>Linka</span>
+                                </div>
+                                <div class="col-md-8">
+                                    <select name="line" class="form-control" id="frm-line">
+                                        {foreach $lineTrans as $kkey => $value}
+                                            <option value="{$kkey}" {if isset($modalBonus) && $modalBonus->productionLine == $kkey}selected{/if}>{$value}</option>
+                                        {/foreach}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-4 pt-2">
+                                    <span>Den v týdnu</span>
+                                </div>
+                                <div class="col-md-8">
+                                    <select name="day" class="form-control" id="frm-day">
+                                        {foreach $dayTrans as $kkey => $value}
+                                            <option value="{$kkey}" {if isset($modalBonus) && $modalBonus->dayOfWeek == $kkey}selected{/if}>{$value}</option>
+                                        {/foreach}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-4 pt-2">
+                                    <span>První datum</span>
+                                </div>
+                                <div class="col-md-8">
+                                    <input type="text" name="dateStart" id="frm-dateStart" class="form-control form-control" data-provide="datepicker"
+                                           data-date-orientation="bottom" data-date-format="d. m. yyyy" data-date-today-highlight="true" data-date-autoclose="true" data-date-language="cs" autocomplete="off"
+                                           value="{if isset($modalBonus) && $modalBonus->dateStart}{$modalBonus->dateStart->format('d. m. Y')}{else}{/if}" data-lfv-initialized="true" data-lfv-message-id="frm-dateStart">
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-4 pt-2">
+                                    <span>Poslední datum</span>
+                                </div>
+                                <div class="col-md-8">
+                                    <input type="text" name="dateEnd" id="frm-dateEnd" class="form-control form-control" data-provide="datepicker"
+                                           data-date-orientation="bottom" data-date-format="d. m. yyyy" data-date-today-highlight="true" data-date-autoclose="true" data-date-language="cs" autocomplete="off"
+                                           value="{if isset($modalBonus) && $modalBonus->dateEnd}{$modalBonus->dateEnd->format('d. m. Y')}{else}{/if}" data-lfv-initialized="true" data-lfv-message-id="frm-dateEnd_message">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Uložit</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Zavřít</button>
+                    </div>
+                {/form}
+            </div>
+        </div>
+    </div>
+
+    <div n:ifset="$entity" class="modal fade" id="planModalGroup" tabindex="-1" role="dialog" aria-labelledby="planModalGroupLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content" n:snippet="planModalGroup">
+                {form planModalGroupForm}
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="planModalGroupLabel">Šablona směny vedlejší</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="worker" data-autosubmit="" id="frm-worker" value="{$entity->id}">
+                        <div class="col-md-12 mb-4">
+                            <div class="row mt-2">
+                                <div class="col-md-4 pt-2">
+                                    <span>Šablona</span>
+                                </div>
+                                <div class="col-md-8">
+                                    <select name="bonusGroup" class="form-control" id="frm-bonusGroup">
+                                        {foreach $bonusGroupTrans as $kkey => $value}
+                                            <option value="{$kkey}">{$value}</option>
+                                        {/foreach}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Uložit</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Zavřít</button>
+                    </div>
+                {/form}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $( function() {
+            $(document).on('click', '#printWorkerFutureShift', function (e) {
+                $.nette.ajax({
+                    url: {link printWorkerFutureShift!},
+                    type: 'POST',
+                    data: {
+                        id : $(this).attr('data-id')
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        $( function() {
+            $(document).on('click', '.checkShiftBonus', function (e) {
+                $.nette.ajax({
+                    url: {link checkShiftBonus!},
+                    type: 'POST',
+                    data: {
+                        bonus : $(this).attr('data-id')
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        $( function() {
+            $(document).on('click', '.checkShiftBonusGroup', function (e) {
+                $.nette.ajax({
+                    url: {link checkShiftBonusGroup!},
+                    type: 'POST',
+                    data: {
+                        bonus : $(this).attr('data-id')
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        $( function() {
+            $(document).on('click', '.removeShiftBonus', function (e) {
+                $.nette.ajax({
+                    url: {link removeShiftBonus!},
+                    type: 'POST',
+                    data: {
+                        bonus : $(this).attr('data-id')
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        $( function() {
+            $(document).on('click', '.removeShiftBonusAll', function (e) {
+                $.nette.ajax({
+                    url: {link removeShiftBonusAll!},
+                    type: 'POST',
+                    data: {
+                        worker : $(this).attr('data-id')
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $('#cal-col-picker').val('#' + $('#frm-calendarColor').val()).change();
+        });
+
+        $(document).on('change', "#cal-col-picker", function () {
+            $('#frm-calendarColor').val($(this).val().replace('#','')).change();
+        });
+
+        var url = document.location.toString();
+        if (url.match('#')) {
+            $('.nav-tabs a[href="#' + url.split('#')[1] + '"]').tab('show');
+        }
+
+        $("#futureShiftDateFrom, #futureShiftDateTo").datepicker({
+            format: "yyyy-mm-dd",
+            language: 'cs'
+        }).on('change', function() {
+            let dateFrom = null;
+            let dateTo = null;
+            if ($('#futureShiftDateFrom').val() != '') {
+                var dateFromD = new Date($('#futureShiftDateFrom').val());
+                dateFrom = dateFromD.getFullYear() + '-' + (dateFromD.getMonth() + 1) + '-' + dateFromD.getDate();
+            }
+            if ($('#futureShiftDateTo').val() != '') {
+                var dateToD = new Date($('#futureShiftDateTo').val());
+                dateTo = dateToD.getFullYear() + '-' + (dateToD.getMonth() + 1) + '-' + dateToD.getDate();
+            }
+            $.nette.ajax({
+                method: 'post',
+                url: {link showFutureShiftsByDate!},
+                data: {
+                    dateFrom: dateFrom,
+                    dateTo: dateTo,
+                    workerId : $('#workerIdForFutureShift').attr('data-id'),
+                }
+            });
+        });
+
+        $(document).on('click', '#resetFutureShiftDateFilter', function() {
+            $('#futureShiftDateFrom').val('');
+            $('#futureShiftDateTo').val('');
+            $.nette.ajax({
+                method: 'post',
+                url: {link showFutureShiftsByDate!},
+                data: {
+                    dateFrom: null,
+                    dateTo: null,
+                    workerId : $('#workerIdForFutureShift').attr('data-id'),
+                }
+            });
+        });
+    </script>
+
+    {* tabulka Školení *}
+    <script>
+        $( function() {
+            $(document).on('click', '.saveTender', function (e) {
+                var id = $(e.currentTarget).closest('tr').data('id');
+                console.log('savetender ' + id);
+                console.log('selected: ' + $('tr[data-id="' + id + '"] select[name="result"]').find(":selected").val());
+                $.nette.ajax({
+                    url: {link saveTender!},
+                    type: 'POST',
+                    data: {
+                        id : id,
+                        result : $('tr[data-id="' + id + '"] select[name="result"]').find(":selected").val(),
+                        resultDesc : $('tr[data-id="' + id + '"] textarea[name="resultDesc"]').val()
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        $( function() {
+            $(document).on('click', '.removeTender', function (e) {
+                id = $(e.currentTarget).closest('tr').data('id');
+                $.nette.ajax({
+                    url: {link removeTender!},
+                    type: 'POST',
+                    data: {
+                        id : id
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+    </script>
+{/block}

@@ -1,0 +1,90 @@
+{block title}
+    {ifset $entity}
+        {_'Editace poptávky'}
+    {else}
+        {_'Přidání poptávky'}
+    {/ifset}
+{/block}
+{block header-icon}<i class="fa fa-address-card icon-gradient bg-happy-itmeo"></i>{/block}
+{block description}
+{/block}
+{block header-actions}
+    <a n:if="isset($entity)" n:href="createOffer! id => $entity->id" class="btn btn-primary">
+        {if !$entity->offer || count($entity->offer) == 0}
+            {_'Založit nabídku z poptávky'}
+        {else}
+            {_'Založit další nabídku z poptávky'}
+        {/if}
+    </a>
+{/block}
+{block content}
+    <div class="card mb-2">
+        <div class="card-header">
+            {_'Poptávka'} {ifset $entity}{$entity->id}{/ifset}
+        </div>
+        <div class="card-body">
+            {form form}
+                <div class="form-row">
+                    <div class="col-md-6">
+                        <div class="form-row">
+
+                            {include bootstrap-input $form, 'createdAt', 6}
+                            {include bootstrap-input $form, 'conf', 6}
+                            <div class="col-md-6">
+                                Zákazník<br>
+                                {if $entity->customer}
+                                    <div class="py-2">
+                                    <a n:href="Customer:edit id => $entity->customer->id" target="_blank" class="text-left form-control btn-outline-primary h-auto" title="Přejít na zákazníka">
+                                        {if $entity->customer->company}{$entity->customer->company},{/if}
+                                        {$entity->customer->name} {$entity->customer->surname},
+                                        {$entity->customer->email}, {$entity->customer->phone}
+                                    </a>
+                                    </div>
+                                {else}
+                                    <span class="text-danger">Chyba: Zákazník není přiřazený!</span>
+                                {/if}
+                            </div>
+                            <div class="col-md-6">
+                                Adresa instalace<br>
+                                <div class="py-2">
+                                    {$entity->installCity}, {$entity->installZip}
+                                </div>
+                                <div class="pb-2">
+                                    Instalace k rodinnému domu: {if $entity->forFamilyHouse}Ano{else}Ne{/if}
+                                </div>
+                            </div>
+                            {include bootstrap-input $form, 'message', 12}
+                            {include bootstrap-input $form, 'note', 12}
+
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Hodnoty od zákazníka</h5>
+                        <table class="table">
+                            <tr><th>Pole</th><th>Hodnota</th></tr>
+                            {foreach $entity->values as $iv}
+                                <tr><td>{$iv->name}</td><td>{$iv->value}</td></tr>
+                            {/foreach}
+                        </table>
+                        <h5>Přiřazené produkty</h5>
+                        <table class="table">
+                            <tr><th>ID</th><th>Klíč TPV</th><th>Počet</th><th>Označení</th></tr>
+                            {foreach $entity->products as $ip}
+                                <tr><td>{$ip->product->id}</td><td>{$ip->product->klic_polozky}</td><td>{$ip->count}</td><td>{$ip->product->nazev_polozky}</td></tr>
+                            {/foreach}
+                        </table>
+
+                    </div>
+                </div>
+                <button type="submit" name="sendSave" class="d-none" id="main-form-submit"></button>
+            {/form}
+        </div>
+
+        <div class="card-footer">
+            <a n:href="Inquiry:default" class="btn btn-outline-primary m-1"><i class="fa fa-arrow-left"></i> Zpět</a>
+            <button type="button" class="send btn btn-primary m-1" onclick="document.getElementById('main-form-submit').click()">Uložit</button>
+        </div>
+    </div>
+
+{/block}
+

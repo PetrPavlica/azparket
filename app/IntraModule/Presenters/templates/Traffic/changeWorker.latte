@@ -1,0 +1,27 @@
+{block title}{_'Záměna techniků'}{/block}
+{block description}{_'Záměna techniků v provozovně'}{/block}
+{block header-icon}<i class="fa fa-sync-alt icon-gradient bg-happy-itmeo"></i>{/block}
+{block header-actions}
+    <a n:href="Traffic:default" class="btn btn-outline-primary">
+        {_'Zpět'}
+    </a>
+{/block}
+{block content}
+    {form changeWorkerForm}
+        <div class="card">
+            <div class="card-body">
+                <div class="form-row">
+                    {include bootstrap-input $form, 'worker', 4}
+                    {include bootstrap-input $form, 'workerSubstitute', 4}
+                    <div class="mt-auto ml-2">
+                        <div class="form-group">
+                            <button name="send" type="submit" class="btn btn-success">
+                                <i class="fa fa-sync-alt"></i> {_'Změnit'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {/form}
+{/block}

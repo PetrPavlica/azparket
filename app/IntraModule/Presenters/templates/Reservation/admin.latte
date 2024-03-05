@@ -1,0 +1,47 @@
+{block title}{_'Administrace rezervací'}{/block}
+{block description}{_'Správa rezervací a rezervačních položek'}{/block}
+{block header-icon}<i class="fa fa-calendar-week icon-gradient bg-mean-fruit"></i>{/block}
+{block header-actions}
+    <a n:href="Reservation:edit" class="btn btn-outline-primary">
+        {_'Nová rezervace'}
+    </a>
+    <a n:href="Reservation:editItem" class="btn btn-outline-primary">
+        {_'Nová rezervovatelná položka'}
+    </a>
+    <a class="btn btn-primary" n:href="Reservation:default openTab => '#home'"><span>Přehled</span></a>
+    <a class="btn btn-primary" n:href="Reservation:default openTab => '#item'"><span>Rezervovatelné položky</span></a>
+        
+{/block}
+{block content}
+
+    <div id="admin" class="tab-pane tabs-animation fade show active">
+        <div id="reservation-items" class="admin-mode">
+            <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
+                {foreach $reservationItems as $key => $ri}
+                    <li class="nav-item"><span class="nav-link {if !$openTab && $iterator->isFirst() || $openTab == '#ri-tab-' . $ri->id}show active{/if}" data-toggle="tab" href="#ri-tab-{$ri->id}" role="tab"><span>{$ri->name}</span></span></li>
+                {/foreach}
+            </ul>
+            {snippetArea reservation}
+            <div class="tab-content mt-4">
+                {foreach $reservationItems as $key => $ri}
+                    <div id="ri-tab-{$ri->id}" class="tab-pane tabs-animation fade {if !$openTab && $iterator->isFirst() || $openTab == '#ri-tab-' . $ri->id}show active{/if} reservation-data" data-riid="{$ri->id}">                    
+                        {snippet reservationItem-{$ri->id}}
+                            {control reservation-{$ri->id}}
+                        {/snippet}
+                    </div>
+                {/foreach}
+            </div>
+            {/snippetArea}
+        </div>
+    </div>
+
+{/block}
+{block scriptsBot}
+    {if $reservationItems}
+        {control reservation-{$reservationItems[0]->id}:scripts}
+
+        <div n:snippet="reservationModal" data-modal="reservationAdmin">
+            {control reservation-{$reservationItems[0]->id}:modal}
+        </div>
+    {/if}
+{/block}

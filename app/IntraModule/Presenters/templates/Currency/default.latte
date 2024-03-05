@@ -1,0 +1,25 @@
+{block title}{_'Měny'}{/block}
+{block description}{_'Seznam měn'}{/block}
+{block header-icon}<i class="fa fa-euro-sign icon-gradient bg-mean-fruit"></i>{/block}
+{block header-actions}
+    <a n:href="Currency:edit" class="btn btn-primary">
+        {_'Nová měna'}
+    </a>
+{/block}
+{block content}
+    {control table}
+
+    {capture $div}
+        <div class="card">
+        <div class="card-body">
+            <h3>Aktualizace kurzů dle aktuálních kurzů ČNB</h3>
+            Pozor! stiskem tlačítka přepíšete kurzy v informačním systému za aktuální kurzy ČNB <br /><br />
+            <a n:href="actualizeExchangeRates!" class="btn btn-primary btn-loading"><i class="fa fa-money"></i>
+                Aktualizovat
+            </a>
+        </div>
+        </div>
+    {/capture}
+    {control acl $div, 'Tlačítko aktualizace kurzů dle ČNB', 'handleActualizeExchangeRates', 'Currency', 'method'}
+
+{/block}

@@ -1,0 +1,28 @@
+{block title}{_'Rezervace'}{/block}
+{block description}{_'Správa rezervací a rezervačních položek'}{/block}
+{block header-icon}<i class="fa fa-calendar-week icon-gradient bg-mean-fruit"></i>{/block}
+{block header-actions}
+    <a n:href="Reservation:edit" class="btn btn-primary">
+        {_'Nová rezervace'}
+    </a>
+    <a n:href="Reservation:editItem" class="btn btn-primary">
+        {_'Nová rezervovatelná položka'}
+    </a>
+{/block}
+{block content}
+    <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
+        <li class="nav-item"><a class="nav-link {if empty($openTab) || $openTab == '#home'}show active{/if}" data-toggle="tab" id="tab-1" href="#home" role="tab"><span>Přehled</span></a></li>
+        <li class="nav-item"><a class="nav-link {if $openTab == '#item'}show active{/if}" data-toggle="tab" id="tab-2" href="#item" role="tab"><span>Rezervovatelné položky</span></a></li>
+        <li class="nav-item"><a class="nav-link" n:href="Reservation:admin" ><span>Administrace rezervací</span></a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div id="home" class="tab-pane tabs-animation fade {if empty($openTab) || $openTab == '#home'}show active{/if}">
+            {control table}
+        </div>
+
+        <div id="item" class="tab-pane tabs-animation fade {if $openTab == '#item'}show active{/if}">
+            {control itemTable}
+        </div>
+    </div>
+{/block}

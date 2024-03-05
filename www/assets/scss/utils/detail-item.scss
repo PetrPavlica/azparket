@@ -1,0 +1,36 @@
+#detail-item {
+  .detail-title {
+    font-weight: bold;
+  }
+
+  .detail-value {
+
+  }
+
+  .col-item {
+    &:nth-last-child(1), &:nth-last-child(2), &:nth-last-child(3) {
+      .detail-item {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  .detail-item {
+    margin-bottom: 1rem;
+  }
+
+  fieldset {
+    border: 1px solid #909090;
+    padding: 1rem;
+
+    legend {
+      padding: 0 1rem;
+      font-size: 1rem;
+      margin: 0;
+    }
+
+    &:not(:last-child) {
+      margin-bottom: 2rem;
+    }
+  }
+}

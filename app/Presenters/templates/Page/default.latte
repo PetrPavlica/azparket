@@ -1,0 +1,222 @@
+{block title}{if !empty($menu->title)}{$menu->title}{else}{strip_tags($menu->name)}{/if}{/block}
+{block keywords}{$menu->keywords}{/block}
+{block description}{$menu->description}{/block}
+
+{block content}
+    {*<div id="menu-path" n:if="count($structureMenu)">
+        <a n:href="Homepage:"><i class="fa fa-home"></i></a>
+        {foreach $reverseStructureMenu as $m}
+            <span> > </span> <a n:href="Page:default id => $m->id">{strip_tags($m->name)}</a>
+        {/foreach}
+    </div>*}
+
+    {if isset($structureMenu[1]) && (in_array($productsMenu, $structureMenuId) || in_array(6, $structureMenuId))}
+        <a n:href="Page: id => $structureMenu[1]->id" class="btn-back">{_'Zpět'}</a>
+    {/if}
+
+    {if $menu->show_signpost}
+        {if isset($parentMenu) && count($parentMenu)}
+            <div id="signpost">
+                <h2>{$menu->name|noescape}</h2>
+                <div class="items">
+                    {foreach $parentMenu as $m}
+                        <a n:href="Page:default id => $m->id" class="item {if (isset($menu) && $menu->id == $m->id) || (isset($structureMenuId) && in_array($m->id, $structureMenuId))}active{/if}">
+                            {$m->name|noescape}
+                        </a>
+                    {/foreach}
+                </div>
+            </div>
+        {elseif isset($parentMenu) && count($parentMenu) && in_array($productsMenu, $structureMenuId)}
+            <div id="products-guide">
+                <h2>{$menu->name|noescape}</h2>
+                <div class="items">
+                    {foreach $parentMenu as $m}
+                        <a n:href="Page:default id => $m->id" class="item {if (isset($menu) && $menu->id == $m->id) || (isset($structureMenuId) && in_array($m->id, $structureMenuId))}active{/if}">
+                            <div class="image">
+                                {if $m->image && file_exists($m->image)}
+                                <img n:img="$m->image, '200x140'" alt="{$m->name}">
+                                {/if}
+                            </div>
+                            <div class="title">{$m->name|noescape}</div>
+                        </a>
+                    {/foreach}
+                </div>
+            </div>
+        {/if}
+    {/if}
+    
+    {ifset $articlesTop}
+        {control article, $articlesTop, $menu->id}
+    {/ifset}
+
+    {*<div id="products" n:if="isset($products) && count($products)">
+        <h2>{_'Přehled výrobků'}</h2>
+
+        <div id="list">
+            {foreach $products as $p}
+                {control productTile $p}
+            {/foreach}
+        </div>
+    </div>*}
+
+    {* reservations *}
+    {if $menu->id == 7}
+
+        <div id="reservation-items">
+            <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
+                {foreach $reservationItems as $key => $ri}
+                    <li class="nav-item"><span class="nav-link {if !$openTab && $iterator->isFirst() || $openTab == '#ri-tab-' . $ri->id}show active{/if}" data-toggle="tab" href="#ri-tab-{$ri->id}" role="tab"><span>{$ri->name}</span></span></li>
+                {/foreach}
+            </ul>
+            {snippetArea reservation}
+            <div class="tab-content mt-4">
+                {foreach $reservationItems as $key => $ri}
+                    <div id="ri-tab-{$ri->id}" class="tab-pane tabs-animation fade {if !$openTab && $iterator->isFirst() || $openTab == '#ri-tab-' . $ri->id}show active{/if} reservation-data" data-riid="{$ri->id}">                    
+                        {snippet reservationItem-{$ri->id}}
+                            {control reservation-{$ri->id}}
+                        {/snippet}
+                    </div>
+                {/foreach}
+            </div>
+            {/snippetArea}
+
+        </div>
+        
+        
+    {/if}
+
+    {* USABLE INQUIRY FORM *}
+    {*if $menu->id == 12}
+        {form inquiryForm class => 'form-horizontal'}
+            <div class="form-group">
+                {label company class => 'control-label col-sm-2 col-md-offset-1'/}
+                <div class="col-sm-10 col-md-6">
+                    {input company class => 'form-control'}
+                </div>
+            </div>
+            <div class="form-group">
+                {label contactPerson class => 'control-label col-sm-2 col-md-offset-1'/}
+                <div class="col-sm-10 col-md-6">
+                    {input contactPerson class => 'form-control'}
+                </div>
+            </div>
+            <div class="form-group">
+                {label address class => 'control-label col-sm-2 col-md-offset-1'/}
+                <div class="col-sm-10 col-md-6">
+                    {input address class => 'form-control'}
+                </div>
+            </div>
+            <div class="form-group">
+                {label phone class => 'control-label col-sm-2 col-md-offset-1'/}
+                <div class="col-sm-10 col-md-6">
+                    {input phone class => 'form-control'}
+                </div>
+            </div>
+            <div class="form-group">
+                {label email class => 'control-label col-sm-2 col-md-offset-1'/}
+                <div class="col-sm-10 col-md-6">
+                    {input email class => 'form-control'}
+                </div>
+            </div>
+            <div class="form-group">
+                {label inquiry class => 'control-label col-sm-2 col-md-offset-1'/}
+                <div class="col-sm-10 col-md-6">
+                    {input inquiry class => 'form-control'}
+                </div>
+            </div>
+            {input captcha}
+            <div class="form-group">
+                <div class="col-sm-12 col-md-11 text-center">
+                    {input send class => 'btn btn-default'}
+                    {input clear class => 'btn btn-default'}
+                </div>
+            </div>
+        {/form}
+    {/if*}
+
+
+    {* USABLE HAVE A QUESTION FORM *}
+    {*if $menu->id == 0}
+        {form questionForm class => 'form-horizontal'}
+            <div class="form-group">
+                {label name class => 'control-label col-sm-2 col-md-offset-1'/}
+                <div class="col-sm-10 col-md-6">
+                    {input name class => 'form-control'}
+                </div>
+            </div>
+            <div class="form-group">
+                {label lastName class => 'control-label col-sm-2 col-md-offset-1'/}
+                <div class="col-sm-10 col-md-6">
+                    {input lastName class => 'form-control'}
+                </div>
+            </div>
+            <div class="form-group">
+                {label phone class => 'control-label col-sm-2 col-md-offset-1'/}
+                <div class="col-sm-10 col-md-6">
+                    {input phone class => 'form-control'}
+                </div>
+            </div>
+            <div class="form-group">
+                {label email class => 'control-label col-sm-2 col-md-offset-1'/}
+                <div class="col-sm-10 col-md-6">
+                    {input email class => 'form-control'}
+                </div>
+            </div>
+            <div class="form-group">
+                {label inquiry class => 'control-label col-sm-2 col-md-offset-1'/}
+                <div class="col-sm-10 col-md-6">
+                    {input inquiry class => 'form-control'}
+                </div>
+            </div>
+            {input captcha}
+            <div class="form-group">
+                <div class="col-sm-12 col-md-11 text-center">
+                    {input send class => 'btn btn-default'}
+                    {input clear class => 'btn btn-default'}
+                </div>
+            </div>
+        {/form}
+    {/if*}
+
+    {ifset $articlesBottom}
+        {control article, $articlesBottom, $menu->id}
+    {/ifset}
+
+    {if in_array($menu->id, $pagerMenu)}
+    <div id="pager">
+        <ul class="pagination">
+            {if ($paginator->getPage() - 1) > 0}
+                <li><a n:href="Page:default id => $menu->id, page=> $paginator->getPage()-1">« {_'Předchozí'}</a></li>
+            {/if}
+
+            {var $lastPagePag = 0}
+            {for $i = $paginator->getFirstPage(); $i < $paginator->getLastPage()+1; $i++}
+                {if $i == $paginator->getPage()}
+                    <li class="active"><span>{$i}</span></li>
+                {elseif abs($i - $paginator->getPage()) < 4}
+                    <li><a n:href="Page:default id => $menu->id, page=>$i">{$i}</a></li>
+                    {var $lastPagePag = $i}
+                {/if}
+            {/for}
+
+            {if ($paginator->getLastPage() - $paginator->getPage()) > 0 && $paginator->getLastPage() > $lastPagePag}
+                <li class="dots"><span>...</span></li>
+                <li><a n:href="Page:default id => $menu->id, page=>$paginator->getLastPage()+1">{$paginator->getLastPage()}</a></li>
+            {/if}
+
+            {if ($paginator->getLastPage() - $paginator->getPage()) > 0}
+                <li><a n:href="Page:default id => $menu->id, page=> $paginator->getPage()+1">{_'Další'} »</a></li>
+            {/if}
+        </ul>
+    </div>
+    {/if}
+{/block}
+
+{block scriptsBot}
+
+    {if $menu->id == 7}
+        {if $reservationItems}
+            {control reservation-{$reservationItems[0]->id}:scripts}
+        {/if}
+    {/if}
+{/block}

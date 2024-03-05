@@ -1,0 +1,94 @@
+{block title}
+    {ifset $entity}
+        {_'Editace položky'}
+    {else}
+        {_'Přidání položky'}
+    {/ifset}
+{/block}
+{block description}
+    {ifset $entity}
+        {_'Editace rezervovatelné položky'}
+    {else}
+        {_'Přidání rezervovatelné položky'}
+    {/ifset}
+{/block}
+{block header-icon}<i class="fa fa-calendar-week icon-gradient bg-mean-fruit"></i>{/block}
+{block content}
+{form itemForm}
+    {input id}
+    <div class="card">
+        <div class="card-body">
+            <div class="form-row">
+                {include bootstrap-input $form, 'name', 12}
+                
+                {include bootstrap-input $form, 'reservablePeriod', 3}
+                {*include bootstrap-input $form, 'minReservablePeriod', 3*}
+                {include bootstrap-input $form, 'pricePerHour', 3}
+                {include bootstrap-input $form, 'active', 3}
+                <div class="col-md-6">
+                    <div class="form-row mb-3 pb-2 border-bottom">
+                        <div class="col-md-2">Den</div>
+                        <div class="col-md-5">Od</div>
+                        <div class="col-md-5">Do</div>
+                    </div>
+                    <div class="form-row my-2">
+                        <div class="col-md-2">Pondělí</div>
+                        <div class="col-md-5">{input timeMondayFrom}</div>
+                        <div class="col-md-5">{input timeMondayTo}</div>
+                    </div>
+                    <div class="form-row my-2">
+                        <div class="col-md-2">Úterý</div>
+                        <div class="col-md-5">{input timeTuesdayFrom}</div>
+                        <div class="col-md-5">{input timeTuesdayTo}</div>
+                    </div>
+                    <div class="form-row my-2">
+                        <div class="col-md-2">Středa</div>
+                        <div class="col-md-5">{input timeWednesdayFrom}</div>
+                        <div class="col-md-5">{input timeWednesdayTo}</div>
+                    </div>
+                    <div class="form-row my-2">
+                        <div class="col-md-2">Čtvrtek</div>
+                        <div class="col-md-5">{input timeThursdayFrom}</div>
+                        <div class="col-md-5">{input timeThursdayTo}</div>
+                    </div>
+                    <div class="form-row my-2">
+                        <div class="col-md-2">Pátek</div>
+                        <div class="col-md-5">{input timeFridayFrom}</div>
+                        <div class="col-md-5">{input timeFridayTo}</div>
+                    </div>
+                    <div class="form-row my-2">
+                        <div class="col-md-2">Sobota</div>
+                        <div class="col-md-5">{input timeSaturdayFrom}</div>
+                        <div class="col-md-5">{input timeSaturdayTo}</div>
+                    </div>
+                    <div class="form-row my-2">
+                        <div class="col-md-2">Neděle</div>
+                        <div class="col-md-5">{input timeSundayFrom}</div>
+                        <div class="col-md-5">{input timeSundayTo}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-2">
+        <div class="card-body">
+            <a class="btn btn-outline-primary"
+                    {ifset $backUrl}
+               href="{$backUrl}">
+                {else}
+                href="{link Reservation:default}">
+                {/ifset}
+                <span class="fa fa-arrow-left" aria-hidden="true"></span>
+                Zpět
+            </a>
+
+            <button name="send" type="submit" class="btn btn-primary"><i class="fa fa-floppy-o"></i> Uložit</button>
+            <button name="sendBack" type="submit" class="btn btn-primary"><i class="fa fa-floppy-o"></i> Uložit a zpět</button>
+        </div>
+    </div>
+{/form}
+{/block}
+{block scriptsBot}
+
+{/block}

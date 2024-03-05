@@ -1,0 +1,239 @@
+{block title}
+    {ifset $entity}
+        {_'Editace obchodního případu'}
+    {else}
+        {_'Přidání obchodního případu'}
+    {/ifset}
+{/block}
+{block description}
+    {ifset $entity}
+        {_'Editace stávajícího obchodního případu'}
+    {else}
+        {_'Přidání nového obchodního případu'}
+    {/ifset}
+{/block}
+{block header-icon}<i class="fa fa-book icon-gradient bg-happy-itmeo"></i>{/block}
+{block header-actions}
+    <a n:href="VisitProcess:default" class="btn btn-outline-primary">
+        {_'Zpět'}
+    </a>
+{/block}
+
+{block content}
+
+    <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
+        <li class="nav-item"><a class="nav-link {if empty($openTab) || $openTab == '#home'}show active{/if}" data-toggle="tab" id="tab-1" href="#home" role="tab"><span>Úvod</span></a></li>
+        <li n:if="isset($entity)" class="nav-item"><a class="nav-link {if $openTab == '#docs'}show active{/if}" data-toggle="tab" id="tab-2" href="#docs" role="tab"><span>Dokumenty</span></a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div id="home" class="tab-pane tabs-animation fade {if empty($openTab) || $openTab == '#home'}show active{/if}">
+            {form form}
+                {input id}
+                <div class="card mb-2">
+                    <div class="card-header">
+                        {_'Základní informace'}
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 col-sm-12 col-xs-12">
+                                <div class="form-row">
+                                    {include bootstrap-input $form, 'orderId', 9}
+                                    {include bootstrap-input $form, 'isIntOrderId', 3}
+                                    {include bootstrap-input $form, 'name', 12}
+                                    {include bootstrap-autocomplete $form, 'traffic', 12, 'getTraffics', '', 'handleTrafficsAutocmplt'}
+                                    {include bootstrap-autocomplete $form, 'customer', 12, 'getCustomers', '', ''}
+                                    {include bootstrap-autocomplete $form, 'customerOrdered', 12, 'getCustomerOrdereds', '', ''}
+                                    {if isset($entity) && isset($entity->visits) && count($entity->visits)}
+                                        <h5>Nutno objednat:</h5>
+                                        <div class="row">
+                                            {foreach $entity->visits as $vis}
+                                                <div class="col-xs-12 col-sm-12 col-md-3 text-right">{$vis->orderId2}: </div>
+                                                {var $nb = ''}
+                                                {if $vis->materialNeedBuy}
+                                                    {foreach $vis->materialNeedBuy as $buy}
+                                                        {var $nb = $nb.$buy->name.', '}
+                                                    {/foreach}
+                                                {/if}
+                                                <div class="col-xs-12 col-sm-12 col-md-9">{$nb}</div>
+                                            {/foreach}
+                                        </div>
+                                    {/if}
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-12 col-xs-12">
+                                <div class="form-row">
+                                    {include bootstrap-input $form, 'state', 6}
+                                    {include bootstrap-input $form, 'dateAcceptOrder', 6}
+                                    {include bootstrap-input $form, 'dateSendOffer', 6}
+                                    {include bootstrap-input $form, 'dateFinished', 6}
+                                    {include bootstrap-input $form, 'dateOrderPart', 6}
+                                    {include bootstrap-input $form, 'dateSendPart', 6}
+                                    {include bootstrap-input $form, 'worker', 12}
+                                    {include bootstrap-input $form, 'description', 12}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <a n:href="VisitProcess:default" class="btn btn-outline-primary">
+                            <span class="fa fa-arrow-left" aria-hidden="true"></span>
+                            {_'Zpět'}
+                        </a>
+                        <span class="pull-right">
+                            <button name="sendBack" type="submit" class="btn btn-primary">Uložit a zpět</button>
+                            <button name="sendSave" type="submit" class="btn btn-primary">Uložit a pokračovat</button>
+                            <button name="sendNew" type="submit" class="btn btn-primary">Uložit a nový</button>
+                        </span>
+                    </div>
+                </div>
+            {/form}
+
+            <div class="card mb-2" n:if="isset($entity)">
+                <div class="card-header">
+                    {_'Přiřazené výjezdy'}
+                    <span n:if="isset($entity)" class="ml-auto">
+                            <a n:href="Visit:edit visitProcessId => $entity->id" class="btn btn-primary">{_'Přidat výjezd'}</a>
+                        </span>
+                </div>
+                <div class="card-body">
+                    {control visitTable}
+                </div>
+            </div>
+        </div>
+
+        <div id="docs" n:if="isset($entity)" class="tab-pane tabs-animation fade {if $openTab == '#docs'}show active{/if}">
+            <div class="card mb-3">
+                <div class="card-header">
+                    Dokumenty
+                </div>
+                <div class="card-body" n:snippet="product-documents">
+                    {if isset($entity) && $entity->visits && count($entity->visits)}
+                        {form formDocs, class=>"form-horizontal"}
+                            <input type="hidden" name="processId" value="{if isset($entity)}{$entity->id}{/if}">
+                            <input type="hidden" name="processIdno" value="{if isset($entity)}{$entity->orderId}{/if}">
+                            <button name="downloadDocs" type="submit" class="btn btn-warning btn-sm">Stáhnout označené dokumenty</button>
+                            <button name="sendEmailDocs" type="submit" class="btn btn-warning btn-sm">Odeslat označené dokumenty</button>
+                            <button name="sendInvoicingDocs" type="submit" class="btn btn-warning btn-sm">Odeslat na fakturaci</button>
+                            <br><br>
+                            <table class="table table-bordered table-sm" id="sortable-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 3%;">#</th>
+                                        <th style="width: 2%;">#</th>
+                                        <th style="width: 25%;">Název</th>
+                                        <th style="width: 10%;">Přidal</th>
+                                        <th style="width: 10%;">Datum</th>
+                                        <th style="width: 10%;">Náhled</th>
+                                        <th style="width: 10%;">Akce</th>
+                                    </tr>
+                                </thead>
+                                    {foreach $entity->visits as $vis}
+                                        <thead>
+                                            <tr>
+                                                <th colspan="2" style="font-weight: bold;">
+                                                    {_'Výjezd: '}
+                                                </th>
+                                                <th colspan="5" style="font-weight: bold; text-align: center;">
+                                                    {$vis->orderId2}
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        {foreach $vis->document as $document}
+                                            <tbody>
+                                                <tr>
+                                                    <td><input type="checkbox" name="doc/{$document->id}" id="doc/{$document->id}"></td>
+                                                    <td class="text-center">{$iterator}.</td>
+                                                    <td>
+                                                        {$document->name}
+                                                        {*substr($document->document, strrpos($document->document, '/') + 1)*}
+                                                    </td>
+                                                    <td>
+                                                        {if $document->user}{$document->user->name}{/if}
+                                                    </td>
+                                                    <td>
+                                                        {$document->createdAt->format('d.m.Y H:i:s')}
+                                                    </td>
+                                                    <td>
+                                                        <a n:if="$document->document && file_exists($document->document) && exif_imagetype($document->document)" data-fancybox="gallery" href="{$basePath}/{$document->document}">
+                                                            <img src="{$basePath}/{$document->document}" style="max-height: 50px; max-width: 150px;">
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        <a style="cursor: pointer" class="" href="{$basePath}/{$document->document}" download="{$document->name}"><i class="fa fa-download text-success pl-2 pr-3"></i></a>
+                                                        <a style="cursor: pointer" class="" n:href="deleteVisitDocument! documentId => $document->id" data-confirm-sweetalert2="delete"><i class="fa fa-trash text-danger"></i></a>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        {/foreach}
+                                    {/foreach}
+                            </table>
+                        {/form}
+                    {else}
+                        <div>{_'Dokumenty se zobrazí, až bude přiřazen výjezd.'}</div>
+                    {/if}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{/block}
+{block scriptsBot}
+<script>
+    $(document).on('change', '#frm-form-isIntOrderId', function (e) {
+        if($(this).is(':checked')) {
+            $.nette.ajax({
+                url: {link getVisitProcessOrderId!},
+                type: 'POST',
+            }).done(function(data) {
+                $('#frm-orderId').val(data['id']);
+            });
+        }
+    });
+
+    function handleTrafficsAutocmplt(data, p1, p2) {
+        if(data[1]['customerOrdered']) {
+            $('#customerOrdered').val(data[1]['customerOrdered']);
+            let order = $('#textcustomerOrdered');
+            order.val(data[1]['textcustomerOrdered']);
+            order.attr('readonly', true);
+        }
+        if(data[1]['customer']) {
+            $('#customer').val(data[1]['customer']);
+            let order = $('#textcustomer');
+            order.val(data[1]['textcustomer']);
+            order.attr('readonly', true);
+        }
+        if(data[1]['worker']) {
+            $('#frm-worker').val(data[1]['worker']);
+            checkSelectedWorker();
+        }
+    }
+
+    function checkSelectedWorker() {
+        var workerArr = new Array();
+        $('#frm-worker :selected').each(function(i, sel){
+            workerArr.push($(sel).html());
+        });
+        if (workerArr && !workerArr.length) {
+            workerArr.push('Nic není vybráno');
+        }
+        $('#frm-worker').siblings('button').children().children().children().html(workerArr.join(', '));
+    }
+</script>
+    {ifset $canDownloadZip}
+        <script>
+            function downloadURI(uri) {
+                let link = document.createElement("a");
+                link.href = uri;
+                link.click();
+            }
+            $(document).ready(function() {
+                downloadURI({link downloadZip!});
+            });
+        </script>
+    {/ifset}
+{/block}

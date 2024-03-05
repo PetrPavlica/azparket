@@ -1,0 +1,65 @@
+{block title}
+    {_'Náhled absence'}
+{/block}
+{block description}
+    {_'Náhled absence'}
+{/block}
+{block header-icon}<i class="fa fa-user-times icon-gradient bg-happy-itmeo"></i>{/block}
+{block header-actions}
+    <a n:href="Absence:default" class="btn btn-outline-primary">
+        {_'Zpět'}
+    </a>
+{/block}
+{block content}
+    <div class="card mb-2">
+        <div class="card-header">
+            {if $absence->user}{$absence->user->name}{/if}{if $absence->reason} - {$absence->reason->name}{/if}
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 col-sm-12 col-xs-12">
+                    <div class="row" n:if="$absence->dateStart">
+                        <div class="col-3">Začátek:</div>
+                        <div class="col-9 font-weight-bold">{$absence->dateStart|date:'j.n.Y'}</div>
+                    </div>
+                    <div class="row" n:if="$absence->dateEnd">
+                        <div class="col-3">Konec:</div>
+                        <div class="col-9 font-weight-bold">{$absence->dateEnd|date:'j.n.Y'}</div>
+                    </div>
+                    <div class="row" n:if="$absence->timeRange">
+                        <div class="col-3">Rozmezí:</div>
+                        <div class="col-9 font-weight-bold">{$absence->timeRange}</div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-12 col-xs-12">
+                    <div class="row">
+                        <div class="col-3">Celý den:</div>
+                        <div class="col-9 font-weight-bold">{if $absence->wholeDay}Ano{else}Ne{/if}</div>
+                    </div>
+                    <div class="row" n:if="$absence->userDelegate">
+                        <div class="col-3">Zastupuje technik:</div>
+                        <div class="col-9 font-weight-bold">{$absence->userDelegate->name}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-2">
+        <div class="card-header">
+            Popis
+        </div>
+        <div class="card-body">
+            {nl2br($absence->description)|noescape}
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <a class="btn btn-outline-primary" n:href="Absence:default">
+                <span class="fa fa-arrow-left" aria-hidden="true"></span>
+                Zpět
+            </a>
+        </div>
+    </div>
+{/block}

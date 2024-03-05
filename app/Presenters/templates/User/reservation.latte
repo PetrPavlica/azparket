@@ -1,0 +1,50 @@
+{block title}{_'Moje rezervace'}{/block}
+
+{block content}
+
+<div class="mb-3">
+    <a n:href="User:" class="btn btn-outline-primary m-1">Profil <i class="fa fa-cog"></i></a>
+</div>
+
+<div>
+    <div class="card mb-2">
+        <div class="card-header">
+            {_'Rezervace'}
+        </div>
+        <div class="card-body">
+            {snippet reservations}
+                {if count($reservations)}
+                {foreach $reservations as $r}
+                    <div class="row col-xs-12 col-sm-12 col-md-10 col-xl-9">
+                        <div class="col-sm-5">
+                            <div class="">Prostor:</div>
+                            {if $r->reservationItem}
+                                {$r->reservationItem->name}
+                            {/if}
+                        </div>
+                        <div class="col-sm-5">
+                            <div class="">Termín:</div>
+                            {$r->dateFrom|date:'j. n. Y'}
+                            {$r->dateFrom|date:'H:i'}&nbsp;-&nbsp;{$r->dateTo|date:'H:i'}
+                        </div>
+                        <div class="col-sm-2 d-flex align-items-end">
+                            {if $r->canceled}
+                                <span class="text-danger">Zrušeno</span>
+                            {else}
+                                <a n:href="cancelReservation! id => $r->id" class="btn btn-outline-danger ajax">Zrušit <i class="fa fa-times"></i></a>
+                            {/if}
+                        </div>
+                    </div>
+                    {if !$iterator->isLast()}
+                        <hr class="my-3">
+                    {/if}
+                {/foreach}
+                {else}
+                    {count($reservations)}
+                {/if}
+            {/snippet}
+        </div>
+    </div>
+</div>
+
+{/block}

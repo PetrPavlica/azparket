@@ -1,0 +1,22 @@
+{block title}
+    {ifset $entity}
+        {_'Editace normy'}
+    {else}
+        {_'Přidání normy'}
+    {/ifset}
+{/block}
+{block description}
+    {ifset $entity}
+        {_'Editace stávající normy'}
+    {else}
+        {_'Přidání nové normy'}
+    {/ifset}
+{/block}
+{block header-icon}<i class="fa fa-book icon-gradient bg-mean-fruit"></i>{/block}
+{block content}
+    <div class="card">
+        <div class="card-body">
+            {include bootstrap-form 'form'}
+        </div>
+    </div>
+{/block}

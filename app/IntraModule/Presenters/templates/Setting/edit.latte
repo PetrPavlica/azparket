@@ -1,0 +1,53 @@
+{block title}
+    {ifset $entity}
+        {_'Editace nastavení'}
+    {else}
+        {_'Přidání nastavení'}
+    {/ifset}
+{/block}
+{block description}
+    {ifset $entity}
+        {_'Editace stávajícího nastavení'}
+    {else}
+        {_'Přidání nového nastavení'}
+    {/ifset}
+{/block}
+{block header-icon}<i class="fa fa-cog icon-gradient bg-malibu-beach"></i>{/block}
+{block content}
+    <div>
+        {form form}
+            {input id}
+            <div class="card mb-2">
+                <div class="card-body">
+                    <div class="form-row">
+                        {include bootstrap-input $form, 'code', 12}
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+            <div class="card mb-2">
+                <div class="card-body">
+                    <div class="form-row">
+                        {include bootstrap-input $form, 'value', 12}
+                        {include bootstrap-input $form, 'description', 12}
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <a n:href="Setting:default" class="btn btn-outline-primary">
+                        <span class="fa fa-arrow-left" aria-hidden="true"></span>
+                        Zpět
+                    </a>
+                    <span class="pull-right">
+                    <button name="sendBack" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a zpět</button>
+                    <button name="sendSave" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a pokračovat</button>
+                    <button name="sendNew" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a nový</button>
+                </span>
+                </div>
+            </div>
+        {/form}
+    </div>
+{/block}

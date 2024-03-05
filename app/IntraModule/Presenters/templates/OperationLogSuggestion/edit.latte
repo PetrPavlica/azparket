@@ -1,0 +1,22 @@
+{block title}
+    {ifset $entity}
+        {_'Editace připomínky'}
+    {else}
+        {_'Přidání připomínky'}
+    {/ifset}
+{/block}
+{block description}
+    {ifset $entity}
+        {_'Editace stávající připomínky'}
+    {else}
+        {_'Přidání nové připomínky'}
+    {/ifset}
+{/block}
+{block header-icon}<i class="fa fa-question icon-gradient bg-mean-fruit"></i>{/block}
+{block content}
+    <div class="card">
+        <div class="card-body">
+            {include bootstrap-form 'form'}
+        </div>
+    </div>
+{/block}

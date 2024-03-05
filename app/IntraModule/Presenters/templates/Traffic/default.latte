@@ -1,0 +1,15 @@
+{block title}{_'Provozovny'}{/block}
+{block description}{_'Seznam provozoven'}{/block}
+{block header-icon}<i class="fa fa-university icon-gradient bg-happy-itmeo"></i>{/block}
+{block header-actions}
+    <a n:href="Traffic:changeWorker" class="btn btn-primary mr-5">
+        <i class="fa fa-sync-alt" aria-hidden="true"></i>
+        {_'Zaměnit techniky na provozovně'}
+    </a>
+    <a n:href="Traffic:edit" class="btn btn-primary">
+        {_'Nová provozovna'}
+    </a>
+{/block}
+{block content}
+    {control table}
+{/block}

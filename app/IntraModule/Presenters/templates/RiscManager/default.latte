@@ -1,0 +1,12 @@
+{block title}{_'Řízení rizik'}{/block}
+{block description}{_'Seznam řízených rizik'}{/block}
+{block header-icon}<i class="fa fa-percent icon-gradient bg-mean-fruit"></i>{/block}
+{block header-actions}
+    <a n:href="RiscManager:edit" class="btn btn-primary">
+        {_'Nové riziko'}
+    </a>
+    {*_'Přehled OP'} - {$processState->name} - {$processState->type->name*}
+{/block}
+{block content}
+    {control table}
+{/block}

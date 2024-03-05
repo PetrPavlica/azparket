@@ -1,0 +1,26 @@
+{_'Dobrý den,'}<br>
+<br>
+{_'v informačním systému Webrex demo byl změněn stav vaší absence.'}<br>
+Stav: {if $absence->state}{$absence->state->name}{else}{$title}{/if}
+<br><br>
+Váš požadavek:
+<br><br>
+{if $absence->user}{$absence->user->name}{/if}{if $absence->reason} - {$absence->reason->name}{/if}<br>
+Začátek: {$absence->dateStart|date:'j.n.Y'}<br>
+{if $absence->dateEnd}
+Konec: {$absence->dateEnd|date:'j.n.Y'}<br>
+{/if}
+{if $absence->timeRange}
+Rozmezí: {$absence->timeRange}<br>
+{/if}
+Celý den: {if $absence->wholeDay}Ano{else}Ne{/if}<br>
+{if $absence->userDelegate}
+Zastupuje technik: {$absence->userDelegate->name}<br>
+{/if}
+Popis: {$absence->description}<br><br>
+
+{_'S pozdravem,'}<br>
+<a href="{link Intra:Homepage:default}">Webrex demo intra</a><br>
+<small>
+    {_'Email byl vygenerován automaticky.'}
+</small>

@@ -1,0 +1,54 @@
+{block content}
+<div class="row">
+    <div class="col-12 col-md-6">
+        <h1>O firmě</h1>
+        <br/>
+        <h3>CO DĚLÁME</h3>
+        <br/>
+        <span class="dot"></span><p class="work">Kompletní dodávky masívních parketových podlah.</p>
+        <span class="dot"></span><p class="work">Prodej veškerých materiálů pro podlahy.</p>
+        <span class="dot"></span><p class="work">Prodej a pokládka parket, mozaikových parket a palubek.</p>
+        <span class="dot"></span><p class="work">Prodej dřevotřískových a dřevoštěpkových desek.</p>
+        <span class="dot"></span><p class="work">Prodej a pokládka PVC a koberců.</p>
+        <span class="dot"></span><p class="work">Prodej a pokládka dřevěných a laminátových plovoucích podlah.</p>
+        <span class="dot"></span><p class="work">Půjčovna Brusek na parkety.</p>
+    </div>
+    <div class="col-12 col-md-6">
+        <img src="{$basePath}/assets/images/azparket-place.svg" class="responsive" alt="azparket place">
+    </div>    
+</div>
+
+{block scriptsBot}
+<script>
+	$('#home-news .owl-carousel').owlCarousel({
+		loop: false,
+		margin: 0,
+		nav: true,
+		dots: false,
+		navText : ['<span class="arrow"></span>','<span class="arrow"></span>'],
+		responsive:{
+			0:{
+				items:1
+			},
+			600:{
+				items:4
+			}
+		}
+	});
+	$('#home-events .owl-carousel').owlCarousel({
+		loop: false,
+		margin: 0,
+		nav: true,
+		dots: false,
+		navText : ['<span class="arrow"></span>','<span class="arrow"></span>'],
+		responsive:{
+			0:{
+				items:1
+			},
+			600:{
+				items:3
+			}
+		}
+	});
+</script>
+{/block}

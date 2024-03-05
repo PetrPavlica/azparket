@@ -1,0 +1,1698 @@
+{block title}
+    {ifset $entity}
+        {_'Editace provozního deníku'}
+    {else}
+        {_'Přidání provozního deníku'}
+    {/ifset}
+{/block}
+{block description}
+    {ifset $entity}
+        {_'Editace stávajícího provozního deníku'}
+    {else}
+        {_'Přidání nového provozního deníku'}
+    {/ifset}
+{/block}
+{block header-icon}<i class="fa fa-check icon-gradient bg-mean-fruit"></i>{/block}
+{block content}
+
+        <div n:snippet='owf-form'>
+            {form form}
+                {*input id*}
+
+                <div class="card mb-2">
+                    <div class="card-header">
+                        {_'Obecné'}
+
+                        <span class="ml-auto">
+                            {ifset $entity}
+                                {if $entity->takeItemsCheck}
+                                    <span style="cursor: pointer" class="checkLogEnding btn btn-danger ml-auto" data-toggle="modal" data-target="#endingModal" data-id="{$entity->id}">
+                                        <i class="fa fa-check"></i> Předat směnu
+                                    </span>
+                                {else}
+                                    <span style="cursor: pointer" class="checkLogStarting btn btn-success ml-auto" data-toggle="modal" data-target="#startingModal" data-id="{$entity->id}">
+                                        <i class="fa fa-check"></i> Přebrat směnu
+                                    </span>
+                                {/if}
+                            {/ifset}
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-row">
+
+                            <div class="col-12">
+                                <div class="form-row">
+                                    <div class="col-2">
+                                        <div class="form-group">
+                                            <div style="font-size: 20px;">Den: {$dayTrans[$modalSpot->datePlan->format('N')]}</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-3">
+                                        <div class="form-group">
+                                            <div style="font-size: 20px;">Datum: {$modalSpot->datePlan->format('j. n. Y')}</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-3">
+                                        <div class="form-group">
+                                            <div style="font-size: 20px;">Směna: {$nameTrans[$modalSpot->name]}</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-2">
+                                        <div class="form-group">
+                                            <div style="font-size: 20px;">Linka: {$lineTrans[$modalSpot->productionLine]}</div>
+                                        </div>
+                                    </div>
+                                    <span class="ml-auto">
+                                        <span n:ifset="$modalSpot" style="cursor: pointer" class="checkSpotPlan btn btn-primary ml-auto" data-toggle="modal" data-target="#planModal" data-id="{$modalSpot->id}">
+                                            <i class="fa fa-user"></i> Upravit zaměstnance
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <hr style="border-top: solid 1px #cbc5c5;width: 100%;margin-top: -5px;margin-bottom: 5px;">
+
+                            <div class="col-12">
+                                <div class="form-row">
+                                    {ifset $workersArr['leader1']}
+                                        <div class="col-2">
+                                            <div class="form-group">
+                                                <label for="frm-name col-12">Vedoucí</label>
+                                                <div style="font-size: 16px;">{$workersArr['leader1']}</div>
+                                            </div>
+                                        </div>
+                                    {/ifset}
+                                    {ifset $workersArr['leader2']}
+                                        <div class="col-2">
+                                            <div class="form-group">
+                                                <label for="frm-name col-12">Zástupce</label>
+                                                <div style="font-size: 16px;">{$workersArr['leader2']}</div>
+                                            </div>
+                                        </div>
+                                    {/ifset}
+                                    {var $iterCount = 1}
+                                    {foreach $workersArr as $waKey => $wrkName}
+                                        {continueIf ($waKey == 'leader1' || $waKey == 'leader2')}
+                                        <div class="col-2">
+                                            <div class="form-group">
+                                                <label for="frm-name col-12">{$iterCount}.</label>
+                                                <div style="font-size: 16px;">{$wrkName}</div>
+                                            </div>
+                                        </div>
+                                        {var $iterCount += 1}
+                                    {/foreach}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+
+                <div id="accordion2">
+                    <div class="card mb-2">
+                        <div class="card-header">
+                            <a class="card-link" data-toggle="collapse" href="#collapse2">
+                                <i class="fa fa-plus"></i> {_'Kontrola v průběhu směny'}
+                            </a>
+                        </div>
+                        <div id="collapse2" class="collapse show" data-parent="#accordion2">
+                            <div class="card-body checkNormalChange">
+                                <div class="form-row">
+                                    <div class="col-6">
+                                        <div class="form-row" style="text-align: center">
+                                            <div class="col-8"></div>
+                                            <div class="col-1">Kontrola po 6h směny</div>
+                                            <div class="col-1"></div>
+                                            <div class="col-1">1h před koncem směny</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-row" style="text-align: center">
+                                            <div class="col-8"></div>
+                                            <div class="col-1">Kontrola po 6h směny</div>
+                                            <div class="col-1"></div>
+                                            <div class="col-1">1h před koncem směny</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    {if $isZn}
+                                        <div class="col-6">
+                                            <div class="form-row bbt-black brh-black">
+                                                <div class="col-8">
+                                                    <div class="form-group" style="margin-bottom: 5px; margin-top: 5px;">
+                                                        <div style="font-size: 16px;">Těsnost čerpadel</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check1n1" class="form-control checkForSix" id="frm-check1n1" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check1n1}checked{/if}>
+                                                </div>
+                                                <div class="col-1"></div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check1n2" class="form-control checkForEnd" id="frm-check1n2" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check1n2}checked{/if}>
+                                                </div>
+                                            </div>
+                                            <div class="form-row bbt-black brh-black">
+                                                <div class="col-8">
+                                                    <div class="form-group" style="margin-bottom: 5px; margin-top: 5px;">
+                                                        <div style="font-size: 16px;">Filtrace lázní (kontrola průtoku)</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check2n1" class="form-control checkForSix" id="frm-check2n1" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check2n1}checked{/if}>
+                                                </div>
+                                                <div class="col-1"></div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check2n2" class="form-control checkForEnd" id="frm-check2n2" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check2n2}checked{/if}>
+                                                </div>
+                                            </div>
+                                            <div class="form-row bbt-black brh-black">
+                                                <div class="col-8">
+                                                    <div class="form-group" style="margin-bottom: 5px; margin-top: 5px;">
+                                                        <div style="font-size: 16px;">Kontrola tlaku na čerp. čeření</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check3n1" class="form-control checkForSix" id="frm-check3n1" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check3n1}checked{/if}>
+                                                </div>
+                                                <div class="col-1"></div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check3n2" class="form-control checkForEnd" id="frm-check3n2" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check3n2}checked{/if}>
+                                                </div>
+                                            </div>
+                                            <div class="form-row bbt-black brh-black">
+                                                <div class="col-8">
+                                                    <div class="form-group" style="margin-bottom: 5px; margin-top: 5px;">
+                                                        <div style="font-size: 16px;">Sušky (kontrola teploty)</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check4n1" class="form-control checkForSix" id="frm-check4n1" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check4n1}checked{/if}>
+                                                </div>
+                                                <div class="col-1"></div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check4n2" class="form-control checkForEnd" id="frm-check4n2" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check4n2}checked{/if}>
+                                                </div>
+                                            </div>
+                                            <div class="form-row bbt-black brh-black">
+                                                <div class="col-8">
+                                                    <div class="form-group" style="margin-bottom: 5px; margin-top: 5px;">
+                                                        <div style="font-size: 16px;">Elchem (lůžka + zdroj)</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check5n1" class="form-control checkForSix" id="frm-check5n1" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check5n1}checked{/if}>
+                                                </div>
+                                                <div class="col-1"></div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check5n2" class="form-control checkForEnd" id="frm-check5n2" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check5n2}checked{/if}>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="form-row bbt-black">
+                                                <div class="col-8">
+                                                    <div class="form-group" style="margin-bottom: 5px; margin-top: 5px;">
+                                                        <div style="font-size: 16px;">Neutralizační stanice (funkčnost)</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check6n1" class="form-control checkForSix" id="frm-check6n1" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check6n1}checked{/if}>
+                                                </div>
+                                                <div class="col-1"></div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check6n2" class="form-control checkForEnd" id="frm-check6n2" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check6n2}checked{/if}>
+                                                </div>
+                                            </div>
+                                            <div class="form-row bbt-black">
+                                                <div class="col-8">
+                                                    <div class="form-group" style="margin-bottom: 5px; margin-top: 5px;">
+                                                        <div style="font-size: 16px;">El. rozvodovna, kotel</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check7n1" class="form-control checkForSix" id="frm-check7n1" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check7n1}checked{/if}>
+                                                </div>
+                                                <div class="col-1"></div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check7n2" class="form-control checkForEnd" id="frm-check7n2" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check7n2}checked{/if}>
+                                                </div>
+                                            </div>
+                                            <div class="form-row bbt-black">
+                                                <div class="col-8">
+                                                    <div class="form-group" style="margin-bottom: 5px; margin-top: 5px;">
+                                                        <div style="font-size: 16px;">Kompresorovna</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check10n1" class="form-control" id="frm-check10n1" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check10n1}checked{/if}>
+                                                </div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check10n2" class="form-control" id="frm-check10n2" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check10n2}checked{/if}>
+                                                </div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check10n3" class="form-control" id="frm-check10n3" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check10n3}checked{/if}>
+                                                </div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check10n4" class="form-control" id="frm-check10n4" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check10n4}checked{/if}>
+                                                </div>
+                                            </div>
+                                            <div class="form-row bbt-black">
+                                                <div class="col-8">
+                                                    <div class="form-group" style="margin-bottom: 5px; margin-top: 5px;">
+                                                        <div style="font-size: 16px;">Volný prostor pod přístroji PO</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check8n1" class="form-control checkForSix" id="frm-check8n1" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check8n1}checked{/if}>
+                                                </div>
+                                            </div>
+                                            <div class="form-row bbt-black">
+                                                <div class="col-8">
+                                                    <div class="form-group" style="margin-bottom: 5px; margin-top: 5px;">
+                                                        <div style="font-size: 16px;">Úklid prostor Galvaniky (hala, linka)</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check9n1" class="form-control checkForSix" id="frm-check9n1" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check9n1}checked{/if}>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {else}
+                                        <div class="col-6">
+                                            <div class="form-row bbt-black brh-black">
+                                                <div class="col-8">
+                                                    <div class="form-group" style="margin-bottom: 5px; margin-top: 5px;">
+                                                        <div style="font-size: 16px;">Těsnost čerpadel</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check1n1" class="form-control checkForSix" id="frm-check1n1" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check1n1}checked{/if}>
+                                                </div>
+                                                <div class="col-1"></div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check1n2" class="form-control checkForEnd" id="frm-check1n2" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check1n2}checked{/if}>
+                                                </div>
+                                            </div>
+                                            <div class="form-row bbt-black brh-black">
+                                                <div class="col-8">
+                                                    <div class="form-group" style="margin-bottom: 5px; margin-top: 5px;">
+                                                        <div style="font-size: 16px;">Stav čeření</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check2n1" class="form-control checkForSix" id="frm-check2n1" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check2n1}checked{/if}>
+                                                </div>
+                                                <div class="col-1"></div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check2n2" class="form-control checkForEnd" id="frm-check2n2" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check2n2}checked{/if}>
+                                                </div>
+                                            </div>
+                                            <div class="form-row bbt-black brh-black">
+                                                <div class="col-8">
+                                                    <div class="form-group" style="margin-bottom: 5px; margin-top: 5px;">
+                                                        <div style="font-size: 16px;">Funkce přestřiků</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check3n1" class="form-control checkForSix" id="frm-check3n1" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check3n1}checked{/if}>
+                                                </div>
+                                                <div class="col-1"></div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check3n2" class="form-control checkForEnd" id="frm-check3n2" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check3n2}checked{/if}>
+                                                </div>
+                                            </div>
+                                            <div class="form-row bbt-black brh-black">
+                                                <div class="col-8">
+                                                    <div class="form-group" style="margin-bottom: 5px; margin-top: 5px;">
+                                                        <div style="font-size: 16px;">Míchání odmaštění 0,1,2;fosfát</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check4n1" class="form-control checkForSix" id="frm-check4n1" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check4n1}checked{/if}>
+                                                </div>
+                                                <div class="col-1"></div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check4n2" class="form-control checkForEnd" id="frm-check4n2" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check4n2}checked{/if}>
+                                                </div>
+                                            </div>
+                                            <div class="form-row bbt-black brh-black">
+                                                <div class="col-8">
+                                                    <div class="form-group" style="margin-bottom: 5px; margin-top: 5px;">
+                                                        <div style="font-size: 16px;">Tlak na čerpadlech míchání</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check5n1" class="form-control checkForSix" id="frm-check5n1" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check5n1}checked{/if}>
+                                                </div>
+                                                <div class="col-1"></div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check5n2" class="form-control checkForEnd" id="frm-check5n2" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check5n2}checked{/if}>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="form-row bbt-black">
+                                                <div class="col-8">
+                                                    <div class="form-group" style="margin-bottom: 5px; margin-top: 5px;">
+                                                        <div style="font-size: 16px;">Filtrace lázní (fosfát, barva)</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check6n1" class="form-control checkForSix" id="frm-check6n1" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check6n1}checked{/if}>
+                                                </div>
+                                                <div class="col-1"></div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check6n2" class="form-control checkForEnd" id="frm-check6n2" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check6n2}checked{/if}>
+                                                </div>
+                                            </div>
+                                            <div class="form-row bbt-black">
+                                                <div class="col-8">
+                                                    <div class="form-group" style="margin-bottom: 5px; margin-top: 5px;">
+                                                        <div style="font-size: 16px;">Úklid linky a haly (prostory KTL)</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check8n1" class="form-control checkForSix" id="frm-check8n1" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check8n1}checked{/if}>
+                                                </div>
+                                            </div>
+                                            <div class="form-row bbt-black">
+                                                <div class="col-8">
+                                                    <div class="form-group" style="margin-bottom: 5px; margin-top: 5px;">
+                                                        <div style="font-size: 16px;">Volný prostor pod přístroji PO a vraty pece</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check9n1" class="form-control checkForSix" id="frm-check9n1" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check9n1}checked{/if}>
+                                                </div>
+                                            </div>
+                                            <div class="form-row bbt-black">
+                                                <div class="col-8">
+                                                    <div class="form-group" style="margin-bottom: 5px; margin-top: 5px;">
+                                                        <div style="font-size: 16px;">Kontrola nástrojů na čištění závěsové techniky</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check10n1" class="form-control checkForSix" id="frm-check10n1" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check10n1}checked{/if}>
+                                                </div>
+                                                <div class="col-1"></div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check10n2" class="form-control checkForEnd" id="frm-check10n2" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check10n2}checked{/if}>
+                                                </div>
+                                                {*}<div class="col-1">
+                                                    <input type="checkbox" name="check10n3" class="form-control" id="frm-check10n3" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check10n3}checked{/if}>
+                                                </div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check10n4" class="form-control" id="frm-check10n4" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check10n4}checked{/if}>
+                                                </div>{*}
+                                            </div>
+                                            <div class="form-row bbt-black">
+                                                <div class="col-8">
+                                                    <div class="form-group" style="margin-bottom: 5px; margin-top: 5px;">
+                                                        <div style="font-size: 16px;">Hladina neprůtočných lázní</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check7n1" class="form-control checkForSix" id="frm-check7n1" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check7n1}checked{/if}>
+                                                </div>
+                                                <div class="col-1"></div>
+                                                <div class="col-1">
+                                                    <input type="checkbox" name="check7n2" class="form-control checkForEnd" id="frm-check7n2" style="margin-top: 5px; height: 70%;" value="1" {if $entity->check7n2}checked{/if}>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {/if}
+
+                                    <div class="col-12">
+                                        <div class="form-row" style="padding-top: 15px;">
+                                            {include bootstrap-input $form, 'hingeTechnology', 12}
+                                        </div>
+                                    </div>
+
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {*}<div class="card mb-2">
+                    <div class="card-header">
+                        {_'Uvolnění linky'}
+
+                        <span class="ml-auto">
+                            <span n:ifset="$entity" style="cursor: pointer" class="checkLogRelease btn btn-success ml-auto" data-toggle="modal" data-target="#releaseModal" data-id="{$entity->id}">
+                                <i class="fa fa-play"></i> Uvolnit linku
+                            </span>
+                        </span>
+                    </div>
+                    <div class="card-body checkNormalChange">
+                        {if $entity->releaseStartDate || $entity->releaseEndDate || $entity->releaseDate}
+                            <div class="form-row" style="padding-bottom: 20px;" n:snippet="logReleaseTable">
+                                <div class="col-12">
+                                    <div class="form-row">
+                                        <table class="tg-my" style="width:45%;">
+                                            <thead>
+                                            <tr>
+                                                <th colspan="3" class=""><b>Uvolnění linky</b></th>
+                                            </tr>
+                                            <tr>
+                                                <th class="">Čas uvolnění linky</th>
+                                                <th class="">Hodina zápisu</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr style="">
+                                                <td style="width: 33%; font-size: 14px;" class="">{if $entity->releaseEndDate}{$entity->releaseEndDate|date:'j. n. Y H:i'}{/if}</td>
+                                                <td style="width: 33%; font-size: 14px;" class="">{if $entity->releaseEndDateChanged}{$entity->releaseEndDateChanged|date:'j. n. Y H:i'}{/if}</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        {/if}
+
+                        <div class="form-row">
+                            <div class="col-12">
+                                <div class="form-row">
+                                    <table class="tg-my" style="width:100%;">
+                                        <thead>
+                                        <tr>
+                                            <th colspan="2" class=""><b>Přebírání linky</b></th>
+                                            <th style="border-top-color: white;border-bottom-color: white;" class=""></th>
+                                            <th colspan="2" class=""><b>Předání linky</b></th>
+                                        </tr>
+                                        <tr>
+                                            <th class="">Chod linky</th>
+                                            <th class="">Od</th>
+                                            <th style="border-top-color: white;border-bottom-color: white;" class=""></th>
+                                            <th class="">Chod linky</th>
+                                            <th class="">Od</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr style="">
+                                            <td style="width: 25%; font-size: 14px;" class="">{if $lastLog && $lastLog->endRun}{$endRunTrans[$lastLog->endRun]}{/if}</td>
+                                            <td style="width: 20%; font-size: 14px;" class="">{if $lastLog && $lastLog->endRun && $lastLog->endRun != 1 && $lastLog->endRunDate}{$lastLog->endRunDate|date:'j. n. Y H:i'}{/if}</td>
+                                            <td style="width: 10%; border-top-color: white;border-bottom-color: white;" class="">&nbsp;</td>
+                                            <td style="width: 25%;" class="">{input endRun}</td>
+                                            <td style="width: 20%;" class="">
+                                                <div class="checkEndRun" style="visibility: {if $entity->endRun && $entity->endRun != 1}inherit{else}hidden{/if};">
+                                                    {input endRunDate}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr style="">
+                                            <td colspan="2" style="font-size: 14px;" class="">{if $lastLog}{nl2br($lastLog->note)|noescape}{/if}</td>
+                                            <td style="width: 10%; border-top-color: white;border-bottom-color: white;" class="">&nbsp;</td>
+                                            <td colspan="2" class="">{input note}</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>{*}
+
+                <div id="accordion3">
+                    <div class="card mb-2">
+                        <div class="card-header">
+                            <a class="card-link" data-toggle="collapse" href="#collapse3">
+                                <i class="fa fa-plus"></i> {_'Záznamy o zjištěných závadách v průběhu směny'}
+                            </a>
+
+                            <span class="ml-auto">
+                                <span n:ifset="$entity" style="cursor: pointer" class="checkLogProblem btn btn-primary ml-auto" data-toggle="modal" data-target="#problemModal" data-id="0">
+                                    <i class="fa fa-plus"></i> Přidat záznam k závadám
+                                </span>
+                            </span>
+                        </div>
+                        <div id="collapse3" class="collapse show" data-parent="#accordion3">
+                            <div class="card-body checkNormalChange" n:snippet="logProblemsTable">
+                                <div class="form-row">
+                                    {ifset $entity}
+                                        <table class="tg-my" style="width:100%;">
+                                            <thead>
+                                            <tr>
+                                                <th colspan="3" class=""><b>Zjištené závady</b></th>
+                                                <th colspan="3" class=""><b>Odstranění závad</b></th>
+                                                <th rowspan="2" class=""><b>Akce</b></th>
+                                            </tr>
+                                            <tr>
+                                                <th class="">Hodina</th>
+                                                <th class="">Popis závady</th>
+                                                <th class="">Zastavit linku?</th>
+                                                <th class="">Datum</th>
+                                                <th class="">Hodina</th>
+                                                <th class="">Hodina uvolnění linky</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+
+                                            {if isset($logProblems) && $logProblems}
+                                                {foreach $logProblems as $logProblem}
+                                                    <tr style="">
+                                                        <td class="">{$logProblem->hour}</td>
+                                                        <td class="">{$logProblem->description}</td>
+                                                        <td class="">{$logProblem->stopLine}</td>
+                                                        <td class="">{if $logProblem->dateFix}{$logProblem->dateFix|date:'j. n. Y'}{/if}</td>
+                                                        <td class="">{$logProblem->hourFix}</td>
+                                                        <td class="">{$logProblem->hourRelease}</td>
+                                                        <td class="">
+                                                            <span style="cursor: pointer; font-size: 16px;" class="checkLogProblem" data-toggle="modal" data-target="#problemModal" data-id="{$logProblem->id}"><i class="fa fa-pen text-info pl-2 pr-3"></i></span>
+                                                            <span style="cursor: pointer; font-size: 16px;" class="removeLogProblem" data-id="{$logProblem->id}"><i class="fa fa-trash text-danger"></i></span>
+                                                        </td>
+                                                    </tr>
+                                                {/foreach}
+                                            {else}
+                                                <tr>
+                                                    <td class="" colspan="7">{_'Zatím nebyly přidány žádné záznamy'}</td>
+                                                </tr>
+                                            {/if}
+                                            </tbody>
+                                        </table>
+                                    {else}
+                                        {_'Pro přidávání záznamů nejprve uložte formulář'}
+                                    {/ifset}
+                                    <div class="clearfix"></div>
+                                </div>
+
+                                {*}<div class="form-row" style="padding-top: 10px;">
+                                    <legend style="">Seznam položek k předání (za předání a převzetí odpovídají vedoucí směn):</legend>
+                                    <table class="tg-my" style="width:100%;">
+                                        <tbody>
+                                        <tr style="">
+                                            <td style="width: 15%;" class="">{$givenItems[1]}</td>
+                                            <td style="width: 10%;" class="">{input giveItem1}</td>
+                                            <td style="width: 15%;" class="">{input giveItem1Note}</td>
+                                            <td style="width: 10%; border-top-color: white;border-bottom-color: white;" class="">&nbsp;</td>
+                                            <td style="width: 15%;" class="">{$givenItems[2]}</td>
+                                            <td style="width: 10%;" class="">{input giveItem2}</td>
+                                            <td style="width: 15%;" class="">{input giveItem2Note}</td>
+                                        </tr>
+                                        <tr style="">
+                                            <td class="">{$givenItems[3]}</td>
+                                            <td class="">{input giveItem3}</td>
+                                            <td class="">{input giveItem3Note}</td>
+                                            <td style="border-top-color: white;border-bottom-color: white;" class="">&nbsp;</td>
+                                            <td class="">{$givenItems[4]}</td>
+                                            <td class="">{input giveItem4}</td>
+                                            <td class="">{input giveItem4Note}</td>
+                                        </tr>
+                                        <tr style="">
+                                            <td class="">{$givenItems[5]}</td>
+                                            <td class="">{input giveItem5}</td>
+                                            <td class="">{input giveItem5Note}</td>
+                                            <td style="border-top-color: white;border-bottom-color: white;" class="">&nbsp;</td>
+                                            <td class="">{$givenItems[6]}</td>
+                                            <td class="">{input giveItem6}</td>
+                                            <td class="">{input giveItem6Note}</td>
+                                        </tr>
+                                        <tr style="">
+                                            <td class="">{$givenItems[7]}</td>
+                                            <td class="">{input giveItem7}</td>
+                                            <td class="">{input giveItem7Note}</td>
+                                            <td style="border-top-color: white;border-bottom-color: white;" class="">&nbsp;</td>
+                                            <td class="">{$givenItems[8]}</td>
+                                            <td class="">{input giveItem8}</td>
+                                            <td class="">{input giveItem8Note}</td>
+                                        </tr>
+                                        {if $isZn}
+                                            <tr style="">
+                                                <td class="">{$givenItems[9]}</td>
+                                                <td class="">{input giveItem9}</td>
+                                                <td class="">{input giveItem9Note}</td>
+                                                <td style="border-top-color: white;border-bottom-color: white;" class="">&nbsp;</td>
+                                                <td class="">{$givenItems[10]}</td>
+                                                <td class="">{input giveItem10}</td>
+                                                <td class="">{input giveItem10Note}</td>
+                                            </tr>
+                                            <tr style="">
+                                                <td class="">{$givenItems[11]}</td>
+                                                <td class="">{input giveItem11}</td>
+                                                <td class="">{input giveItem11Note}</td>
+                                                <td style="border-top-color: white;border-bottom-color: white;" class="">&nbsp;</td>
+                                                <td class="">{$givenItems[12]}</td>
+                                                <td class="">{input giveItem12}</td>
+                                                <td class="">{input giveItem12Note}</td>
+                                            </tr>
+                                        {/if}
+                                        </tbody>
+                                    </table>
+                                </div>{*}
+
+                                <div class="form-row" style="padding-top: 10px;">
+                                    <span class="ml-auto">
+                                        {ifset $entity}
+                                            {if $entity->takeItemsCheck}
+                                                <span style="cursor: pointer" class="checkLogEnding btn btn-danger ml-auto" data-toggle="modal" data-target="#endingModal" data-id="{$entity->id}">
+                                                    <i class="fa fa-check"></i> Předat směnu
+                                                </span>
+                                            {else}
+                                                <span style="cursor: pointer" class="checkLogStarting btn btn-success ml-auto" data-toggle="modal" data-target="#startingModal" data-id="{$entity->id}">
+                                                    <i class="fa fa-check"></i> Přebrat směnu
+                                                </span>
+                                            {/if}
+                                        {/ifset}
+                                    </span>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="accordion4">
+                    <div class="card mb-2">
+                        <div class="card-header">
+                            <a class="card-link" data-toggle="collapse" href="#collapse4">
+                                <i class="fa fa-plus"></i> {_'Náměty a připomínky'}
+                            </a>
+
+                            <span class="ml-auto">
+                                <span n:ifset="$entity" style="cursor: pointer" class="checkLogSuggestion btn btn-primary ml-auto" data-toggle="modal" data-target="#suggestionModal" data-id="0">
+                                    <i class="fa fa-plus"></i> Přidat připomínku
+                                </span>
+                            </span>
+                        </div>
+                        <div id="collapse4" class="collapse show" data-parent="#accordion4">
+                            <div class="card-body" n:snippet="logSuggestionTable">
+                                <div class="form-row">
+                                    {ifset $entity}
+                                        <table class="tg-my" style="width:100%;">
+                                            <thead>
+                                            <tr>
+                                                <th style="width: 90%;" class=""><b>Text připomínky</b></th>
+                                                <th style="width: 10%;" class=""><b>Akce</b></th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+
+                                            {if isset($logSuggestions) && $logSuggestions}
+                                                {foreach $logSuggestions as $logSuggestion}
+                                                    <tr style="">
+                                                        <td class="">{$logSuggestion->text}</td>
+                                                        <td class="">
+                                                            <span style="cursor: pointer; font-size: 16px;" class="checkLogSuggestion" data-toggle="modal" data-target="#suggestionModal" data-id="{$logSuggestion->id}"><i class="fa fa-pen text-info pl-2 pr-3"></i></span>
+                                                            <span style="cursor: pointer; font-size: 16px;" class="removeLogSuggestion" data-id="{$logSuggestion->id}"><i class="fa fa-trash text-danger"></i></span>
+                                                        </td>
+                                                    </tr>
+                                                {/foreach}
+                                            {else}
+                                                <tr>
+                                                    <td class="" colspan="2">{_'Zatím nebyly přidány žádné náměty či připomínky'}</td>
+                                                </tr>
+                                            {/if}
+                                            </tbody>
+                                        </table>
+                                    {else}
+                                        {_'Pro přidávání záznamů nejprve uložte formulář'}
+                                    {/ifset}
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="accordion5">
+                    <div class="card mb-2">
+                        <div class="card-header">
+                            <a class="card-link" data-toggle="collapse" href="#collapse5">
+                                <i class="fa fa-plus"></i> {_'Záznamy o průběhu realizace povrchové úpravy'}
+                            </a>
+
+                            <span class="ml-auto">
+                                <span n:ifset="$entity" style="cursor: pointer" class="loadLogItems btn btn-primary ml-auto" data-id="{$entity->id}">
+                                    <i class="fa fa-plus"></i> Načíst záznamy
+                                </span>
+                            </span>
+                        </div>
+                        <div id="collapse5" class="collapse show" data-parent="#accordion5">
+                            <div class="card-body" n:snippet="logItemsTable">
+                                <div class="form-row">
+                                    {ifset $entity}
+                                        <table class="tg-my" style="width:100%;">
+                                            <thead>
+                                            <tr>
+                                                <th class="">P.č.</th>
+                                                <th class="">Tyč</th>
+                                                <th class="">Kód dílce</th>
+                                                <th class="">Typ</th>
+                                                <th class="">Počet kusů</th>
+                                                <th class="">Ověření tlouškoměru</th>
+                                                <th class="">Hodnocení</th>
+                                                {if $isZn}
+                                                    <th class="">Vrácené díly</th>
+                                                {/if}
+                                                <th class="">Kód vady / Poznámka</th>
+                                                <th class="">Akce</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+
+                                            {if isset($logItems) && $logItems}
+                                                {var $iterCounter = 1}
+                                                {var $usedInterNumber = array()}
+                                                {foreach $logItems as $logItem}
+                                                    <tr style="{if ($logItem->interNumber == 1 || $logItem->interNumber % 10 == 0) && !isset($usedInterNumber[$logItem->interNumber])}background-color: #dcdcdc{/if}">
+                                                        <td class="">{$logItem->interNumber}</td>
+                                                        <td class="">{$logItem->rod}</td>
+                                                        <td class="">{$logItem->code}</td>
+                                                        <td class="">{$logItem->typ}</td>
+                                                        <td class="">{$logItem->counts}</td>
+                                                        <td class="">
+                                                            {if ($logItem->interNumber == 1 || $logItem->interNumber % 10 == 0) && !isset($usedInterNumber[$logItem->interNumber])}
+                                                                <select name="result1-{$logItem->id}" class="result1Change form-control" id="result1-{$logItem->id}" data-id="{$logItem->id}">
+                                                                    <option value="">--</option>
+                                                                    <option value="OK" {if $logItem->result1 == 'OK'}selected{/if}>OK</option>
+                                                                    <option value="NOK" {if $logItem->result1 == 'NOK'}selected{/if}>NOK</option>
+                                                                </select>
+                                                                {var $usedInterNumber[$logItem->interNumber] = 1}
+                                                            {/if}
+                                                        </td>
+                                                        <td class="">
+                                                            <select name="result2-{$logItem->id}" class="result2Change form-control" id="result2-{$logItem->id}" data-id="{$logItem->id}">
+                                                                <option value="">--</option>
+                                                                <option value="OK" {if $logItem->result2 == 'OK'}selected{/if}>OK</option>
+                                                                <option value="NOK" {if $logItem->result2 == 'NOK'}selected{/if}>NOK</option>
+                                                            </select>
+                                                        </td>
+                                                        {if $isZn}
+                                                            <td class="">
+                                                                <input type="text" name="countsResult2-{$logItem->id}" class="countsResult2Change form-control" id="countsResult2-{$logItem->id}" value="{$logItem->countsResult2}"  data-id="{$logItem->id}" autocomplete="off">
+                                                            </td>
+                                                        {/if}
+                                                        <td class="">
+                                                            <input type="text" name="note-{$logItem->id}" class="noteChange form-control" id="note-{$logItem->id}" value="{$logItem->note}"  data-id="{$logItem->id}" autocomplete="off">
+                                                        </td>
+                                                        <td class="">
+                                                            <span style="cursor: pointer; font-size: 16px;" class="checkLogItem" data-toggle="modal" data-target="#partModal" data-id="{$logItem->id}"><i class="fa fa-pen text-info pl-2 pr-3"></i></span>
+                                                        </td>
+                                                    </tr>
+                                                    {var $iterCounter += 1}
+                                                {/foreach}
+                                            {else}
+                                                <tr>
+                                                    <td class="" colspan="{if $isZn}10{else}9{/if}">{_'Zatím nebyly přidány žádné záznamy'}</td>
+                                                </tr>
+                                            {/if}
+                                            </tbody>
+                                        </table>
+                                    {else}
+                                        {_'Pro načtení záznamů nejprve uložte formulář'}
+                                    {/ifset}
+                                    <div class="clearfix"></div>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="card-footer">
+                                <span class="ml-auto">
+                                    <span n:ifset="$entity" style="cursor: pointer; margin-right: -10px;" class="loadLogItems btn btn-primary ml-auto" data-id="{$entity->id}">
+                                        <i class="fa fa-plus"></i> NAČÍST ZÁZNAMY
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <a
+                                href="{if isset($entity)}
+                                    {link OperationLog:default type => $entity->productionLine}
+                                {else}
+                                    {link OperationLog:default type => 1}
+                                {/if}"
+                                class="btn btn-outline-primary"
+                        >
+                            <span class="fa fa-arrow-left" aria-hidden="true"></span>
+                            Zpět
+                        </a>
+                        <span class="pull-right">
+                            <button name="sendBack" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a zpět</button>
+                            <button name="send" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit</button>
+                            {ifset $entity}
+                                {if $entity->takeItemsCheck}
+                                    <span style="cursor: pointer" class="checkLogEnding btn btn-danger ml-auto" data-toggle="modal" data-target="#endingModal" data-id="{$entity->id}">
+                                        <i class="fa fa-check"></i> Předat směnu
+                                    </span>
+                                {/if}
+                            {/ifset}
+                        </span>
+                    </div>
+                </div>
+                {*input ajax*}
+            {/form}
+        </div>
+
+
+{/block}
+
+{block scriptsBot}
+    <div n:ifset="$entity" class="modal fade" id="partModal" tabindex="-1" role="dialog" aria-labelledby="partModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+            <div class="modal-content" n:snippet="partModal">
+                {form partModalForm}
+                    <input type="text" style="display: none;" name="operationLog" value="{$entity->id}">
+                    <input type="text" style="display: none;" name="id">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="partModalLabel">Záznam</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <style type="text/css">
+
+                    </style>
+                    <div class="modal-body compact-my-modal">
+                        <div class="form-row">
+                            <legend style="">Identifikace dílu</legend>
+                            {include bootstrap-input $form, 'result1', 4}
+                            {include bootstrap-input $form, 'result2', 4}
+                            {if $isZn}
+                                {include bootstrap-input $form, 'countsResult2', 4}
+                            {/if}
+
+                            <hr>
+
+                            {include bootstrap-input $form, 'note', 12}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Uložit</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Zavřít</button>
+                    </div>
+                {/form}
+            </div>
+        </div>
+    </div>
+
+    <div n:ifset="$entity" class="modal fade" id="problemModal" tabindex="-1" role="dialog" aria-labelledby="problemModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+            <div class="modal-content" n:snippet="problemModal">
+                {form problemModalForm}
+                    <input type="text" style="display: none;" name="operationLog" value="{$entity->id}">
+                    <input type="text" style="display: none;" name="id">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="problemModalLabel">Záznam o závadě</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <style type="text/css">
+
+                    </style>
+                    <div class="modal-body compact-my-modal">
+                        <div class="form-row">
+                            <legend style="">Zjištené závady</legend>
+                            {include bootstrap-input $form, 'hour', 3}
+                            {include bootstrap-input $form, 'description', 6}
+                            {include bootstrap-input $form, 'stopLine', 3}
+
+                            <hr>
+                            <legend style="">Odstranění závad</legend>
+                            {include bootstrap-input $form, 'dateFix', 4}
+                            {include bootstrap-input $form, 'hourFix', 4}
+                            {include bootstrap-input $form, 'hourRelease', 4}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Uložit</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Zavřít</button>
+                    </div>
+                {/form}
+            </div>
+        </div>
+    </div>
+
+    <div n:ifset="$entity" class="modal fade" id="suggestionModal" tabindex="-1" role="dialog" aria-labelledby="suggestionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+            <div class="modal-content" n:snippet="suggestionModal">
+                {form suggestionModalForm}
+                    <input type="text" style="display: none;" name="operationLog" value="{$entity->id}">
+                    <input type="text" style="display: none;" name="id">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="suggestionModalLabel">Náměty a připomínky</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <style type="text/css">
+
+                    </style>
+                    <div class="modal-body compact-my-modal">
+                        <div class="form-row">
+                            <legend style="">Přidání připomínky</legend>
+                            {include bootstrap-input $form, 'text', 12}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Uložit</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Zavřít</button>
+                    </div>
+                {/form}
+            </div>
+        </div>
+    </div>
+
+    <div n:ifset="$entity" class="modal fade" id="endingModal" tabindex="-1" role="dialog" aria-labelledby="endingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+            <div class="modal-content" n:snippet="endingModal">
+                {form endingModalForm}
+                    <input type="text" style="display: none;" name="id" value="{$entity->id}">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="endingModalLabel">Předání směny</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <style type="text/css">
+
+                    </style>
+                    <div class="checkNormalChange modal-body compact-my-modal">
+                        <div class="form-row">
+                            <div class="col-12">
+                                <div class="form-row">
+                                    <legend>{_'Předání linky'}</legend>
+                                    {include bootstrap-input $form, 'endRun', 6}
+                                    <div class="checkEndRun col-6" style="visibility: {if $entity->endRun && $entity->endRun != 1}inherit{else}hidden{/if};">
+                                        {include bootstrap-input $form, 'endRunDate', 12}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-row" style="padding-top: 15px;">
+                                    {include bootstrap-input $form, 'note', 12}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row" style="padding-top: 10px;">
+                            <legend style="">Seznam položek k předání (za předání a převzetí odpovídají vedoucí směn):</legend>
+                            <table class="tg-my" style="width:100%;">
+                                <tbody>
+                                <tr style="">
+                                    <td style="width: 15%;" class="">{$givenItems[1]}</td>
+                                    <td style="width: 10%;" class="">{input giveItem1}</td>
+                                    <td style="width: 15%;" class="">{input giveItem1Note}</td>
+                                    <td style="width: 10%; border-top-color: white;border-bottom-color: white;" class="">&nbsp;</td>
+                                    <td style="width: 15%;" class="">{$givenItems[2]}</td>
+                                    <td style="width: 10%;" class="">{input giveItem2}</td>
+                                    <td style="width: 15%;" class="">{input giveItem2Note}</td>
+                                </tr>
+                                <tr style="">
+                                    <td class="">{$givenItems[3]}</td>
+                                    <td class="">{input giveItem3}</td>
+                                    <td class="">{input giveItem3Note}</td>
+                                    <td style="border-top-color: white;border-bottom-color: white;" class="">&nbsp;</td>
+                                    <td class="">{$givenItems[4]}</td>
+                                    <td class="">{input giveItem4}</td>
+                                    <td class="">{input giveItem4Note}</td>
+                                </tr>
+                                <tr style="">
+                                    <td class="">{$givenItems[5]}</td>
+                                    <td class="">{input giveItem5}</td>
+                                    <td class="">{input giveItem5Note}</td>
+                                    <td style="border-top-color: white;border-bottom-color: white;" class="">&nbsp;</td>
+                                    <td class="">{$givenItems[6]}</td>
+                                    <td class="">{input giveItem6}</td>
+                                    <td class="">{input giveItem6Note}</td>
+                                </tr>
+                                <tr style="">
+                                    <td class="">{$givenItems[7]}</td>
+                                    <td class="">{input giveItem7}</td>
+                                    <td class="">{input giveItem7Note}</td>
+                                    <td style="border-top-color: white;border-bottom-color: white;" class="">&nbsp;</td>
+                                    <td class="">{$givenItems[8]}</td>
+                                    <td class="">{input giveItem8}</td>
+                                    <td class="">{input giveItem8Note}</td>
+                                </tr>
+                                {if $isZn}
+                                    <tr style="">
+                                        <td class="">{$givenItems[9]}</td>
+                                        <td class="">{input giveItem9}</td>
+                                        <td class="">{input giveItem9Note}</td>
+                                        <td style="border-top-color: white;border-bottom-color: white;" class="">&nbsp;</td>
+                                        <td class="">{$givenItems[10]}</td>
+                                        <td class="">{input giveItem10}</td>
+                                        <td class="">{input giveItem10Note}</td>
+                                    </tr>
+                                    <tr style="">
+                                        <td class="">{$givenItems[11]}</td>
+                                        <td class="">{input giveItem11}</td>
+                                        <td class="">{input giveItem11Note}</td>
+                                        <td style="border-top-color: white;border-bottom-color: white;" class="">&nbsp;</td>
+                                        <td class="">{$givenItems[12]}</td>
+                                        <td class="">{input giveItem12}</td>
+                                        <td class="">{input giveItem12Note}</td>
+                                    </tr>
+                                {/if}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" name="logout" class="btn btn-danger">Předat směnu a odhlásit</button>
+                        <button type="submit" class="btn btn-primary">Předat směnu</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Zavřít</button>
+                    </div>
+                {/form}
+
+                <script>
+                    $(document).ready(function () {
+                        $('.flatPick').flatpickr({
+                            enableTime: true,
+                            enableSeconds: false,
+                            dateFormat: "j. n. Y H:i"
+                        });
+                    });
+                </script>
+            </div>
+        </div>
+    </div>
+
+    <div n:ifset="$entity" class="modal fade" id="startingModal" tabindex="-1" role="dialog" aria-labelledby="startingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+            <div class="modal-content" n:snippet="startingModal">
+                {form startingModalForm}
+                    <input type="text" style="display: none;" name="id" value="{$entity->id}">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="startingModalLabel">Přebírání směny</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <style type="text/css">
+
+                    </style>
+                    <div class="checkNormalChange modal-body compact-my-modal">
+                        <div class="form-row">
+                            <table class="tg-my" style="width:100%;">
+                                <thead>
+                                <tr>
+                                    <th colspan="2" class=""><b>Přebírání linky</b></th>
+                                </tr>
+                                <tr>
+                                    <th class="">Chod linky</th>
+                                    <th class="">Od</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr style="">
+                                    <td style="width: 25%; font-size: 14px;" class="">{if $lastLog && $lastLog->endRun}{$endRunTrans[$lastLog->endRun]}{/if}</td>
+                                    <td style="width: 20%; font-size: 14px;" class="">{if $lastLog && $lastLog->endRun && $lastLog->endRun != 1 && $lastLog->endRunDate}{$lastLog->endRunDate|date:'j. n. Y H:i'}{/if}</td>
+                                </tr>
+                                <tr style="">
+                                    <td colspan="2" style="font-size: 14px;" class="">{if $lastLog}{nl2br($lastLog->note)|noescape}{/if}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="form-row" style="padding-top: 10px;">
+                            <legend style="">Seznam položek k přebrání (za předání a převzetí odpovídají vedoucí směn):</legend>
+                            <table class="tg-my" style="width:100%;">
+                                <tbody>
+                                <tr style="">
+                                    <td style="width: 15%;" class="">{$givenItems[1]}</td>
+                                    <td style="width: 10%;" class="">{input takeItem1}</td>
+                                    <td style="width: 15%;" class="">{input takeItem1Note}</td>
+                                    <td style="width: 10%; border-top-color: white;border-bottom-color: white;" class="">&nbsp;</td>
+                                    <td style="width: 15%;" class="">{$givenItems[2]}</td>
+                                    <td style="width: 10%;" class="">{input takeItem2}</td>
+                                    <td style="width: 15%;" class="">{input takeItem2Note}</td>
+                                </tr>
+                                <tr style="">
+                                    <td class="">{$givenItems[3]}</td>
+                                    <td class="">{input takeItem3}</td>
+                                    <td class="">{input takeItem3Note}</td>
+                                    <td style="border-top-color: white;border-bottom-color: white;" class="">&nbsp;</td>
+                                    <td class="">{$givenItems[4]}</td>
+                                    <td class="">{input takeItem4}</td>
+                                    <td class="">{input takeItem4Note}</td>
+                                </tr>
+                                <tr style="">
+                                    <td class="">{$givenItems[5]}</td>
+                                    <td class="">{input takeItem5}</td>
+                                    <td class="">{input takeItem5Note}</td>
+                                    <td style="border-top-color: white;border-bottom-color: white;" class="">&nbsp;</td>
+                                    <td class="">{$givenItems[6]}</td>
+                                    <td class="">{input takeItem6}</td>
+                                    <td class="">{input takeItem6Note}</td>
+                                </tr>
+                                <tr style="">
+                                    <td class="">{$givenItems[7]}</td>
+                                    <td class="">{input takeItem7}</td>
+                                    <td class="">{input takeItem7Note}</td>
+                                    <td style="border-top-color: white;border-bottom-color: white;" class="">&nbsp;</td>
+                                    <td class="">{$givenItems[8]}</td>
+                                    <td class="">{input takeItem8}</td>
+                                    <td class="">{input takeItem8Note}</td>
+                                </tr>
+                                {if $isZn}
+                                    <tr style="">
+                                        <td class="">{$givenItems[9]}</td>
+                                        <td class="">{input takeItem9}</td>
+                                        <td class="">{input takeItem9Note}</td>
+                                        <td style="border-top-color: white;border-bottom-color: white;" class="">&nbsp;</td>
+                                        <td class="">{$givenItems[10]}</td>
+                                        <td class="">{input takeItem10}</td>
+                                        <td class="">{input takeItem10Note}</td>
+                                    </tr>
+                                    <tr style="">
+                                        <td class="">{$givenItems[11]}</td>
+                                        <td class="">{input takeItem11}</td>
+                                        <td class="">{input takeItem11Note}</td>
+                                        <td style="border-top-color: white;border-bottom-color: white;" class="">&nbsp;</td>
+                                        <td class="">{$givenItems[12]}</td>
+                                        <td class="">{input takeItem12}</td>
+                                        <td class="">{input takeItem12Note}</td>
+                                    </tr>
+                                {/if}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Přebrat směnu</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Zavřít</button>
+                    </div>
+                {/form}
+            </div>
+        </div>
+    </div>
+
+    <div n:ifset="$entity" class="modal fade" id="releaseModal" tabindex="-1" role="dialog" aria-labelledby="releaseModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+            <div class="modal-content" n:snippet="releaseModal">
+                {form releaseModalForm}
+                    <input type="text" style="display: none;" name="id" value="{$entity->id}">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="releaseModalLabel">Uvolnění linky</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <style type="text/css">
+
+                    </style>
+                    <div class="checkNormalChange modal-body compact-my-modal">
+                        <div class="form-row">
+                            <div class="col-12">
+                                <div class="form-row">
+                                    <legend>{_'Uvolnění linky'}</legend>
+                                    {*include bootstrap-input $form, 'releaseStartDate', 3*}
+                                    {include bootstrap-input $form, 'releaseEndDate', 3}
+                                    <div class="col-3"></div>
+                                    {*include bootstrap-input $form, 'releaseDate', 3*}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Uvolnit linku</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Zavřít</button>
+                    </div>
+                {/form}
+
+                <script>
+                    $(document).ready(function () {
+                        $('.flatPick').flatpickr({
+                            enableTime: true,
+                            enableSeconds: false,
+                            dateFormat: "j. n. Y H:i"
+                        });
+                    });
+                </script>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="planModal" tabindex="-1" role="dialog" aria-labelledby="planModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+            <div class="modal-content" n:snippet="planModal">
+                {form planModalForm}
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="planModalLabel">Zaměstnanci v plánu</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input n:ifset="$modalSpot" type="hidden" name="spot" data-autosubmit="" id="frm-spot" value="{$modalSpot->id}">
+                        {ifset $workerSelect}
+                            <div class="col-md-12 mb-4">
+                                <div class="row">
+                                    <div class="col-md-7">
+                                        <select name="worker" class="form-control selectpicker" data-live-search="true" id="frm-worker">
+                                            <option value="">-- vyberte</option>
+                                            {foreach $workerSelect as $kkey => $worker}
+                                                <option {if strpos($worker, '<b></b>') !== false}style="color: blue;"{/if} value="{$kkey}">{$worker|noescape}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <select name="workerPosition" class="form-control selectpicker" data-live-search="true" id="frm-workerPosition">
+                                            <option value="">-- neprovádět změnu</option>
+                                            {foreach $workerPositionSelect as $poss}
+                                                <option value="{$poss->id}">{$poss->name}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="submit" class="btn btn-primary">Přidat</button>
+                                    </div>
+                                </div>
+                            </div>
+                        {/ifset}
+
+                        <table class="table table-bordered table-sm" id="sortable-table">
+                            <thead>
+                            <tr>
+                                <th style="width: 5%;">#</th>
+                                <th style="width: 25%;">Příjmení a jméno</th>
+                                <th style="width: 25%;">Pozice</th>
+                                <th style="width: 7%;">Hodiny</th>
+                                <th style="width: 7%; text-align: center;">Hlavní</th>
+                                <th style="width: 7%; text-align: center;">Kmen</th>
+                                <th style="width: 7%; text-align: center;">Přišel</th>
+                                <th style="width: 13%; text-align: center;">Akce</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {if isset($modalSpot) && $modalSpotWorkers && count($modalSpotWorkers)}
+                                {var $i = 1}
+                                {foreach $modalSpotWorkers as $conn}
+                                    <tr>
+                                        <td>
+                                            <span>{$i}.</span>
+                                        </td>
+                                        <td>
+                                            {$conn->worker->surname} {$conn->worker->name}
+                                        </td>
+                                        <td>
+                                            {if $conn->workerPosition}{$conn->workerPosition->name}{else}-{/if}
+                                        </td>
+                                        <td>
+                                            <input type="text" name="hours-{$conn->id}" class="hoursChange form-control" id="hours-{$conn->id}" value="{$conn->hours}"  data-id="{$conn->id}" autocomplete="off">
+                                        </td>
+                                        <td style="text-align: center;">
+                                            {if $conn->worker->shift == $modalSpot->shift}<i class="fa fa-check text-success"></i>{else}<i class="fa fa-times text-info"></i>{/if}
+                                        </td>
+                                        <td style="text-align: center;">
+                                            {if !$conn->worker->agency}<i class="fa fa-check text-success"></i>{else}<i class="fa fa-times text-info"></i>{/if}
+                                        </td>
+                                        <td style="text-align: center;">
+                                            {if !$conn->minusLog}<i class="fa fa-check text-success"></i>{else}<i class="fa fa-times text-info"></i>{/if}
+                                        </td>
+                                        <td>
+                                            {if $conn->minusLog}
+                                                <span style="cursor: pointer; margin-left: 15px;" class="plusWorkerSpot" title="Přišel" data-id="{$conn->id}"><i class="fa fa-plus-square text-success"></i></span>
+                                            {else}
+                                                <span style="cursor: pointer; margin-left: 15px;" class="minusWorkerSpot" title="Nepřišel" data-id="{$conn->id}"><i class="fa fa-minus-square text-danger"></i></span>
+                                            {/if}
+                                            {if $usrGrp == 1}
+                                                <span style="cursor: pointer; margin-right: 15px; float: right;" class="removeWorkerSpot" title="Odebrat" data-id="{$conn->id}"><i class="fa fa-trash text-danger"></i></span>
+                                            {/if}
+                                        </td>
+                                    </tr>
+                                    {var $i += 1}
+                                {/foreach}
+                            {else}
+                                <tr>
+                                    <td colspan="8">
+                                        {_'Žádný zaměstanec není zadán'}
+                                    </td>
+                                </tr>
+                            {/if}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Zavřít</button>
+                    </div>
+                {/form}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $( function() {
+            $(document).on('click', '.checkSpot', function (e) {
+                $.nette.ajax({
+                    url: {link checkSpotPlan!},
+                    type: 'POST',
+                    data: {
+                        spot : $(this).attr('data-id')
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        $( function() {
+            $(document).on('click', '.minusWorkerSpot', function (e) {
+                $.nette.ajax({
+                    url: {link minusWorkerSpot!},
+                    type: 'POST',
+                    data: {
+                        plan : $(this).attr('data-id')
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        $( function() {
+            $(document).on('click', '.plusWorkerSpot', function (e) {
+                $.nette.ajax({
+                    url: {link plusWorkerSpot!},
+                    type: 'POST',
+                    data: {
+                        plan : $(this).attr('data-id')
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        $( function() {
+            $(document).on('click', '.removeWorkerSpot', function (e) {
+                $.nette.ajax({
+                    url: {link removeWorkerSpot!},
+                    type: 'POST',
+                    data: {
+                        plan : $(this).attr('data-id')
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        $( function() {
+            $(document).on('click', '.checkLogItem', function (e) {
+                $.nette.ajax({
+                    url: {link checkLogItem!},
+                    type: 'POST',
+                    data: {
+                        item : $(this).attr('data-id')
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        $( function() {
+            $(document).on('click', '.checkLogProblem', function (e) {
+                $.nette.ajax({
+                    url: {link checkLogProblem!},
+                    type: 'POST',
+                    data: {
+                        problem : $(this).attr('data-id')
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        $(document).on('click', '.removeLogProblem', function (e) {
+            $.nette.ajax({
+                url: {link removeLogProblem!},
+                type: 'POST',
+                data: {
+                    problem : $(this).attr('data-id')
+                },
+                off: {
+                    snippets: true
+                }
+            });
+        });
+
+        $( function() {
+            $(document).on('click', '.checkLogSuggestion', function (e) {
+                $.nette.ajax({
+                    url: {link checkLogSuggestion!},
+                    type: 'POST',
+                    data: {
+                        suggestion : $(this).attr('data-id')
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        $(document).on('click', '.removeLogSuggestion', function (e) {
+            $.nette.ajax({
+                url: {link removeLogSuggestion!},
+                type: 'POST',
+                data: {
+                    suggestion : $(this).attr('data-id')
+                },
+                off: {
+                    snippets: true
+                }
+            });
+        });
+
+        $( function() {
+            $(document).on('click', '.loadLogItems', function (e) {
+                $.nette.ajax({
+                    url: {link loadLogItems!},
+                    type: 'POST',
+                    data: {
+                        log : $(this).attr('data-id')
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        $( function() {
+            $(document).on('click', '.checkLogEnding', function (e) {
+                $.nette.ajax({
+                    url: {link checkLogEnding!},
+                    type: 'POST',
+                    data: {
+                        item : $(this).attr('data-id')
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        $( function() {
+            $(document).on('click', '.checkLogStarting', function (e) {
+                $.nette.ajax({
+                    url: {link checkLogStarting!},
+                    type: 'POST',
+                    data: {
+                        item : $(this).attr('data-id')
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        $( function() {
+            $(document).on('click', '.checkLogRelease', function (e) {
+                $.nette.ajax({
+                    url: {link checkLogRelease!},
+                    type: 'POST',
+                    data: {
+                        item : $(this).attr('data-id')
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        $( function() {
+            $(document).on('change', '.hoursChange', function (e) {
+                $.nette.ajax({
+                    url: {link hoursChange!},
+                    type: 'POST',
+                    data: {
+                        item : $(this).attr('data-id'),
+                        val: $(this).val()
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        {ifset $entity}
+            $( function() {
+                $(document).on('change', '.checkNormalChange :input', function (e) {
+                    let tVal = $(this).val();
+                    let allowCheck = 1;
+                    if($(this).attr('type') == 'checkbox') {
+                        if($(this).is(':checked')) {
+                            tVal = 1;
+
+                            let today = new Date();
+                            let yyyy = today.getFullYear();
+                            let mm = today.getMonth() + 1; // Months start at 0!
+                            let dd = today.getDate();
+                            if (dd < 10) dd = '0' + dd;
+                            if (mm < 10) mm = '0' + mm;
+                            let h = parseInt(today.getHours());
+
+                            let nowYmd = yyyy + '-' + mm + '-' + dd;
+                            let logYmd = {$entity->dateString};
+                            let nextYmd = {$nextDayDateString};
+
+                            if($(this).hasClass('checkForSix')) {
+                                {if $entity->name == 1}
+                                    if((nowYmd < logYmd) || (nowYmd === logYmd && h < 12)) {
+                                        allowCheck = 0;
+                                    }
+                                {else}
+                                    if((nowYmd < nextYmd)) {
+                                        allowCheck = 0;
+                                    }
+                                {/if}
+                            } else if($(this).hasClass('checkForEnd')) {
+                                {if $entity->name == 1}
+                                    if((nowYmd < logYmd) || (nowYmd === logYmd && h < 16)) {
+                                        allowCheck = 0;
+                                    }
+                                {else}
+                                    if((nowYmd < nextYmd) || (nowYmd === nextYmd && h < 4)) {
+                                        allowCheck = 0;
+                                    }
+                                {/if}
+                            }
+                        } else {
+                            tVal = 0;
+                        }
+                    } else if($(this).attr('name') === 'endRun') {
+                        if(tVal == 2 || tVal == 3) {
+                            $('.checkEndRun').css('visibility', 'inherit');
+                        } else {
+                            $('.checkEndRun').css('visibility', 'hidden');
+                        }
+                    }
+                    if(allowCheck) {
+                        $.nette.ajax({
+                            url: {link checkNormalChange!},
+                            type: 'POST',
+                            data: {
+                                item : {$entity->id},
+                                val: tVal,
+                                input: $(this).attr('name')
+                            },
+                            off: {
+                                snippets: true
+                            }
+                        });
+                    } else {
+                        $(this).prop('checked', false);
+                    }
+                });
+            });
+        {/ifset}
+
+        $( function() {
+            $(document).on('change', '.result1Change', function (e) {
+                $.nette.ajax({
+                    url: {link result1Change!},
+                    type: 'POST',
+                    data: {
+                        item : $(this).attr('data-id'),
+                        val: $(this).val()
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        $( function() {
+            $(document).on('change', '.result2Change', function (e) {
+                $.nette.ajax({
+                    url: {link result2Change!},
+                    type: 'POST',
+                    data: {
+                        item : $(this).attr('data-id'),
+                        val: $(this).val()
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        $( function() {
+            $(document).on('change', '.countsResult2Change', function (e) {
+                $.nette.ajax({
+                    url: {link countsResult2Change!},
+                    type: 'POST',
+                    data: {
+                        item : $(this).attr('data-id'),
+                        val: $(this).val()
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        $( function() {
+            $(document).on('change', '.noteChange', function (e) {
+                $.nette.ajax({
+                    url: {link noteChange!},
+                    type: 'POST',
+                    data: {
+                        item : $(this).attr('data-id'),
+                        val: $(this).val()
+                    },
+                    off: {
+                        snippets: true
+                    }
+                });
+            });
+        });
+
+        $(".autosized").each(function () {
+            this.setAttribute("style", "height:" + (this.scrollHeight) + "px;overflow-y:hidden;");
+            }).on("input", function () {
+              this.style.height = "auto";
+              this.style.height = (this.scrollHeight) + "px";
+        });
+    </script>
+
+{/block}

@@ -1,0 +1,245 @@
+{block title}
+    {ifset $entity}
+        {_'Úprava obchodního případu'}
+    {else}
+        {_'Nový obchodní případ'}
+    {/ifset}
+{/block}
+{block header-actions}
+    {ifset $processState}
+        {var $slug = $processState->slug}
+    {else}
+        {var $slug = ''}
+    {/ifset}
+    {if isset($previousOP) && $previousOP}
+        <a n:href="Process:edit id => $previousOP->id, slug => $slug" data-toggle="tooltip" title="Předchozí OP" class="btn btn-default">
+            <span class="fa fa-arrow-left" aria-hidden="true"></span>
+            Předchozí OP
+        </a>
+    {/if}
+    {if isset($nextOP) && $nextOP}
+        <a n:href="Process:edit id => $nextOP->id, slug => $slug" data-toggle="tooltip" title="Následující OP" class="btn btn-default">
+            <span class="fa fa-arrow-right" aria-hidden="true"></span>
+            Následující OP
+        </a>
+    {/if}
+    <a n:href="Process:default slug=> $slug" class="btn btn-default">
+        <span class="fa fa-arrow-left" aria-hidden="true"></span>
+        Zpět
+    </a>
+{/block}
+
+{block content}
+
+<div id="customer-order">
+<span n:snippet='owf-form'>
+{form form}
+    {input id}
+    {input changedInput}
+
+    <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
+        <li class="nav-item"><a class="nav-link show active" data-toggle="tab" id="tab-1" href="#home" role="tab"><span>Základní informace</span></a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div id="home" class="tab-pane tabs-animation fade active show">
+            <div class="card mb-2">
+                <div class="card-header">
+                    OP {ifset $process}- {$process->bpNumber} {/ifset}
+                    {if isset($process->customer) && $process->customer}
+                        {var $customer = $process->customer}
+                        |
+                        {$customer->name} {$customer->surname}, {$customer->phone}, {$customer->email}
+                    {/if}
+                </div>
+                <div class="card-body">
+                    <div class="form-row">
+                        {include bootstrap-autocomplete $form, 'customer', 6, 'getCustomers', '', 'handleCustomerAutocmplt'}
+                        {*<div class="col-1">
+                            <div class="customer-btns">
+                                <a id="customerInfoHref" data-target="" style="display:none" target="_blank">
+                                    <i class="glyphicon glyphicon-info-sign"></i>
+                                </a>
+                                <button name='addCustomer' type="submit" class="btn btn-link">
+                                    <span style="font-size: 200%">+</span>
+                                </button>
+                            </div>
+                        </div>*}
+
+                        {include bootstrap-input $form, 'processState', 6}
+                    </div>
+
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-2">
+        <div class="card-header">Položky</div>
+        <div class="card-body">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th class="text-center" style="width: 100px;">Pořadové<br>č. položky</th>
+                        <th>Název</th>
+                        <th>Typy položky</th>
+                        <th>Popis</th>
+                        <th class="text-right" style="width: 60px;"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {if isset($formValues['items'])}
+                        {foreach $formValues['items'] as $k => $vals}
+                            <tr>
+                                <td>
+                                    <input type="hidden" name="items[{$k}][id]" value="{ifset $vals['id']}{$vals['id']}{/ifset}">
+                                    {$iterator}.
+                                </td>
+
+                                <td>
+                                    <input type="text" name="items[{$k}][name]" class="form-control" value="{ifset $vals['name']}{$vals['name']}{/ifset}">
+                                </td>
+
+                                <td>
+                                    <select name="items[{$k}][itemTypes][]" class="form-control selectpicker" multiple data-live-search="true" data-width="100%">
+                                        <option value="">-- vyberte</option>
+                                        {foreach $itemTypes as $id => $name}
+                                            <option value="{$id}" {if isset($vals['itemTypes']) && in_array($id, $vals['itemTypes'])}selected{/if}>{$name|noescape}</option>
+                                        {/foreach}
+                                    </select>
+                                </td>
+
+                                <td>
+                                    <input type="text" name="items[{$k}][description]" class="form-control" value="{ifset $vals['description']}{$vals['description']}{/ifset}">
+                                </td>
+
+                                <td class="text-right">
+                                    <button type="submit" name="removeItem" class="btn btn-danger ajax" value="{$k}">
+                                        <i class="fa fa-times"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        {/foreach}
+                    {/if}
+                    <tr>
+                        <td></td>
+
+                        <td>
+                            <input type="text" name="newItem[name]" class="form-control" value="{ifset $formValues['newItem']['name']}{$formValues['newItem']['name']}{/ifset}">
+                        </td>
+
+                        <td>
+                            <select name="newItem[itemTypes][]" class="form-control selectpicker" multiple data-live-search="true" data-width="100%">
+                                <option value="">-- vyberte</option>
+                                {foreach $itemTypes as $id => $name}
+                                    <option value="{$id}" {if isset($formValues['newItem']['itemTypes']) && in_array($id, $formValues['newItem']['itemTypes'])}selected{/if}>{$name|noescape}</option>
+                                {/foreach}
+                            </select>
+                        </td>
+
+                        <td>
+                            <input type="text" name="newItem[description]" class="form-control" value="{ifset $formValues['newItem']['description']}{$formValues['newItem']['description']}{/ifset}">
+                        </td>
+
+                        <td class="text-right">
+                            <button type="submit" name="addItem" class="btn btn-primary ajax">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+        </div>
+    </div>
+
+    <div class="card">
+    <div class="card-body">
+        {ifset $processState}
+            {var $slug = $processState->slug}
+        {else}
+            {var $slug = ''}
+        {/ifset}
+                <a n:href="Process:default slug => $slug" class="btn btn-outline-primary">
+                    <span class="fa fa-arrow-left" aria-hidden="true"></span>
+                    Zpět
+                </a>
+                <span class="pull-right">
+                    <button name="sendBack" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a zpět</button>
+                    <button name="send" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit</button>
+                    <button name="sendNew" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a nový</button>
+                    <button name="sendRemoveAll" type="submit" class="btn btn-primary"><i style="color: #1461A7" class=" fa fa-trash-o"></i> Zahodit změny</button>
+                </span>
+    </div>
+    </div>
+    {input ajax}
+{/form}
+    </span>
+</div>
+
+{ifset $statesP}
+<div class="col-xs-12 col-sm-12 col-md-12" style="padding-bottom: 60px;">
+    <table class="timeline">
+        <tbody>
+            <tr>
+                {var $active = 0}
+                {if !isset($processState)}
+                    {var $active = 1}
+                {/if}
+                {foreach $statesP as $state}
+                    {if isset($processState) && $state->id == $processState->id}
+                        {var $active = 1}
+                    {/if}
+                    <td class="save
+                                     {if $active == 0}
+                                         passed
+                                     {/if}
+                                     " data="{$iterator->getCounter()}">
+                        <a n:href="Process:default slug => $state->slug" style="color: black;">
+                            <div class="obal">
+                                <div data-id="{$state->id}" class="point button-state
+                                              {if $active == 0}
+                                                  passed
+                                              {elseif $active == 1}
+                                                  active
+                                              {/if}
+                                              ">{$state->name}
+                                </div>
+                                <div class="limit">&nbsp;
+                                </div>
+                            </div>
+                        </a>
+                    </td>
+                    {if $active == 1}
+                        {var $active = 3}
+                    {/if}
+                {/foreach}
+            </tr>
+        </tbody>
+    </table>
+</div>
+{/ifset}
+
+<script>
+    var actualCurrency;
+
+    function handleCustomerAutocmplt(data, inputCm, inputRes) {
+        /*var tr = inputCm.parent().parent().parent();
+        $.get({link getCustomerPreload!}, {
+            customerId: inputRes.val()
+        }, function (data, status, xhr) {
+            var values = JSON.parse(data.data); //0 => priceLevel, 1 => currency
+            $(document).find("#frm-currency").val(values[1]);
+            $(document).find("#frm-priceLevel").val(values[0]);
+            customElemFocus = $("#1_tatcmplt");
+        });
+        tr.closest('form').append('<input type="hidden" name="changeSupplier" value="1">');
+        $("#save").click();*/
+    }
+
+    var url = document.location.toString();
+    if (url.match('#')) {
+        $('.nav-tabs a[href="#' + url.split('#')[1] + '"]').tab('show');
+    }
+
+</script>

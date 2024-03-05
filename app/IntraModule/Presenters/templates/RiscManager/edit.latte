@@ -1,0 +1,318 @@
+{block title}
+    {ifset $entity}
+        {_'Úprava řízeného rizika'}
+    {else}
+        {_'Nové řízené riziko'}
+    {/ifset}
+{/block}
+
+{block content}
+
+<div n:snippet='owf-form'>
+    {form form}
+        {input id}
+
+        <div class="card mb-2">
+            <div class="card-header">
+                {ifset $risc}
+                    {switch $risc->type}
+                        {case 1}
+                            {_'Interní riziko'} {$risc->id}
+                        {case 2}
+                            {_'Externí riziko'} {$risc->id}
+                        {case 3}
+                            {_'Riziko Zainteresované strany'} {$risc->id}
+                        {default}
+                            {_'Nové riziko'}
+                    {/switch}
+                {else}
+                    {_'Nové riziko'}
+                {/ifset}
+            </div>
+            <div class="card-body">
+                <div class="form-row">
+                    {include bootstrap-input $form, 'type', 6}
+                    {include bootstrap-input $form, 'aspect', 6}
+                    
+                    <div class="col-12">
+                        <div id="form-part-interestedPartyExpectations" class="form-row" style="display:none">
+                            {include bootstrap-input $form, 'interestedPartyType', 3}
+                            {include bootstrap-input $form, 'interestedPartyName', 9}
+                            {include bootstrap-input $form, 'interestedPartyExpectations', 12}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="clearfix"></div>
+            </div>
+        </div>
+
+        <div class="row no-gutters">
+            <div class="col-md-6 mb-2 pr-1">
+                <div class="card">
+                    <div class="card-header">
+                        {_'Riziko'} <div style="text-transform:initial;margin: 0 10px 0 auto">Míra rizika: <span id="MrValue" style="color: #f33"></span></div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            {include bootstrap-input $form, 'probability', 4}
+                            {include bootstrap-input $form, 'relevance', 4}
+                            {include bootstrap-input $form, 'detectability', 4}
+
+                            {include bootstrap-input $form, 'aspectRiscDesc', 12}
+                            {include bootstrap-input $form, 'measureRisc', 12}
+                            {include bootstrap-input $form, 'riscRespond', 6}
+                            {include bootstrap-input $form, 'dateRisc', 6}
+                        </div>
+
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-md-6 mb-2 pl-1">
+                <div class="card">
+                    <div class="card-header">
+                        {_'Příležitost'} <div style="text-transform:initial;margin: 0 10px 0 auto">Míra příležitosti: <span id="MpValue" style="color: #f33"></span></div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            {include bootstrap-input $form, 'benefit', 4}
+                            {include bootstrap-input $form, 'feasibility', 4}
+                            
+                            {include bootstrap-input $form, 'aspectOpporDesc', 12}
+                            {include bootstrap-input $form, 'measureOppor', 12}
+                            {include bootstrap-input $form, 'opporRespond', 6}
+                            {include bootstrap-input $form, 'dateOppor', 6}
+                        </div>
+
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-2">
+            <div class="card-header">
+                {_'Přehodnocení'}
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped" id="revaluatesTable">
+                    <thead>
+                    <tr>
+                        <th class="text-center" style="width: 60px;">Poř. č.</th>
+                        <th style="width: 120px;">Datum</th>
+                        <th style="width: 80px;">Pr.</th>
+                        <th style="width: 80px;">Z.</th>
+                        <th style="width: 80px;">O.</th>
+                        <th style="width: 60px;">Mr</th>
+                        <th style="width: 80px;">Př.</th>
+                        <th style="width: 80px;">R.</th>
+                        <th style="width: 60px;">Mp</th>
+                        <th style="width: 250px">Odpovědnost</th>
+                        <th style="width: auto;">Stav</th>
+                        
+                        <th class="text-right" style="width: 60px;"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {if isset($formValues['items'])}
+                        {foreach $formValues['items'] as $k => $vals}
+                            <tr data-row="{$k}">
+                                <td>
+                                    <input type="hidden" name="items[{$k}][id]" value="{ifset $vals['id']}{$vals['id']}{/ifset}">
+                                    {$iterator}.
+                                </td>
+                                <td>
+                                    <input
+                                        type="text"
+                                        name="items[{$k}][revaluationDate]"
+                                        class="form-control"
+                                        value="{ifset $vals['revaluationDate']}{$vals['revaluationDate']}{/ifset}"
+                                        data-provide="datepicker"
+                                        data-date-orientation="bottom"
+                                        data-date-format="d. m. yyyy"
+                                        data-date-today-highlight="true"
+                                        data-date-autoclose="true"
+                                        data-date-language="cs"
+                                    >
+                                </td>
+                                <td>
+                                    <input type="number" name="items[{$k}][probability]" class="form-control" value="{ifset $vals['probability']}{$vals['probability']}{/ifset}">
+                                </td>
+                                <td>
+                                    <input type="number" name="items[{$k}][relevance]" class="form-control" value="{ifset $vals['relevance']}{$vals['relevance']}{/ifset}">
+                                </td>
+                                <td>
+                                    <input type="number" name="items[{$k}][detectability]" class="form-control" value="{ifset $vals['detectability']}{$vals['detectability']}{/ifset}">
+                                </td>
+                                <td>
+                                    <span id="frm-revals-mr-{$k}"></span>
+                                </td>
+                                <td>
+                                    <input type="number" name="items[{$k}][benefit]" class="form-control" value="{ifset $vals['benefit']}{$vals['benefit']}{/ifset}">
+                                </td>
+                                <td>
+                                    <input type="number" name="items[{$k}][feasibility]" class="form-control" value="{ifset $vals['feasibility']}{$vals['feasibility']}{/ifset}">
+                                </td>
+                                <td>
+                                    <span id="frm-revals-mp-{$k}"></span>
+                                </td>
+                                <td>
+                                    <textarea name="items[{$k}][revalRespond]" class="form-control" rows="1">{ifset $vals['revalRespond']}{$vals['revalRespond']}{/ifset}</textarea>
+                                </td>
+                                <td>
+                                    <textarea name="items[{$k}][realizationState]" class="form-control" rows="1">{ifset $vals['realizationState']}{$vals['realizationState']}{/ifset}</textarea>
+                                </td>
+                                <td class="text-right">
+                                    <button type="submit" name="removeItem" class="btn btn-danger ajax" value="{$k}">
+                                        <i class="fa fa-times"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        {/foreach}
+                    {/if}
+                        <tr>
+                            <td></td>
+
+                            <td>
+                                <input
+                                    type="text"
+                                    name="newItem[revaluationDate]"
+                                    class="form-control"
+                                    value="{ifset $formValues['newItem']['revaluationDate']}{$formValues['newItem']['revaluationDate']}{else}{="now"|date:'j. n. Y'}{/ifset}"
+                                    data-provide="datepicker"
+                                    data-date-orientation="bottom"
+                                    data-date-format="d. m. yyyy"
+                                    data-date-today-highlight="true"
+                                    data-date-autoclose="true"
+                                    data-date-language="cs"
+                                >
+                            </td>
+                            <td>
+                                <input type="number" name="newItem[probability]" class="form-control" value="{ifset $formValues['newItem']['probability']}{$formValues['newItem']['probability']}{/ifset}">
+                            </td>
+                            <td>
+                                <input type="number" name="newItem[relevance]" class="form-control" value="{ifset $formValues['newItem']['relevance']}{$formValues['newItem']['relevance']}{/ifset}">
+                            </td>
+                            <td>
+                                <input type="number" name="newItem[detectability]" class="form-control" value="{ifset $formValues['newItem']['detectability']}{$formValues['newItem']['detectability']}{/ifset}">
+                            </td>
+                            <td>
+                            </td>
+                            <td>
+                                <input type="number" name="newItem[benefit]" class="form-control" value="{ifset $formValues['newItem']['benefit']}{$formValues['newItem']['benefit']}{/ifset}">
+                            </td>
+                            <td>
+                                <input type="number" name="newItem[feasibility]" class="form-control" value="{ifset $formValues['newItem']['feasibility']}{$formValues['newItem']['feasibility']}{/ifset}">
+                            </td>
+                            <td>
+                            </td>
+                            <td>
+                                <textarea name="newItem[revalRespond]" class="form-control" rows="1">{ifset $formValues['newItem']['revalRespond']}{$formValues['newItem']['revalRespond']}{/ifset}</textarea>
+                            </td>
+                            <td>
+                                <textarea name="newItem[realizationState]" class="form-control" rows="1">{ifset $formValues['newItem']['realizationState']}{$formValues['newItem']['realizationState']}{/ifset}</textarea>
+                            </td>
+
+                            <td class="text-right">
+                                <button type="submit" name="addItem" class="btn btn-primary ajax">
+                                    <i class="fa fa-plus"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <a n:href="RiscManager:default" class="btn btn-outline-primary">
+                    <span class="fa fa-arrow-left" aria-hidden="true"></span>
+                    Zpět
+                </a>
+                <span class="pull-right">
+                    <button name="sendBack" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a zpět</button>
+                    <button name="send" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit</button>
+                    <button name="sendNew" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a nový</button>
+                    <button name="sendRemoveAll" type="submit" class="btn btn-primary"><i style="color: #1461A7" class=" fa fa-trash-o"></i> Zahodit změny</button>
+                </span>
+            </div>
+        </div>
+        {input ajax}
+    {/form}
+</div>
+
+
+<script>
+    initRiscInputs();
+
+    function initRiscInputs() {
+        changeRiscType(document.querySelector('input[id^="frm-form-type-"]:checked').value);
+        refreshRiscVals();
+
+        {if isset($formValues['items'])}
+            var revals = JSON.parse({json_encode(array_keys($formValues['items']))})
+            revals.forEach(element => refreshRiscRevalVals(element));
+        {/if}
+
+        document.querySelectorAll('input[id^="frm-form-type-"]').forEach(item => {
+            item.addEventListener("change", function() {
+                changeRiscType(item.value);
+            });
+        });
+
+        document.querySelectorAll('#frm-form-probability, #frm-form-relevance, #frm-form-detectability, #frm-form-benefit, #frm-form-feasibility').forEach(item => {
+            item.addEventListener("change", function() {
+                refreshRiscVals();
+            });
+        });
+
+        document.querySelectorAll('#revaluatesTable input[type="number"][name^="items["]').forEach(item => {
+            item.addEventListener("change", function() {
+                refreshRiscRevalVals(item.closest('tr').getAttribute('data-row'));
+            });
+        });
+    }
+
+    function refreshRiscVals() {
+        document.getElementById('MrValue').textContent = '' + (
+            document.getElementById('frm-form-probability').value
+            * document.getElementById('frm-form-relevance').value
+            * document.getElementById('frm-form-detectability').value
+            );
+        document.getElementById('MpValue').textContent = '' + (
+            document.getElementById('frm-form-benefit').value
+            * document.getElementById('frm-form-feasibility').value
+            );
+    }
+
+    function refreshRiscRevalVals(row) {
+        console.log(row);
+        document.getElementById('frm-revals-mr-' + row).textContent = '' + (
+            document.querySelector('input[name="items[' + row + '][probability]"]').value
+            * document.querySelector('input[name="items[' + row + '][relevance]"]').value
+            * document.querySelector('input[name="items[' + row + '][detectability]"]').value
+            );
+        document.getElementById('frm-revals-mp-' + row).textContent = '' + (
+            document.querySelector('input[name="items[' + row + '][benefit]"]').value
+            * document.querySelector('input[name="items[' + row + '][feasibility]"]').value
+            );
+    }
+
+    function changeRiscType(type) {
+        if (type == 3) {
+            document.getElementById('form-part-interestedPartyExpectations').style.display = "";
+        } else {
+            document.getElementById('form-part-interestedPartyExpectations').style.display = "none";
+        }
+    }
+
+    
+    var url = document.location.toString();
+    if (url.match('#')) {
+        $('.nav-tabs a[href="#' + url.split('#')[1] + '"]').tab('show');
+    }
+</script>

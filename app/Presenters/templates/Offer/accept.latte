@@ -1,0 +1,80 @@
+{block title}{_'Potvrzení objednávky'}{/block}
+{block content}
+    <div style="font-size: 1.1rem; max-width:800px" class="mx-auto">
+        <div class="text-center">
+            <h1 class="mb-4 text-left">Potvrzení nabídky</h1>
+        </div>
+        <p>
+            <a href="{$basePath}/{$offerPath}" target="_blank">Otevřít nabídku v PDF</a>
+        </p>
+        <div n:snippet="offer-accept-form">
+            {if $offer->acceptDate && $offer->state == 2}
+                <h2 class="text-center mt-5" style="line-height:1.35; ">
+                    <i class="fa fa-check text-primary"></i> {_'Nabídka byla potvrzena'} {$offer->acceptDate|date:'j. n. Y'}.
+                    <br>Děkujeme.
+                    <br>
+                    <img src="{$basePath}/assets/img/logo.png" class="mt-5">
+                </h2>
+            {elseif $offer->state == 3}
+                <h2 class="text-center mt-5" style="line-height:1.35; ">
+                    <i class="fa fa-times text-danger"></i> {_'Nabídka byla odmítnuta'} 
+                    <br>
+                    <img src="{$basePath}/assets/img/logo.png" class="mt-5">
+                </h2>
+            {else}
+                    
+                <h4>Přiřazené produkty</h4>
+                <table class="table">
+                    <tr>{*<th>ID</th><th>Klíč TPV</th>*}<th style="width:50%">Označení</th><th>Počet</th></tr>
+                    {foreach $offer->products as $p}
+                        <tr>{*<td>{$p->product->id}</td><td>{$p->product->klic_polozky}</td>*}<td>{$p->product->nazev_polozky}</td><td>{$p->count}</td></tr>
+                    {/foreach}
+                </table>
+
+                <h4 class="mt-5">Ceny</h4>
+                <p>
+                    <b>Výsledná cena se může mírně lišit kvůli dopočtu dopravy a počtu montážníků v závislosti na váhu a rozměry.</b>
+                </p>
+                {var $restPrice = $offer->price - $offer->priceDelivery - $offer->priceInstall - $offer->priceCrane}
+                <table class="table">
+                    <tr n:if="$offer->priceDelivery"><td style="width:50%">Cena dopravy</td><td>{$offer->priceDelivery|number: 2, ',', ' '} Kč</td></tr>
+                    <tr n:if="$offer->priceInstall"><td style="width:50%">Cena montáže</td><td>{$offer->priceInstall|number: 2, ',', ' '} Kč</td></tr>
+                    <tr n:if="$offer->priceCrane"><td style="width:50%">Cena jeřábu</td><td>{$offer->priceCrane|number: 2, ',', ' '} Kč</td></tr>
+                    <tr n:if="$offer->priceDelivery || $offer->priceInstall || $offer->priceCrane"><td style="width:50%; border-bottom:1px solid #999">Cena produktů a ostatních služeb</td><td style="border-bottom:1px solid #999">{$restPrice|number: 2, ',', ' '} Kč</td></tr>
+                    <tr><td style="width:50%">DPH &nbsp;&nbsp;&nbsp; {if $offer->vat}{$offer->vat->name}{else}0 %{/if}</td><td>{if $offer->vat}{$offer->vat->value / 100 * $offer->price|number:2, ',', ' '}{else}{0|number:2, ',', ' '} Kč{/if}</td></tr>
+                    <tr><td style="width:50%">Nabídnutá celková cena bez DPH</td><td>{$offer->price|number: 2, ',', ' '} Kč</td></tr>
+                    <tr><th style="width:50%">Nabídnutá celková cena vč. DPH</th><th>{if $offer->vat}{(100 + $offer->vat->value) / 100 * $offer->price|number:2, ',', ' '}{else}{$offer->price|number:2, ',', ' '} Kč{/if}</th></tr>
+                </table>
+
+                <h4 class="mt-5">Údaje nabídky</h4>
+                <hr>
+                {form offerAcceptForm class => 'form-accept p-2'}
+        
+                    <div class="form-row">
+                        {include bootstrap-input $form, 'company', 6}
+                        {include bootstrap-input $form, 'ico', 6}
+                        {include bootstrap-input $form, 'name', 6}
+                        {include bootstrap-input $form, 'surname', 6}
+                        {include bootstrap-input $form, 'email', 6}
+                        {include bootstrap-input $form, 'phone', 6}
+                        {include bootstrap-input $form, 'installCity', 6}
+                        {include bootstrap-input $form, 'installZip', 6}
+                    </div>
+
+                    <div class="row mb-2 mt-n2">
+                        {include bootstrap-input $form, 'agree', 12}
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        {input send}
+                        <a n:href="dismissOffer! $offer->acceptCode" class="btn btn-lg btn-outline-danger">{_'Odmítnout'}</a>
+                    </div>
+                {/form}
+            {/if}
+        </div>
+    </div>
+{/block}
+
+{block scriptsBot}
+   
+{/block}

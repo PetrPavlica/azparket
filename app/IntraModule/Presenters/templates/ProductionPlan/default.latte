@@ -1,0 +1,718 @@
+{block title}{_'Plánování výroby'}{/block}
+{*block description}{_'Přehled výroby pro linku'} {$aaType}{/block}
+{block header-icon}<i class="fa fa-box icon-gradient bg-mean-fruit"></i>{/block*}
+{block header-actions-top}
+
+    <div class="top-week">
+        <a n:href="ProductionPlan: type => $aaType, week => $previousWeek, year => $previousYear">
+            <i class="fa fa-chevron-left"></i>
+        </a>
+        <div class="week-number date-btn">
+            <span>{$week}. Týden, {$year}</span>
+            <input type="text" id="date" value="{$dateInput}" autocomplete="off" />
+        </div>
+        <a n:href="ProductionPlan: type => $aaType, week => $nextWeek, year => $nextYear">
+            <i class="fa fa-chevron-right"></i>
+        </a>
+    </div>
+
+
+{/block}
+{block content}
+    <div class="col-md-12" style="margin-bottom: 50px;">
+        {form planPrintForm}
+            {include bootstrap-input $form, 'type'}
+            <div class="row">
+                {*<input type="date" name="date" class="selectpicker">*}
+                {_'Vyberte datum:'}&nbsp;&nbsp;&nbsp;
+                <input type="text" name="date" id="date2" autocomplete="off" />
+                <button type="send" name="send" class="btn btn-primary">
+                    <i class="fas fa-download"></i> {_'Tisk'}
+                </button>
+            </div>
+        {/form}
+    </div>
+    <span>{_'Detail (Levé tlačítko myši), Přesouvání (Pravé tlačítko myši)'}</span>
+    <div class="col-md-12 tpp1" style="margin-bottom: 50px;" n:snippet="planTop">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row cols-cus-22">
+                    {foreach $cusDays as $dayName}
+                        {if $dayName != ''}
+                            <div class="col-md-1 cus22-md-3 {if $iterator->counter >= 7}tpp2-end{else}tpp2{/if} d-flex align-items-center justify-content-center">
+                                <div style="font-size: medium; font-weight: 500;">
+                                    {$dayName}
+                                </div>
+                            </div>
+                        {else}
+                            <div class="col-md-1 cus22-md-1 tpp2 d-flex align-items-center justify-content-center">
+                                <div style="font-size: medium; font-weight: 500;">
+                                    &nbsp;
+                                </div>
+                            </div>
+                        {/if}
+                    {/foreach}
+                </div>
+                {foreach $floorsA as $floor}
+                    <div class="row cols-cus-22">
+                        {foreach $columnsA as $ymd => $column}
+                            {if $floor >= 0}
+                                {if $column >= 0}
+                                    <div class="col-md-1 cus22-md-3 tpp2">
+                                        {foreach $placesA as $place}
+                                            <div class="row" data-toggle="modal" data-target="#planModal">
+                                                <div data-id="A_{$ymd.'_'.$floor.'_'.$planType}"
+                                                     class="checkSpot tpp4 col-md-12 tppDrag spt-base"
+                                                     style="font-size: small;{if isset($spotsA[$ymd.'_'.$floor]) && !$spotsA[$ymd.'_'.$floor]['plan']->rodSend}{$spotsA[$ymd.'_'.$floor]['style']|noescape}{/if}"
+                                                     data-toggle="tooltip" data-placement="bottom" title="{ifset $spotsA[$ymd.'_'.$floor]}{$spotsA[$ymd.'_'.$floor]['desc']}{/ifset}"
+                                                     data-animation="false" data-html="true">
+                                                        {ifset $spotsA[$ymd.'_'.$floor]}{$spotsA[$ymd.'_'.$floor]['title']}{else}&nbsp;{/ifset}
+                                                </div>
+                                            </div>
+                                        {/foreach}
+                                    </div>
+                                {else}
+                                    <div class="col-md-1 cus22-md-1 tpp2 d-flex align-items-center justify-content-center">
+                                        <div style="font-size: small; font-weight: 500;">
+                                            {$floor}
+                                        </div>
+                                    </div>
+                                {/if}
+                            {else}
+                                {if $column >= 0}
+                                    <div class="col-md-1 cus22-md-3 {if $iterator->counter >= 7}tpp2-end{else}tpp2{/if} d-flex align-items-center justify-content-center">
+                                        <div style="font-size: medium; font-weight: 500;">
+                                            <a n:href="ProductionPlan:view type => $aaType, day => $dateHelpA[$ymd]['d'], month => $dateHelpA[$ymd]['m'], year => $dateHelpA[$ymd]['y']">{$column}</a>
+                                        </div>
+                                    </div>
+                                {else}
+                                    <div class="col-md-1 cus22-md-1 tpp2 d-flex align-items-center justify-content-center">
+                                        <div style="font-size: medium; font-weight: 500;">
+                                            &nbsp;
+                                        </div>
+                                    </div>
+                                {/if}
+                            {/if}
+                        {/foreach}
+                    </div>
+                {/foreach}
+            </div>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="col-md-12 tpp1" style="margin-bottom: 50px;" n:snippet="planBot">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row cols-cus-22">
+                    {foreach $cusDays as $dayName}
+                        {if $dayName != ''}
+                            <div class="col-md-1 cus22-md-3 {if $iterator->counter >= 7}tpp2-end{else}tpp2{/if} d-flex align-items-center justify-content-center">
+                                <div style="font-size: medium; font-weight: 500;">
+                                    {$dayName}
+                                </div>
+                            </div>
+                        {else}
+                            <div class="col-md-1 cus22-md-1 tpp2 d-flex align-items-center justify-content-center">
+                                <div style="font-size: medium; font-weight: 500;">
+                                    &nbsp;
+                                </div>
+                            </div>
+                        {/if}
+                    {/foreach}
+                </div>
+                {foreach $floorsB as $floor}
+                    <div class="row cols-cus-22">
+                        {foreach $columnsB as $ymd => $column}
+                            {if $floor >= 0}
+                                {if $column >= 0}
+                                    <div class="col-md-1 cus22-md-3 tpp2">
+                                        {foreach $placesB as $place}
+                                            <div class="row" data-toggle="modal" data-target="#planModal">
+                                                <div data-id="B_{$ymd.'_'.$floor.'_'.$planType}"
+                                                     class="checkSpot tpp4 col-md-12 tppDrag spt-base"
+                                                     style="font-size: small;{if isset($spotsB[$ymd.'_'.$floor]) && !$spotsB[$ymd.'_'.$floor]['plan']->rodSend}{$spotsB[$ymd.'_'.$floor]['style']|noescape}{/if}"
+                                                     data-toggle="tooltip" data-placement="bottom" title="{ifset $spotsB[$ymd.'_'.$floor]}{$spotsB[$ymd.'_'.$floor]['desc']}{/ifset}"
+                                                     data-animation="false" data-html="true">
+                                                        {ifset $spotsB[$ymd.'_'.$floor]}{$spotsB[$ymd.'_'.$floor]['title']}{else}&nbsp;{/ifset}
+                                                </div>
+                                            </div>
+                                        {/foreach}
+                                    </div>
+                                {else}
+                                    <div class="col-md-1 cus22-md-1 tpp2 d-flex align-items-center justify-content-center">
+                                        <div style="font-size: small; font-weight: 500;">
+                                            {$floor}
+                                        </div>
+                                    </div>
+                                {/if}
+                            {else}
+                                {if $column >= 0}
+                                    <div class="col-md-1 cus22-md-3 {if $iterator->counter >= 7}tpp2-end{else}tpp2{/if} d-flex align-items-center justify-content-center">
+                                        <div style="font-size: medium; font-weight: 500;">
+                                            <a n:href="ProductionPlan:view type => $aaType, day => $dateHelpB[$ymd]['d'], month => $dateHelpB[$ymd]['m'], year => $dateHelpB[$ymd]['y']">{$column}</a>
+                                        </div>
+                                    </div>
+                                {else}
+                                    <div class="col-md-1 cus22-md-1 tpp2 d-flex align-items-center justify-content-center">
+                                        <div style="font-size: medium; font-weight: 500;">
+                                            &nbsp;
+                                        </div>
+                                    </div>
+                                {/if}
+                            {/if}
+                        {/foreach}
+                    </div>
+                {/foreach}
+            </div>
+        </div>
+    </div>
+{/block}
+
+{block scriptsBot}
+    <div class="modal fade" id="planModal" tabindex="-1" role="dialog" aria-labelledby="planModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+            <div class="modal-content" n:snippet="planModal">
+                {form planModalForm}
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="planModalLabel">Výrobky v plánu</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input n:ifset="$modalSpot" type="hidden" name="spot" data-autosubmit="" id="frm-spot" value="{$modalSpot->id}">
+                        {ifset $productSelect}
+                            <div class="col-md-12 mb-4">
+                                <div class="row">
+                                    <div class="col-md-10">
+                                        <select name="product" class="form-control selectpicker" data-live-search="true" id="frm-product">
+                                            <option value="">-- vyberte</option>
+                                            {foreach $productSelect as $kkey => $product}
+                                                <option value="{$kkey}">{$product}</option>
+                                            {/foreach}
+                                            {foreach $orderItemSelect as $kkey => $product}
+                                                <option value="{$kkey}">{$product}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="submit" class="btn btn-primary">Přidat</button>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-2" style="padding-top: 7px; padding-right: 5px;">
+                                        <span>Vlastní počet (0 = vše)</span>
+                                    </div>
+                                    <div class="col-md-1" style="padding-left: 0;">
+                                        <input type="text" name="fillAll" class="form-control" id="frm-fillAll" value="0"
+                                               data-nette-rules='[{"op":"optional"},{"op":":integer","msg":"Zadaná hodnota musí být číslo!"}]'>
+                                    </div>
+                                    {*}<div class="col-md-3" style="padding-top: 7px;">
+                                        <span>Využít všechny kusy</span>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <select name="fillAll" class="form-control" data-live-search="true" id="frm-fillAll">
+                                            <option value="0">NE</option>
+                                            <option value="1">ANO</option>
+                                        </select>
+                                    </div>{*}
+                                    <div class="col-md-2" style="padding-top: 7px; padding-right: 0; text-align: right;">
+                                        <span>s minimální prodlevou</span>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <input type="text" name="fillSpace" class="form-control" id="frm-fillSpace" value="0"
+                                               data-nette-rules='[{"op":"optional"},{"op":":integer","msg":"Zadaná hodnota musí být číslo!"}]'>
+                                    </div>
+                                    <div class="col-md-2" style="padding-top: 7px; padding-right: 0; text-align: right;">
+                                        <span>s opakováním</span>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <select name="reserveProduct" class="form-control" data-live-search="true" id="frm-reserveProduct">
+                                            <option value="0">NE</option>
+                                            <option value="D">Denně (D)</option>
+                                            <option value="T">Týdně (T)</option>
+                                            <option value="M">Měsíčně (M)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+
+                                    </div>
+                                    <div class="col-md-2" style="padding-top: 7px; padding-right: 0; text-align: right;">
+                                        <span>konec opakování</span>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="text" name="reserveProductEndDate" id="frm-reserveProductEndDate" class="form-control form-control" data-provide="datepicker"
+                                               data-date-orientation="bottom" data-date-format="d. m. yyyy" data-date-today-highlight="true" data-date-autoclose="true" data-date-language="cs" autocomplete="off"
+                                               value="{$futureDate}" data-lfv-initialized="true" data-lfv-message-id="frm-reserveProductEndDate_message">
+                                    </div>
+                                </div>
+                            </div>
+                        {/ifset}
+
+                        {ifset $orderSelect}
+                            <div class="col-md-12 mb-4">
+                                <div class="row">
+                                    <div class="col-md-12" style="padding-top: 1px; margin-top: -20px;">
+                                        <span>Nebo rozplánovat celou objednávku dle položek</span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-10">
+                                        <select name="orders" class="form-control selectpicker" data-live-search="true" id="frm-orders">
+                                            <option value="">-- vyberte</option>
+                                            {foreach $orderSelect as $kkey => $orders}
+                                                <option value="{$kkey}">{$orders}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button name="ordered" type="submit" class="btn btn-primary">Rozplánovat</button>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-2" style="padding-top: 7px; padding-right: 5px;">
+                                        <span>Počet tyčí (0 = vše)</span>
+                                    </div>
+                                    <div class="col-md-1" style="padding-left: 0;">
+                                        <input type="text" name="orderFillRods" class="form-control" id="frm-orderFillRods" value="0"
+                                               data-nette-rules='[{"op":"optional"},{"op":":integer","msg":"Zadaná hodnota musí být číslo!"}]'>
+                                    </div>
+                                    <div class="col-md-2" style="padding-top: 7px; padding-right: 0; text-align: right;">
+                                        <span>s minimální prodlevou</span>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <input type="text" name="orderFillSpace" class="form-control" id="frm-orderFillSpace" value="0"
+                                               data-nette-rules='[{"op":"optional"},{"op":":integer","msg":"Zadaná hodnota musí být číslo!"}]'>
+                                    </div>
+                                    <div class="col-md-2" style="padding-top: 7px; padding-right: 0; text-align: right;">
+                                        <span>s opakováním</span>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <select name="orderRepeat" class="form-control" data-live-search="true" id="frm-orderRepeat">
+                                            <option value="0">NE</option>
+                                            <option value="D">Denně (D)</option>
+                                            <option value="T">Týdně (T)</option>
+                                            <option value="M">Měsíčně (M)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+
+                                    </div>
+                                    <div class="col-md-2" style="padding-top: 7px; padding-right: 0; text-align: right;">
+                                        <span>konec opakování</span>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="text" name="orderEndDate" id="frm-orderEndDate" class="form-control form-control" data-provide="datepicker"
+                                               data-date-orientation="bottom" data-date-format="d. m. yyyy" data-date-today-highlight="true" data-date-autoclose="true" data-date-language="cs" autocomplete="off"
+                                               value="{$futureDate}" data-lfv-initialized="true" data-lfv-message-id="frm-orderEndDate_message">
+                                    </div>
+                                </div>
+
+                                <div n:snippet="planModalOrder">
+                                    {ifset $orderItems}
+                                        <div class="row">
+                                            <div class="col-md-7" style="padding-top: 7px; padding-right: 5px; border-bottom: 1px solid #ced4da">
+                                                <span>{_'Název položky'}</span>
+                                            </div>
+                                            <div class="col-md-1" style="padding-left: 0; border-bottom: 1px solid #ced4da">
+                                                <input type="checkbox" name="orderUse-All" class="form-control" id="frm-orderUse-All" style="margin-top: 5px; height: 70%;" value="1">
+                                            </div>
+                                            <div class="col-md-2" style="padding-top: 7px; padding-right: 5px; border-bottom: 1px solid #ced4da">
+                                                <span>Naplánovat kusů</span>
+                                            </div>
+                                        </div>
+                                        {foreach $orderItems as $oItem}
+                                            <div class="row">
+                                                <div class="col-md-7" style="padding-top: 7px; padding-right: 5px; border-bottom: 1px solid #ced4da">
+                                                    <span>{$oItem['name']}</span>
+                                                </div>
+                                                <div class="col-md-1" style="padding-left: 0; border-bottom: 1px solid #ced4da">
+                                                    <input type="checkbox" name="orderUse-{$oItem['id']}" class="form-control orderUseNormal" id="frm-orderUse-{$oItem['id']}" style="margin-top: 5px; height: 70%;"
+                                                           value="1">
+                                                </div>
+                                                <div class="col-md-1" style="padding-top: 7px; padding-right: 5px; border-bottom: 1px solid #ced4da">
+                                                    <span>Počet</span>
+                                                </div>
+                                                <div class="col-md-1" style="padding-left: 0;">
+                                                    <input type="text" name="orderQuantity-{$oItem['id']}" class="form-control" id="frm-orderQuantity-{$oItem['id']}" value="{$oItem['quantity']}"
+                                                           data-nette-rules='[{"op":"optional"},{"op":":integer","msg":"Zadaná hodnota musí být číslo!"}]'>
+                                                </div>
+                                            </div>
+                                        {/foreach}
+                                    {/ifset}
+                                </div>
+                            </div>
+                        {/ifset}
+
+                        <table class="table table-bordered table-sm" id="sortable-table">
+                            <thead>
+                            <tr>
+                                <th style="width: 10%;">Id</th>
+                                <th style="width: 50%;">Název</th>
+                                <th style="width: 10%;">Objednávka</th>
+                                <th style="width: 10%;">Počet</th>
+                                <th style="width: 20%;">Opakování</th>
+                                {*}<th style="width: 20%;">Deadline</th>{*}
+                                <th style="width: 10%;">Akce</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {if isset($modalSpot) && $modalSpot->products && count($modalSpot->products)}
+                                {var $i = 1}
+                                {foreach $modalSpot->products as $conn}
+                                    <tr>
+                                        <td>
+                                            {$conn->productId}
+                                        </td>
+                                        <td>
+                                            {$conn->product}
+                                        </td>
+                                        <td>
+                                            {$conn->orderName}
+                                        </td>
+                                        <td>
+                                            {$conn->counts}
+                                        </td>
+                                        <td>
+                                            {if $conn->reservation}
+                                                {$conn->reservation->name}&nbsp;&nbsp;
+                                                <span style="cursor: pointer" class="removeReservationProductSpot" data-id="{$conn->reservation->id}"><i class="fa fa-times text-danger"></i></span>
+                                            {else}-{/if}
+                                        </td>
+                                        {*}<td>
+                                            {if $conn->product->deadline}{$conn->product->deadline|date:'j.n.Y'}{/if}
+                                        </td>{*}
+                                        <td>
+                                            <span style="cursor: pointer" class="removeProductSpot" data-id="{$conn->id}"><i class="fa fa-trash text-danger"></i></span>
+                                        </td>
+                                    </tr>
+                                    {var $i += 1}
+                                {/foreach}
+                            {else}
+                                <tr>
+                                    <td colspan="6">
+                                        {_'Žádné výrobky nejsou zadány'}
+                                    </td>
+                                </tr>
+                            {/if}
+                            </tbody>
+                        </table>
+
+                        <span n:ifset="$modalSpot" style="cursor: pointer; float: right;" class="removeProductSpotAll btn btn-danger" data-id="{$modalSpot->id}"><i class="fa fa-trash"></i> Odebrat vše</span>
+                        <br>
+                    </div>
+
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="planModalLabel">Rezervace pro zákazníka</h5>
+                    </div>
+
+                    <div class="modal-body">
+                        {if isset($modalSpot) && $modalSpot->customerId}
+                            <table class="table table-bordered table-sm" id="sortable-table">
+                                <thead>
+                                <tr>
+                                    <th style="width: 20%;">Id</th>
+                                    <th style="width: 30%;">Název</th>
+                                    <th style="width: 20%;">Opakování</th>
+                                    <th style="width: 10%;">Akce</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>
+                                        {$modalSpot->customerId}
+                                    </td>
+                                    <td>
+                                        {$modalSpot->customer}
+                                    </td>
+                                    <td>
+                                        {if $modalSpot->reservation}
+                                            {$modalSpot->reservation->name}&nbsp;&nbsp;
+                                            <span style="cursor: pointer" class="removeReservationSpot" data-id="{$modalSpot->reservation->id}"><i class="fa fa-times text-danger"></i></span>
+                                        {else}-{/if}
+                                    </td>
+                                    <td>
+                                        <span style="cursor: pointer" class="removeCustomerSpot" data-id="{$modalSpot->id}"><i class="fa fa-trash text-danger"></i></span>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        {else}
+                            {ifset $customerSelect}
+                                <div class="col-md-12 mb-4">
+                                    <div class="row">
+                                        <div class="col-md-10">
+                                            <select name="customer" class="form-control selectpicker" data-live-search="true" id="frm-customer">
+                                                <option value="">-- vyberte</option>
+                                                {foreach $customerSelect as $kkey => $customer}
+                                                    <option value="{$kkey}">{$customer}</option>
+                                                {/foreach}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button name="reserve" type="submit" class="btn btn-primary">Rezervovat</button>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-1" style="padding-top: 7px; padding-right: 5px;">
+                                            <span>Počet tyčí</span>
+                                        </div>
+                                        <div class="col-md-1" style="padding-left: 0;">
+                                            <input type="text" name="reserveNumber" class="form-control" id="frm-reserveNumber" value="1"
+                                                   data-nette-rules='[{"op":"optional"},{"op":":integer","msg":"Zadaná hodnota musí být číslo!"}]'>
+                                        </div>
+                                        <div class="col-md-3" style="padding-top: 7px; padding-right: 0; text-align: right;">
+                                            <span>s minimální prodlevou</span>
+                                        </div>
+                                        <div class="col-md-1">
+                                            <input type="text" name="reserveFillSpace" class="form-control" id="frm-reserveFillSpace" value="0"
+                                                   data-nette-rules='[{"op":"optional"},{"op":":integer","msg":"Zadaná hodnota musí být číslo!"}]'>
+                                        </div>
+                                        <div class="col-md-2" style="padding-top: 7px; padding-right: 0; text-align: right;">
+                                            <span>s opakováním</span>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <select name="reserveRepeat" class="form-control" data-live-search="true" id="frm-reserveRepeat">
+                                                <option value="0">NE</option>
+                                                <option value="D">Denně (D)</option>
+                                                <option value="T">Týdně (T)</option>
+                                                <option value="M">Měsíčně (M)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+
+                                        </div>
+                                        <div class="col-md-2" style="padding-top: 7px; padding-right: 0; text-align: right;">
+                                            <span>konec opakování</span>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <input type="text" name="reserveEndDate" id="frm-reserveEndDate" class="form-control form-control" data-provide="datepicker"
+                                                   data-date-orientation="bottom" data-date-format="d. m. yyyy" data-date-today-highlight="true" data-date-autoclose="true" data-date-language="cs" autocomplete="off"
+                                                   value="{$futureDate}" data-lfv-initialized="true" data-lfv-message-id="frm-reserveEndDate_message">
+                                        </div>
+                                    </div>
+                                </div>
+                            {/ifset}
+                        {/if}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Zavřít</button>
+                    </div>
+                {/form}
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+            $( function() {
+                $(document).on('change', '#frm-orderUse-All', function (e) {
+                    $('.orderUseNormal').prop('checked', this.checked);
+                });
+            });
+
+            $( function() {
+                $(document).on('change', '.orderUseNormal', function (e) {
+                    let allChecked = true;
+                    $(".orderUseNormal").each(function() {
+                        if(!this.checked) {
+                            allChecked = false;
+                        }
+                    });
+
+                    if(allChecked) {
+                        $('#frm-orderUse-All').prop('checked', true);
+                    } else {
+                        $('#frm-orderUse-All').prop('checked', false);
+                    }
+                });
+            });
+
+            $( function() {
+                $(document).on('change', '#frm-orders', function (e) {
+                    $.nette.ajax({
+                        url: {link changeOrderSelect!},
+                        type: 'POST',
+                        data: {
+                            orderId : this.value
+                        },
+                        off: {
+                            snippets: true
+                        }
+                    });
+                });
+            });
+
+            $( function() {
+                $(document).on('click', '.checkSpot', function (e) {
+                    $.nette.ajax({
+                        url: {link checkSpotPlan!},
+                        type: 'POST',
+                        data: {
+                            spot : $(this).attr('data-id')
+                        },
+                        off: {
+                            snippets: true
+                        }
+                    });
+                });
+            });
+
+            $( function() {
+                $(document).on('click', '.removeProductSpot', function (e) {
+                    $.nette.ajax({
+                        url: {link removeProductSpot!},
+                        type: 'POST',
+                        data: {
+                            plan : $(this).attr('data-id')
+                        },
+                        off: {
+                            snippets: true
+                        }
+                    });
+                });
+            });
+
+            $( function() {
+                $(document).on('click', '.removeProductSpotAll', function (e) {
+                    $.nette.ajax({
+                        url: {link removeProductSpotAll!},
+                        type: 'POST',
+                        data: {
+                            id : $(this).attr('data-id')
+                        },
+                        off: {
+                            snippets: true
+                        }
+                    });
+                });
+            });
+
+            $( function() {
+                $(document).on('click', '.removeCustomerSpot', function (e) {
+                    $.nette.ajax({
+                        url: {link removeCustomerSpot!},
+                        type: 'POST',
+                        data: {
+                            plan : $(this).attr('data-id')
+                        },
+                        off: {
+                            snippets: true
+                        }
+                    });
+                });
+            });
+
+            $( function() {
+                $(document).on('click', '.removeReservationSpot', function (e) {
+                    $.nette.ajax({
+                        url: {link removeReservationSpot!},
+                        type: 'POST',
+                        data: {
+                            reservation : $(this).attr('data-id')
+                        },
+                        off: {
+                            snippets: true
+                        }
+                    });
+                });
+            });
+
+            $( function() {
+                $(document).on('click', '.removeReservationProductSpot', function (e) {
+                    $.nette.ajax({
+                        url: {link removeReservationProductSpot!},
+                        type: 'POST',
+                        data: {
+                            reservation : $(this).attr('data-id')
+                        },
+                        off: {
+                            snippets: true
+                        }
+                    });
+                });
+            });
+
+
+        $("#date2").datepicker({
+            format: "yyyy-mm-dd",
+            language: 'cs'
+        });
+
+        $("#date").datepicker({
+            format: "yyyy-mm-dd",
+            language: 'cs'
+        }).on('changeDate', function(e) {
+            let eDate = new Date(e.date.getTime());
+            let nDay = (eDate.getDay() + 6) % 7;
+            eDate.setDate(eDate.getDate() - nDay + 3);
+            let n1stThursday = eDate.valueOf();
+            eDate.setMonth(0, 1);
+            if (eDate.getDay() !== 4) {
+                eDate.setMonth(0, 1 + ((4 - eDate.getDay()) + 7) % 7);
+            }
+            let weekNumber = (1 + Math.ceil((n1stThursday - eDate) / 604800000)) + '';
+            weekNumber = (weekNumber.length === 1 ? '0'+weekNumber : weekNumber);
+            let dateString = weekNumber + ". Týden, " + e.date.getFullYear();
+            let yearUrl = e.date.getFullYear();
+
+            $(".week-number").find("span").text(dateString);
+            let fullLink = {link ProductionPlan: test=>0};
+            fullLink = fullLink.split('?')[0];
+            let typeUrl = {$aaType};
+            location.href = fullLink + "?week=" + weekNumber + '&year=' + yearUrl + '&type=' + typeUrl;
+        });
+
+        $( function() {
+            $(document).on('contextmenu', '.checkSpot', function (e) {
+                console.log($(this));
+                e.stopPropagation();
+                if($(this).hasClass('tpp3-selected')) {
+                    $(this).removeClass('tpp3-selected');
+                } else {
+                    let start = $(".tpp3-selected");
+                    if(start.length) {
+                        let startText = start.text();
+                        start.text($(this).text());
+                        $(this).text(startText);
+
+                        let startStyle = start.attr('style');
+                        start.attr('style',  $(this).attr('style'));
+                        $(this).attr('style', startStyle);
+
+                        let startTitle = start.attr('title');
+                        start.attr('title',  $(this).attr('title'));
+                        $(this).attr('title', startTitle);
+
+                        let startId = start.attr('data-id');
+                        $.nette.ajax({
+                            url: {link dragProductSpot!},
+                            type: 'POST',
+                            data: {
+                                start: startId,
+                                end : $(this).attr('data-id')
+                            },
+                            off: {
+                                snippets: true
+                            }
+                        });
+                        start.removeClass('tpp3-selected');
+                    } else {
+                        $(".checkSpot").removeClass('tpp3-selected');
+                        $(this).addClass('tpp3-selected');
+                    }
+                }
+
+                return false;
+            });
+        });
+    </script>
+{/block}

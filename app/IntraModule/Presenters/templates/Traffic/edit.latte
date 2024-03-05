@@ -1,0 +1,136 @@
+{block title}
+    {ifset $entity}
+        {_'Editace provozovny'}
+    {else}
+        {_'Přidání provozovny'}
+    {/ifset}
+{/block}
+{block description}
+    {ifset $entity}
+        {_'Editace stávací provozovny'}
+    {else}
+        {_'Přidání nové provozovny'}
+    {/ifset}
+{/block}
+{block header-icon}<i class="fa fa-university icon-gradient bg-happy-itmeo"></i>{/block}
+{block header-actions}
+    <a n:href="Traffic:default" class="btn btn-outline-primary">
+        {_'Zpět'}
+    </a>
+{/block}
+{block content}
+    <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
+        <li class="nav-item"><a class="nav-link {if empty($openTab) || $openTab == '#home'}show active{/if}" data-toggle="tab" id="tab-1" href="#home" role="tab"><span>Přehled</span></a></li>
+        <li n:if="isset($entity)" class="nav-item"><a class="nav-link {if $openTab == '#visit'}show active{/if}" data-toggle="tab" id="tab-2" href="#visit" role="tab"><span>Výjezdy</span></a></li>
+    </ul>
+
+    <div class="tab-content">
+
+        <div id="home" class="tab-pane tabs-animation fade {if empty($openTab) || $openTab == '#home'}show active{/if}">
+
+            {form form}
+                {input id}
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <div class="row">
+                            <div style="" class="col-xs-12 col-sm-12 col-md-6">
+                                <div class="form-row">
+                                    {include bootstrap-input $form, 'name', 12}
+                                    {include bootstrap-input $form, 'num', 12}
+                                    {include bootstrap-input $form, 'customer', 12}
+                                    {include bootstrap-input $form, 'customerOrdered', 12}
+                                    {include bootstrap-input $form, 'active', 12}
+                                </div>
+                            </div>
+                            <div style="" class="col-xs-12 col-sm-12 col-md-6">
+                                {include bootstrap-input $form, 'street', 12}
+                                {include bootstrap-input $form, 'city', 12}
+                                {include bootstrap-input $form, 'zip', 12}
+                                {include bootstrap-input $form, 'email', 12}
+                                {include bootstrap-input $form, 'phone', 12}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-2">
+                    <div class="card-header">
+                        {_'Přiřazení zaměstnanci'}
+                    </div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            {include bootstrap-input $form, 'worker', 6}
+                            {include bootstrap-input $form, 'workerSubstitute', 6}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-2">
+                    <div class="card-header">
+                        {_'Cestovné / paušál'}
+                    </div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            {include bootstrap-input $form, 'isCostProgram', 2}
+                            {include bootstrap-input $form, 'costProgram', 10}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row no-gutters">
+                    <div class="col-md-6 mb-2 pr-md-1">
+                        <div class="card">
+                            <div class="card-header">
+                                {_'Cestovné tam'}
+                            </div>
+                            <div class="card-body">
+                                <div class="form-row">
+                                    {include bootstrap-input $form, 'costFrom', 6}
+                                    {include bootstrap-input $form, 'costTo', 6}
+                                    {include bootstrap-input $form, 'costDistance', 2}
+                                    {include bootstrap-input $form, 'costLostHoursDistance', 5}
+                                    {include bootstrap-input $form, 'costLostMinutesDistance', 5}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-2 pl-md-1">
+                        <div class="card">
+                            <div class="card-header">
+                                {_'Cestovné zpátky'}
+                            </div>
+                            <div class="card-body">
+                                <div class="form-row">
+                                    {include bootstrap-input $form, 'costBackFrom', 6}
+                                    {include bootstrap-input $form, 'costBackTo', 6}
+                                    {include bootstrap-input $form, 'costBackDistance', 2}
+                                    {include bootstrap-input $form, 'costLostHoursBackDistance', 5}
+                                    {include bootstrap-input $form, 'costLostMinutesBackDistance', 5}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <a n:href="Traffic:default" class="btn btn-outline-primary">
+                            <span class="fa fa-arrow-left" aria-hidden="true"></span>
+                            Zpět
+                        </a>
+                        <span class="pull-right">
+                            <button name="sendBack" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a zpět</button>
+                            <button name="sendSave" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a pokračovat</button>
+                            <button name="sendNew" type="submit" class="btn btn-primary"><i style="color: #1461A7" class="fa fa-floppy-o"></i> Uložit a nový</button>
+                        </span>
+                    </div>
+                </div>
+            {/form}
+        </div>
+
+        <div n:if="isset($entity)" id="visit" class="tab-pane tabs-animation fade {if $openTab == '#visit'}show active{/if}">
+            {control visitTable}
+        </div>
+    </div>
+{/block}

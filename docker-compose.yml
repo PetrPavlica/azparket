@@ -1,0 +1,83 @@
+version: "3.2"
+services:
+  php:
+    build:
+      context: '.docker/php/'
+      args:
+        PHP_VERSION: ${PHP_VERSION}
+    networks:
+      - backend
+    volumes:
+      - ${PROJECT_ROOT}/:/var/www/html/
+      - .docker/php/php.ini:/usr/local/etc/php/conf.d/custom.ini
+    #container_name: php
+    user: "1000:1000"
+  web:
+    image: nginx:latest
+    ports:
+      - 80:80
+    volumes:
+      - ${PROJECT_ROOT}:/var/www/html
+      - .docker/nginx/site.conf:/etc/nginx/conf.d/site.conf
+    links:
+      - php
+    networks:
+      - backend
+      - frontend
+    #  apache:
+    #    build:
+    #      context: '.docker/apache/'
+    #      args:
+    #        APACHE_VERSION: ${APACHE_VERSION}
+    #    depends_on:
+    #      - php
+    #      - db
+    #    networks:
+    #      - frontend
+    #      - backend
+    #    ports:
+    #      - 80:80
+    #    volumes:
+    #      - ${PROJECT_ROOT}/:/var/www/html/
+    #container_name: apache
+  db:
+    #image: mysql:${MYSQL_VERSION:-latest}
+    image: mariadb:${MARIADB_VERSION:-latest}
+    #restart: always
+    ports:
+      - 3306:3306
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - backend
+    environment:
+      MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD}"
+      MYSQL_DATABASE: "${DB_NAME}"
+      MYSQL_USER: "${DB_USERNAME}"
+      MYSQL_PASSWORD: "${DB_PASSWORD}"
+    #container_name: db
+
+  pma:
+    image: phpmyadmin/phpmyadmin
+    #container_name: pma
+    #restart: always
+    ports:
+      - 8080:80
+    links:
+      - db
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: "${DB_ROOT_PASSWORD}"
+      UPLOAD_LIMIT: 3000000000
+    depends_on:
+      - db
+    networks:
+      - backend
+
+networks:
+  frontend:
+  backend:
+volumes:
+  dbdata:

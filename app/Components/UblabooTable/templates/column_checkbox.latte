@@ -1,0 +1,20 @@
+{**
+ * @param $row    Ublaboo\DataGrid\Row
+ * @param $status Ublaboo\DataGrid\Column\ColumnStatus
+ * remake for boolean
+*}
+
+{var $active_option = $status->getCurrentOption($row)}
+
+<div>
+    {if $active_option}
+        <input class="ublabooCheckbox onoffswitch-checkbox" data-id="{$row->getId()}" id="{$row->getId()}" data-key="{$status->getKey()}" data-href="{link changeStatus!, id => $row->getId(), key => $status->getKey(), value => $active_option->getValue()}" type="checkbox" {if $row->getValue($status->getColumn()) == 1}checked{/if}>
+        <label class="onoffswitch-label" for="{$row->getId()}">
+            <span class="onoffswitch-inner"></span>
+            <span class="onoffswitch-switch"></span>
+        </label>
+    {else}
+        {$row->getValue($status->getColumn())}
+    {/if}
+
+</div>

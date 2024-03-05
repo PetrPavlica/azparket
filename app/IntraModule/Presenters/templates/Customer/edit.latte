@@ -1,0 +1,124 @@
+{block title}
+    {ifset $entity}
+        {capture $a}
+            {$entity->company}, {$entity->name} {$entity->surname}
+        {/capture}
+        {_'Úprava zákazníka'} - {$a|trim:', '}
+    {else}
+        {_'Nový zákazník'}
+    {/ifset}
+{/block}
+{block description}
+    {ifset $entity}
+        {_'Editace stávajícího zákazníka'}
+    {else}
+        {_'Přidání nového zákazníka'}
+    {/ifset}
+{/block}
+{block header-icon}<i class="fa fa-users icon-gradient bg-happy-itmeo"></i>{/block}
+
+{block content}
+{form form}
+    {input id}
+    <div class="">
+        <div class="">
+            <div class="card mb-2">
+                <div class="card-header">
+                    Základní informace
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {include bootstrap-autocomplete $form, 'searchAres', 6, 'getCustomersAres', '', 'handleAresComplete'}
+                    </div>
+                    <div class="row">
+                        {include bootstrap-input $form, 'company', 6}
+                        {include bootstrap-input $form, 'worker', 6}
+                        {include bootstrap-input $form, 'name', 6}
+                        {include bootstrap-input $form, 'surname', 6}
+                        {include bootstrap-input $form, 'email', 6}
+                        {include bootstrap-input $form, 'phone', 6}
+                        {include bootstrap-input $form, 'active', 6}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-2">
+                <div class="card-header">
+                    Fakturační údaje
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {include bootstrap-input $form, 'idNo', 6}
+                        {include bootstrap-input $form, 'vatNo', 6}
+                        {include bootstrap-input $form, 'street', 6}
+                        {include bootstrap-input $form, 'city', 6}
+                        {include bootstrap-input $form, 'zip', 6}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-2">
+                <div class="card-header">
+                    Doručovací údaje &nbsp;<small>(jenom pokud jsou jiné než fakturační)</small>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {include bootstrap-input $form, 'contactPerson', 6}
+                        {include bootstrap-input $form, 'emailDelivery', 6}
+                        {include bootstrap-input $form, 'phoneDelivery', 6}
+                        {include bootstrap-input $form, 'streetDelivery', 6}
+                        {include bootstrap-input $form, 'cityDelivery', 6}
+                        {include bootstrap-input $form, 'zipDelivery', 6}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-2">
+                <div class="card-header">
+                    Doplňující údaje
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {include bootstrap-input $form, 'accountNumber', 6}
+                        {include bootstrap-input $form, 'bankCode', 6}
+                        {include bootstrap-input $form, 'constantSymbol', 6}
+                        {include bootstrap-input $form, 'bankName', 6}
+                        {include bootstrap-input $form, 'maturity', 6}
+                        {include bootstrap-input $form, 'www', 6}
+                        {include bootstrap-input $form, 'description', 6}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <a class="btn btn-outline-primary"
+               {ifset $backUrl}
+                   href="{$backUrl}">
+               {else}
+                   href="{link Customer:default}">
+               {/ifset}
+               <span class="fa fa-arrow-left" aria-hidden="true"></span>
+               Zpět </a>
+
+            <button name="sendBack" type="submit" class="btn btn-primary"><i class="fa fa-floppy-o"></i> Uložit</button>
+            <button name="send" type="submit" class="btn btn-primary"><i class="fa fa-floppy-o"></i> Uložit a pokračovat</button>
+        </div>
+    </div>
+{/form}
+{/block}
+{block scriptsBot}
+    <script>
+        function handleAresComplete(data, inputCm, inputRes) {
+            inputCm.val(data[1][0]);
+            $(document).find('#frm-company').val(data[1][0]);
+            $(document).find('#frm-idNo').val(data[1][1]);
+            $(document).find('#frm-vatNo').val(data[1][2]);
+            $(document).find('#frm-street').val(data[1][3]);
+            $(document).find('#frm-city').val(data[1][4]);
+            $(document).find('#frm-zip').val(data[1][5]);
+        }
+    </script>
+{/block}

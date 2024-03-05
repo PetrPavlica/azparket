@@ -1,0 +1,16 @@
+<table width="100%" border="1" style="border-collapse: collapse;">
+    <tr>
+        <th style="font-size: 14px;">Datum</th>
+        <th style="font-size: 14px;">Směna</th>
+        <th style="font-size: 14px;">Linka</th>
+        <th style="font-size: 14px;">Ranní/Noční</th>
+    </tr>
+    {foreach $futureShiftWork as $fs}
+        <tr>
+            <td style="font-size: 14px;">{$fs->plan->datePlan->format('j.n.Y')}</td>
+            <td style="font-size: 14px;">{$fs->plan->shift}</td>
+            <td style="font-size: 14px;">{$lineTrans[$fs->plan->productionLine]}</td>
+            <td style="font-size: 14px;">{$nameTrans[$fs->plan->name]}</td>
+        </tr>
+    {/foreach}
+</table>
