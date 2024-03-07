@@ -31515,6 +31515,21 @@ img {
   font-size: 24px;
 }
 
+.nav-link {
+  color: white;
+  font-size: 14px;
+}
+
+.nav-link:hover {
+  color: #FFD539;
+  text-decoration: underline;
+}
+
+.nav-link.active {
+  color: #FFD539 !important;
+  text-decoration: underline;
+}
+
 #product {
   color: #000;
 }

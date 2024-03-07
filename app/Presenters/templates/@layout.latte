@@ -86,22 +86,22 @@
       <div class=" collapse navbar-collapse" id="navbarNavDropdown">
         <ul class="navbar-nav ms-r ">
           <li class="nav-item">
-            <a class="nav-link mx-2 active" aria-current="page" href="#">Úvod</a>
+            <a class="nav-link mx-2 {$presenter->isLinkCurrent('Homepage:default') ? 'active'}"  href="{plink Homepage:default}">Úvod</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link mx-2" href="#">O firmě</a>
+            <a class="nav-link mx-2 {$presenter->isLinkCurrent('Homepage:references') ? 'active'}" href="{plink Homepage:references}">Reference</a>
           </li>
+         <li class="nav-item">
+            <a class="nav-link mx-2 {$presenter->isLinkCurrent('Homepage:downloads') ? 'active'}" href="{plink Homepage:downloads}">Ke stažení</a>
+         </li>
+         <li class="nav-item">
+             <a class="nav-link mx-2 {$presenter->isLinkCurrent('Homepage:sortiment') ? 'active'}" href="{plink Homepage:sortiment}">Sortiment</a>
+         </li>
           <li class="nav-item">
-            <a class="nav-link mx-2" href="#">Reference</a>
-          </li>
-         <li class="nav-item">
-            <a class="nav-link mx-2" href="#">Ke stažení</a>
+            <a class="nav-link mx-2 {$presenter->isLinkCurrent('Homepage:partners') ? 'active'}" href="{plink Homepage:partners}">Partneři</a>
          </li>
          <li class="nav-item">
-            <a class="nav-link mx-2" href="#">Sortiment</a>
-         </li>
-         <li class="nav-item">
-            <a class="nav-link mx-2" href="#">Kontakt</a>
+            <a class="nav-link mx-2" {$presenter->isLinkCurrent('Homepage:aboute') ? 'active'}" href="{plink Homepage:aboute}">Kontakt</a>
           </li>
          
         </ul>
