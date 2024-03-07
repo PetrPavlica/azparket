@@ -66,8 +66,8 @@
            <div class="col-12 col-md-3">
               <form action="{link Search:}" method="get">
                 <div class="d-flex justify-content-start align-items-center">
-                <input type="text" name="term" placeholder="hledat na webu..." value="{$searchTerm|noescape}" class="form-control " style="height:25px;background-color: #201710;border:1px solid #7B6617;">
-                <button type="submit" value="" class="btn btn-light" style="font-size:6px"><i class="fa fa-search" style="color:#7B6617;"></i></button>
+                <input type="text" name="term" placeholder="hledat na webu..." value="{$searchTerm|noescape}" class="form-control " style="height:25px;background-color: #201710;border:1px solid #7B6617;margin-top: 18px;">
+                <button type="submit" value="" class="btn btn-light" style="font-size:6px;margin-top: 18px;"><i class="fa fa-search" style="color:#7B6617;"></i></button>
                 </div>
                </form>
             </div>
@@ -84,7 +84,7 @@
       </button>
     
       <div class=" collapse navbar-collapse" id="navbarNavDropdown">
-        <ul class="navbar-nav ms-r ">
+        <ul class="navbar-nav ms-right" style="margin-left: 20%;font-size: 15px;">
           <li class="nav-item">
             <a class="nav-link mx-2 {$presenter->isLinkCurrent('Homepage:default') ? 'active'}"  href="{plink Homepage:default}">Úvod</a>
           </li>
@@ -103,7 +103,7 @@
          <li class="nav-item">
             <a class="nav-link mx-2" {$presenter->isLinkCurrent('Homepage:aboute') ? 'active'}" href="{plink Homepage:aboute}">Kontakt</a>
           </li>
-         
+          <button type="button" class="btn btn-warning font-weight-bold" style="margin-top:5px;border-radius: 36px">Půjčovna</button>
         </ul>
       </div>
     </div>
